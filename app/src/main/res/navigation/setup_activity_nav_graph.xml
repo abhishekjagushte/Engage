@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/setup_activity_nav_graph"
+    app:startDestination="@id/chooseMethodFragment">
+
+    <fragment
+        android:id="@+id/chooseMethodFragment"
+        android:name="com.abhishekjagushte.engage.ui.setup.fragments.ChooseMethodFragment"
+        android:label="choose_method_fragment"
+        tools:layout="@layout/choose_method_fragment" >
+        <action
+            android:id="@+id/action_chooseMethodFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+        <action
+            android:id="@+id/action_chooseMethodFragment_to_signUpFragment"
+            app:destination="@id/signUpFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.abhishekjagushte.engage.ui.setup.fragments.login.LoginFragment"
+        android:label="login_fragment"
+        tools:layout="@layout/login_fragment" />
+    <fragment
+        android:id="@+id/signUpFragment"
+        android:name="com.abhishekjagushte.engage.ui.setup.fragments.signup.SignUpFragment"
+        android:label="sign_up_fragment"
+        tools:layout="@layout/sign_up_fragment" >
+        <action
+            android:id="@+id/action_signUpFragment_to_setUsernameFragment"
+            app:destination="@id/setUsernameFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/setUsernameFragment"
+        android:name="com.abhishekjagushte.engage.ui.setup.fragments.setusername.SetUsernameFragment"
+        android:label="set_username_fragment"
+        tools:layout="@layout/set_username_fragment" >
+        <argument
+            android:name="email"
+            app:argType="string" />
+        <argument
+            android:name="password"
+            app:argType="string" />
+    </fragment>
+</navigation>

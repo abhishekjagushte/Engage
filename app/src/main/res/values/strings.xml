@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Engage</string>
+    <string name="welcome_to_engage">Welcome to Engage</string>
+    <string name="tagline">Better way to socialize</string>
+    <string name="login">Login</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="login_to_engage">Login to Engage</string>
+    <string name="email_id">Email ID</string>
+    <string name="password">Password</string>
+    <string name="sign_up_with_engage">Sign Up with Engage</string>
+    <string name="one_last_step">One Last Step</string>
+    <string name="name">Name</string>
+    <string name="username">Username</string>
+    <string name="verifying_your_email_address">Verifying your Email Address</string>
+</resources>
