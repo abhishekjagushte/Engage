@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.abhishekjagushte.engage.R
 import com.abhishekjagushte.engage.database.AppDatabase
+import com.abhishekjagushte.engage.repository.DataRepository
 import com.abhishekjagushte.engage.ui.setup.fragments.setusername.SetUsernameFragmentArgs
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
@@ -32,10 +33,14 @@ class SetUsernameFragment: Fragment() {
         val confirmButton = view.findViewById<Button>(R.id.confirm_button)
 
         val application = requireNotNull(this.activity).application
-        val databaseDao = AppDatabase.getInstance(application).databaseDao
-        val viewModelFactory = SetUsernameViewModelFactory(databaseDao, application)
+        //val databaseDao = AppDatabase.getInstance(application).databaseDao
+        //val viewModelFactory = SetUsernameViewModelFactory(databaseDao, application)
 
-        val viewModel = ViewModelProvider(this, viewModelFactory).get(SetUsernameViewModel::class.java)
+        //val viewModel = ViewModelProvider(this, viewModelFactory).get(SetUsernameViewModel::class.java)
+
+        val viewModel = ViewModelProvider(this).get(SetUsernameViewModel::class.java)
+
+        viewModel.repository = DataRepository( AppDatabase.getInstance(application))
 
         val args = SetUsernameFragmentArgs.fromBundle(requireArguments())
         viewModel.email = args.email

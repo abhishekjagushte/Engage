@@ -22,7 +22,11 @@
         android:id="@+id/loginFragment"
         android:name="com.abhishekjagushte.engage.ui.setup.fragments.login.LoginFragment"
         android:label="login_fragment"
-        tools:layout="@layout/login_fragment" />
+        tools:layout="@layout/login_fragment" >
+        <action
+            android:id="@+id/action_loginFragment_to_mainActivity2"
+            app:destination="@id/mainActivity2" />
+    </fragment>
     <fragment
         android:id="@+id/signUpFragment"
         android:name="com.abhishekjagushte.engage.ui.setup.fragments.signup.SignUpFragment"
@@ -43,5 +47,15 @@
         <argument
             android:name="password"
             app:argType="string" />
+        <action
+            android:id="@+id/action_setUsernameFragment_to_mainActivity2"
+            app:destination="@id/mainActivity2" />
     </fragment>
+
+    <activity
+        android:id="@+id/mainActivity2"
+        android:name="com.abhishekjagushte.engage.ui.main.MainActivity"
+        android:label="activity_main"
+        tools:layout="@layout/activity_main" />
+
 </navigation>

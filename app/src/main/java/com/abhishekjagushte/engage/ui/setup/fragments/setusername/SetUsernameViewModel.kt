@@ -1,21 +1,18 @@
 package com.abhishekjagushte.engage.ui.setup.fragments.setusername
 
-import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
-import com.abhishekjagushte.engage.database.Contact
-import com.abhishekjagushte.engage.database.DatabaseDao
-import com.abhishekjagushte.engage.database.UserData
-import com.abhishekjagushte.engage.network.Profile
-import com.abhishekjagushte.engage.network.convertDomainObject
+import androidx.lifecycle.ViewModel
+import com.abhishekjagushte.engage.repository.DataRepository
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.iid.FirebaseInstanceId
-import kotlinx.coroutines.*
-import java.util.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
-class SetUsernameViewModel(private val databaseDao: DatabaseDao, application: Application): AndroidViewModel(application){
+class SetUsernameViewModel(/*private val databaseDao: DatabaseDao, application: Application*/): /*AndroidViewModel(application)*/
+    ViewModel() {
 
     private var viewModelJob = Job()
     private val TAG = "SetUsernameViewModel"
@@ -25,6 +22,7 @@ class SetUsernameViewModel(private val databaseDao: DatabaseDao, application: Ap
     lateinit var password: String
 
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
+    lateinit var repository: DataRepository
 
     fun confirmSetup(name: String, username: String) {
         FirebaseInstanceId.getInstance().instanceId
@@ -37,7 +35,9 @@ class SetUsernameViewModel(private val databaseDao: DatabaseDao, application: Ap
                 val token = task.result?.token
 
                 if (token != null) {
-                    firebaseAddData(name, username, token)
+                    uiScope.launch {
+                        repository.firebaseAddDataSignUp(name, username, token, email, password)
+                    }
                     Log.d(TAG, token)
                 }
                 else{
@@ -46,41 +46,48 @@ class SetUsernameViewModel(private val databaseDao: DatabaseDao, application: Ap
             })
     }
 
+//
+//    private fun firebaseAddData(name: String, username: String, token: String){
+//        mAuth = FirebaseAuth.getInstance()
+//        val uid = mAuth.currentUser!!.uid
+//
+//        val profile = Profile(
+//            id = uid,
+//            name = name,
+//            username = username,
+//            joinTimeStamp = Date(),
+//            notificationChannelID = token
+//        )
+//
+//        val firestore = FirebaseFirestore.getInstance()
+//
+//        firestore.collection("users").document().set(profile)
+//            .addOnCompleteListener(OnCompleteListener { task ->
+//                if (task.isSuccessful) {
+//
+//                    uiScope.launch {
+//                        addDataLocal(profile.convertDomainObject(0))
+//                        Log.d(TAG, "Completed")
+//                    }
+//
+//                } else {
+//                    Log.d(TAG, "Failed")
+//                }
+//            })
+//    }
+//
+//
+//
+//    private suspend fun addDataLocal(myself: Contact) {
+//        withContext(Dispatchers.IO) {
+//            databaseDao.insertMeinContacts(myself)
+//            databaseDao.insertCredentials(UserData(email, password))
+//        }
+//    }
 
-    private fun firebaseAddData(name: String, username: String, token: String){
-        mAuth = FirebaseAuth.getInstance()
-
-        val uid = mAuth.currentUser!!.uid
-
-        val profile = Profile(
-            id = uid,
-            name = name,
-            username = username,
-            joinTimeStamp = Date(),
-            notificationChannelID = token
-        )
-
-        val firestore = FirebaseFirestore.getInstance()
-
-        firestore.collection("users").document(uid).set(profile)
-            .addOnCompleteListener(OnCompleteListener { task ->
-                if(task.isSuccessful){
-                    uiScope.launch {
-                        addDataLocal(profile.convertDomainObject(0))
-                        Log.d(TAG, "Completed")
-                    }
-                }
-                else{
-                    Log.d(TAG, "Failed")
-                }
-            })
-    }
-
-    private suspend fun addDataLocal(myself: Contact) {
-        withContext(Dispatchers.IO) {
-            databaseDao.insertMeinContacts(myself)
-            databaseDao.insertCredentials(UserData(email, password))
-        }
+    override fun onCleared() {
+        super.onCleared()
+        viewModelJob.cancel()
     }
 
 }

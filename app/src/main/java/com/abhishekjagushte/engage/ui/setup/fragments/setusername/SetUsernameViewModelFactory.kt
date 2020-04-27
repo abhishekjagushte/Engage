@@ -14,7 +14,7 @@ class SetUsernameViewModelFactory (
     @Suppress("unchecked_cast")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(SetUsernameViewModel::class.java)) {
-            return SetUsernameViewModel(databaseDao, application) as T
+            //return SetUsernameViewModel(databaseDao, application) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
