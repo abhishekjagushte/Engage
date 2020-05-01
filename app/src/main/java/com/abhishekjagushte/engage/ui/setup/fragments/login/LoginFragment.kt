@@ -20,7 +20,6 @@ class LoginFragment : Fragment() {
 
     private val TAG: String = "LoginFragment"
 
-
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
@@ -39,12 +38,11 @@ class LoginFragment : Fragment() {
 
         loginButton.setOnClickListener {
 
-            viewModel.firebaseSignIn("","")
             val email = emailInput.text.toString()
             val password = passwordInput.text.toString()
 
             if(email.isNotEmpty() && password.isNotEmpty()){
-
+                viewModel.firebaseSignIn(email,password)
             }
 
         }

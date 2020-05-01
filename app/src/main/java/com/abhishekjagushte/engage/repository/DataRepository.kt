@@ -8,8 +8,10 @@ import com.abhishekjagushte.engage.datasource.localdatasource.LocalDataSource
 import com.abhishekjagushte.engage.datasource.remotedatasource.FirebaseDataSource
 import com.abhishekjagushte.engage.network.Profile
 import com.abhishekjagushte.engage.network.convertDomainObject
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
 import java.util.Date
@@ -19,11 +21,20 @@ class DataRepository @Inject constructor(
     private val localDataSource: LocalDataSource,
     private val firebaseDataSource: FirebaseDataSource
 ){
-
     private val TAG: String = "DataRepository"
 
+    fun signUpAddCredentialsLocal(email: String, password: String){
+        localDataSource.signUpAddCredentialsLocal(email, password)
+    }
+
+    fun checkUserName(username: String): Task<QuerySnapshot> {
+        return firebaseDataSource.checkUsername(username)
+    }
 }
-//TODO: https://developer.android.com/jetpack/docs/guide#manage-dependencies
+
+
+
+
 
 //        firestore.collection("users").document().set(profile)
 //            .addOnCompleteListener(OnCompleteListener { task ->

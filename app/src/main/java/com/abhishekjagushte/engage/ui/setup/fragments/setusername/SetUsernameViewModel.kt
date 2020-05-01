@@ -2,6 +2,8 @@ package com.abhishekjagushte.engage.ui.setup.fragments.setusername
 
 import android.util.Log
 import android.view.View
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.abhishekjagushte.engage.network.convertDomainObject
 import com.abhishekjagushte.engage.repository.AuthRepository
@@ -27,11 +29,31 @@ class SetUsernameViewModel @Inject constructor(
     lateinit var email: String
     lateinit var password: String
 
+
+    private val _noteText = MutableLiveData<String>()
+    val noteText: LiveData<String>
+        get() { return _noteText }
+
+    private val _usernameValid = MutableLiveData<Boolean>()
+    val usernameValid: LiveData<Boolean>
+        get() { return _usernameValid }
+
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
     fun confirmSetup(name: String, username: String) {
 
 
+    }
+
+    fun checkUsername(username: String){
+        dataRepository.checkUserName(username).addOnSuccessListener {
+            //Log.d(TAG,"Inside vm checkusername ${it.size()}  ${it.isEmpty}")
+            if (!it.isEmpty) {
+                _noteText.value = "This username is already taken"
+            }
+            else
+                _noteText.value = ""
+        }
     }
 
     override fun onCleared() {

@@ -17,13 +17,21 @@ class LoginFragmentViewModel @Inject constructor(
     private val dataRepository: DataRepository
 ) : ViewModel(){
 
+    //private val coriutine
+
     private val TAG: String = "LoginFragmentViewModel"
     private val viewModelJob = Job()
     private val coroutineScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
 
     fun firebaseSignIn(email: String, password: String){
-        Log.d(TAG, "Inside FirebaseSign in that means viewmodel created successfully")
+        authRepository.login(email, password).addOnSuccessListener {
+            Log.d(TAG, " Success")
+
+
+        }.addOnFailureListener{
+            Log.d(TAG, " Something went wrong ${it.message}")
+        }
     }
 
 }

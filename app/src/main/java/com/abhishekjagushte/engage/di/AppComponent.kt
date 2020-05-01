@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModelProvider
 import com.abhishekjagushte.engage.EngageApplication
 import com.abhishekjagushte.engage.repository.DataRepository
 import com.abhishekjagushte.engage.ui.setup.fragments.login.di.LoginComponent
+import com.abhishekjagushte.engage.ui.setup.fragments.setusername.di.SetUsernameComponent
+import com.abhishekjagushte.engage.ui.setup.fragments.signup.di.SignUpComponent
 import dagger.Binds
 import dagger.BindsInstance
 import dagger.Component
@@ -30,6 +32,8 @@ interface AppComponent: AndroidInjector<EngageApplication>{
     }
 
     fun addLoginComponent(): LoginComponent.Factory
+    fun addSignUpComponent(): SignUpComponent.Factory
+    fun addSetUsernameComponent(): SetUsernameComponent.Factory
     fun getDataRepository(): DataRepository
 }
 
@@ -43,7 +47,7 @@ abstract class ViewModelBuilderModule {
 }
 
 
-@Module(subcomponents = [LoginComponent::class])
+@Module(subcomponents = [LoginComponent::class, SignUpComponent::class, SetUsernameComponent::class])
 object SubcomponentsModule
 
 

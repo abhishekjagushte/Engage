@@ -2,6 +2,8 @@ package com.abhishekjagushte.engage.datasource.remotedatasource
 
 import androidx.lifecycle.LiveData
 import com.abhishekjagushte.engage.network.Profile
+import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import javax.inject.Inject
@@ -10,8 +12,12 @@ class FirebaseAuthDataSource @Inject constructor(
     private val mAuth: FirebaseAuth,
     private val firestore: FirebaseFirestore
 ){
-    fun firebaseSignIn(email: String, password: String){
+    fun signUp(email: String, password: String): Task<AuthResult> {
+        return mAuth.createUserWithEmailAndPassword(email, password)
+    }
 
+    fun login(email: String, password: String): Task<AuthResult> {
+        return mAuth.signInWithEmailAndPassword(email, password)
     }
 }
 
