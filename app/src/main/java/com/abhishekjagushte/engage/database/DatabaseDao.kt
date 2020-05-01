@@ -16,6 +16,4 @@ interface DatabaseDao{
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertCredentials(userData: UserData)
 
-
-
 }

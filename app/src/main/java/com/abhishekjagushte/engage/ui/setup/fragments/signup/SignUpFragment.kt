@@ -1,24 +1,18 @@
 package com.abhishekjagushte.engage.ui.setup.fragments.signup
 
-import android.app.Activity
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-
 import com.abhishekjagushte.engage.R
 import com.google.android.material.textfield.TextInputEditText
-import com.google.firebase.auth.FirebaseAuth
 
 class SignUpFragment : Fragment() {
 
     private lateinit var viewModel: SignUpViewModel
-    private lateinit var mAuth: FirebaseAuth
     private val TAG: String = "SignUpFragment"
 
     override fun onCreateView(
@@ -40,7 +34,23 @@ class SignUpFragment : Fragment() {
     }
 
     private fun firebaseSignup(email: String, password: String) {
-        mAuth = FirebaseAuth.getInstance()
+
+    }
+
+    private fun updateUI(email: String, password: String) {
+                findNavController().navigate(
+                    SignUpFragmentDirections.actionSignUpFragmentToSetUsernameFragment
+                        (email = email, password =  password ))
+    }
+
+}
+
+
+
+/*
+    Firebase Signup
+
+     mAuth = FirebaseAuth.getInstance()
 
         mAuth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(activity as Activity) { task ->
@@ -60,12 +70,6 @@ class SignUpFragment : Fragment() {
 
                 // ...
             }
-    }
 
-    private fun updateUI(email: String, password: String) {
-                findNavController().navigate(
-                    SignUpFragmentDirections.actionSignUpFragmentToSetUsernameFragment
-                        (email = email, password =  password ))
-    }
 
-}
+ */

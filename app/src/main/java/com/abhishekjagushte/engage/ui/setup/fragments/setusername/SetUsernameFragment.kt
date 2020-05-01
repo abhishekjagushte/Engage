@@ -40,7 +40,7 @@ class SetUsernameFragment: Fragment() {
 
         val viewModel = ViewModelProvider(this).get(SetUsernameViewModel::class.java)
 
-        viewModel.repository = DataRepository( AppDatabase.getInstance(application))
+        //viewModel.repository = DataRepository( AppDatabase.getInstance(application))
 
         val args = SetUsernameFragmentArgs.fromBundle(requireArguments())
         viewModel.email = args.email

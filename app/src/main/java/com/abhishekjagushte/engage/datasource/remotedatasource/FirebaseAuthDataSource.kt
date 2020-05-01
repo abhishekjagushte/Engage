@@ -1,0 +1,81 @@
+package com.abhishekjagushte.engage.datasource.remotedatasource
+
+import androidx.lifecycle.LiveData
+import com.abhishekjagushte.engage.network.Profile
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import javax.inject.Inject
+
+class FirebaseAuthDataSource @Inject constructor(
+    private val mAuth: FirebaseAuth,
+    private val firestore: FirebaseFirestore
+){
+    fun firebaseSignIn(email: String, password: String){
+
+    }
+}
+
+
+
+/*
+suspend fun firebaseAddDataSignUp(name: String, username: String, token: String): Profile?{
+        val uid = mAuth.currentUser!!.uid
+
+        val profile = Profile(
+            id = uid,
+            name = name,
+            username = username,
+            joinTimeStamp = Date(),
+            notificationChannelID = token
+        )
+
+        val firestore = FirebaseFirestore.getInstance()
+        firestore.collection("users").document(profile.username).set(profile).await()
+        return profile
+    }
+
+    suspend fun addDataLocalSignUp(myself: Contact, email: String, password: String) {
+        withContext(Dispatchers.IO) {
+            database.databaseDao.insertMeinContacts(myself)
+            database.databaseDao.insertCredentials(UserData(email, password))
+        }
+    }
+
+
+    //TODO: Complete this function and add the required in login fragment
+    suspend fun fireBaseGetDataSignIn(uid: String): Profile?{
+        val firestore = FirebaseFirestore.getInstance()
+
+        val query = firestore.collection("users").whereEqualTo("id", uid)
+
+        //Trying out the await extension function
+        val result = query.get().await()
+
+        if(result!=null){
+            val doc = result.documents.get(0)
+            val profile = doc.toObject(Profile::class.java)
+            return profile
+        }
+        else{
+            return null
+        }
+    }
+
+    suspend fun addDataLocalSignIn(profile: Profile, email: String, password: String) {
+        withContext(Dispatchers.IO) {
+            val firestore = FirebaseFirestore.getInstance()
+            val myself = profile.convertDomainObject(0)
+            database.databaseDao.insertMeinContacts(myself)
+            database.databaseDao.insertCredentials(UserData(email, password))
+
+            //TODO: Add the user connections on a background Thread
+//            for(contact in profile.contacts){
+//                firestore.collection("users").document(contact).addSnapshotListener {
+//                        documentSnapshot, firebaseFirestoreException ->
+//
+//                    val conn = documentSnapshot?.toObject(Profile::class.java).convertDomainObject(1)
+//                }
+//            }
+        }
+    }
+ */

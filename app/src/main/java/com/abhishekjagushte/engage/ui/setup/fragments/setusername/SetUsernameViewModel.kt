@@ -1,7 +1,10 @@
 package com.abhishekjagushte.engage.ui.setup.fragments.setusername
 
 import android.util.Log
+import android.view.View
 import androidx.lifecycle.ViewModel
+import com.abhishekjagushte.engage.network.convertDomainObject
+import com.abhishekjagushte.engage.repository.AuthRepository
 import com.abhishekjagushte.engage.repository.DataRepository
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
@@ -10,9 +13,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SetUsernameViewModel(/*private val databaseDao: DatabaseDao, application: Application*/): /*AndroidViewModel(application)*/
-    ViewModel() {
+class SetUsernameViewModel @Inject constructor(
+    private val authRepository: AuthRepository,
+    private val dataRepository: DataRepository
+): ViewModel() {
 
     private var viewModelJob = Job()
     private val TAG = "SetUsernameViewModel"
@@ -22,10 +28,24 @@ class SetUsernameViewModel(/*private val databaseDao: DatabaseDao, application: 
     lateinit var password: String
 
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
-    lateinit var repository: DataRepository
 
     fun confirmSetup(name: String, username: String) {
-        FirebaseInstanceId.getInstance().instanceId
+
+
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        viewModelJob.cancel()
+    }
+
+}
+
+
+/*
+    Confirm Setup
+
+    FirebaseInstanceId.getInstance().instanceId
             .addOnCompleteListener(OnCompleteListener { task ->
                 if (!task.isSuccessful) {
                     Log.d(TAG, "getInstanceId failed", task.exception)
@@ -36,7 +56,14 @@ class SetUsernameViewModel(/*private val databaseDao: DatabaseDao, application: 
 
                 if (token != null) {
                     uiScope.launch {
-                        repository.firebaseAddDataSignUp(name, username, token, email, password)
+                        val profile = repository.firebaseAddDataSignUp(name, username, token)
+                        if (profile != null){
+                            repository.addDataLocalSignUp(profile.convertDomainObject(0),email, password)
+                            Log.d(TAG, "Signup Completed")
+                        }
+                        else{
+                            Log.d(TAG, "Profile is null")
+                        }
                     }
                     Log.d(TAG, token)
                 }
@@ -44,7 +71,8 @@ class SetUsernameViewModel(/*private val databaseDao: DatabaseDao, application: 
                     Log.d(TAG, "Failed to get token")
                 }
             })
-    }
+ */
+
 
 //
 //    private fun firebaseAddData(name: String, username: String, token: String){
@@ -84,10 +112,3 @@ class SetUsernameViewModel(/*private val databaseDao: DatabaseDao, application: 
 //            databaseDao.insertCredentials(UserData(email, password))
 //        }
 //    }
-
-    override fun onCleared() {
-        super.onCleared()
-        viewModelJob.cancel()
-    }
-
-}

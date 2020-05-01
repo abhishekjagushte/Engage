@@ -1,6 +1,5 @@
 package com.abhishekjagushte.engage.ui.main.fragments.chatlist
 
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
