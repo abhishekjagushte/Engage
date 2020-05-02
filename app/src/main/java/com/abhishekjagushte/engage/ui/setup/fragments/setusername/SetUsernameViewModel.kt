@@ -1,21 +1,19 @@
 package com.abhishekjagushte.engage.ui.setup.fragments.setusername
 
 import android.util.Log
-import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.abhishekjagushte.engage.network.convertDomainObject
 import com.abhishekjagushte.engage.repository.AuthRepository
 import com.abhishekjagushte.engage.repository.DataRepository
-import com.google.android.gms.tasks.OnCompleteListener
+import com.abhishekjagushte.engage.utils.Constants
+import com.abhishekjagushte.engage.utils.Constants.NOT_INITIATED
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.iid.FirebaseInstanceId
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import java.lang.Exception
 import javax.inject.Inject
+
+
 
 class SetUsernameViewModel @Inject constructor(
     private val authRepository: AuthRepository,
@@ -29,6 +27,8 @@ class SetUsernameViewModel @Inject constructor(
     lateinit var email: String
     lateinit var password: String
 
+    lateinit var name: String
+    lateinit var username: String
 
     private val _noteText = MutableLiveData<String>()
     val noteText: LiveData<String>
@@ -38,11 +38,43 @@ class SetUsernameViewModel @Inject constructor(
     val usernameValid: LiveData<Boolean>
         get() { return _usernameValid }
 
+    val changeCompleteStatus = MutableLiveData<String>()
+
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
+    init {
+        changeCompleteStatus.value = NOT_INITIATED
+    }
+
     fun confirmSetup(name: String, username: String) {
+        //check if the noteText is empty to get proper status
+        Log.d(TAG, noteText.value?:"Notetext value is null")
+        if(noteText.value == ""){
+            this.name = name
+            this.username = username
+            authRepository.setNameAndUsername(name, username, changeCompleteStatus)
+            //The status of this task is observed from the fragment
+        }
+    }
 
-
+    //Adds data into local database i.e Adds My profile into contacts as type 0 which makes searching in groups easier
+    fun setUsernameLocalDB(){
+        val uid = authRepository.getCurrentUserUID()
+        uiScope.launch {
+            withContext(Dispatchers.IO){
+                try {
+                    dataRepository.addMyDetailsInContacts(
+                        name,
+                        username,
+                        Constants.CONTACTS_ME,
+                        uid
+                    )
+                    changeCompleteStatus.postValue(Constants.LOCAL_DB_SUCCESS)
+                }catch (e: Exception){
+                    changeCompleteStatus.postValue(Constants.LOCAL_DB_FAILED)
+                }
+            }
+        }
     }
 
     fun checkUsername(username: String){
@@ -50,9 +82,12 @@ class SetUsernameViewModel @Inject constructor(
             //Log.d(TAG,"Inside vm checkusername ${it.size()}  ${it.isEmpty}")
             if (!it.isEmpty) {
                 _noteText.value = "This username is already taken"
+                _usernameValid.value = false
             }
-            else
+            else{
                 _noteText.value = ""
+                _usernameValid.value = true
+            }
         }
     }
 

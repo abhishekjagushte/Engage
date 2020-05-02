@@ -1,20 +1,10 @@
 package com.abhishekjagushte.engage.repository
 
-import android.util.Log
-import com.abhishekjagushte.engage.database.AppDatabase
 import com.abhishekjagushte.engage.database.Contact
-import com.abhishekjagushte.engage.database.UserData
 import com.abhishekjagushte.engage.datasource.localdatasource.LocalDataSource
 import com.abhishekjagushte.engage.datasource.remotedatasource.FirebaseDataSource
-import com.abhishekjagushte.engage.network.Profile
-import com.abhishekjagushte.engage.network.convertDomainObject
 import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
-import kotlinx.coroutines.*
-import kotlinx.coroutines.tasks.await
-import java.util.Date
 import javax.inject.Inject
 
 class DataRepository @Inject constructor(
@@ -30,6 +20,16 @@ class DataRepository @Inject constructor(
     fun checkUserName(username: String): Task<QuerySnapshot> {
         return firebaseDataSource.checkUsername(username)
     }
+
+    fun addMyDetailsInContacts(
+        name: String,
+        username: String,
+        type: Int,
+        uid: String
+    ){
+        localDataSource.addMyDetailsInContacts(name,username,type,uid)
+    }
+
 }
 
 

@@ -16,7 +16,7 @@ data class Contact(
     var name: String,
 
     @ColumnInfo(defaultValue = "I am using Engage!")
-    var bio: String,
+    var bio: String = "I am using Engage!",
 
 //    @ColumnInfo(name="dp_thmb", typeAffinity = ColumnInfo.BLOB)
 //    var dp_thmb: String? = null,

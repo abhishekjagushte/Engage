@@ -14,21 +14,16 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.abhishekjagushte.engage.EngageApplication
 import com.abhishekjagushte.engage.R
-import com.abhishekjagushte.engage.database.AppDatabase
-import com.abhishekjagushte.engage.repository.DataRepository
-import com.abhishekjagushte.engage.ui.setup.fragments.setusername.SetUsernameFragmentArgs
-import com.abhishekjagushte.engage.ui.setup.fragments.signup.SignUpFragmentViewModel
+import com.abhishekjagushte.engage.utils.Constants
 import com.google.android.material.textfield.TextInputEditText
-import com.google.firebase.auth.FirebaseAuth
 import javax.inject.Inject
 
 class SetUsernameFragment: Fragment() {
 
     private val TAG: String = "SetUsernameFragment"
-    private lateinit var mAuth: FirebaseAuth
-    lateinit var args: SetUsernameFragmentArgs
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -71,6 +66,17 @@ class SetUsernameFragment: Fragment() {
             Log.d(TAG,it)
         })
 
+        viewModel.changeCompleteStatus.observe(viewLifecycleOwner, Observer {
+            when(it){
+                Constants.LOCAL_DB_SUCCESS -> updateUI()
+                Constants.INITIATED -> confirmInitiated()
+                Constants.FIREBASE_CHANGE_FAILED -> confirmFailed()
+                Constants.FIREBASE_CHANGE_COMPLETE -> viewModel.setUsernameLocalDB()
+                Constants.LOCAL_DB_FAILED -> confirmFailed()
+                else -> Log.d(TAG,"Not initiated")
+            }
+        })
+
         confirmButton.setOnClickListener {
 
             val name = nameInput.text.toString()
@@ -85,6 +91,18 @@ class SetUsernameFragment: Fragment() {
         return view
     }
 
+    private fun confirmFailed() {
+        Log.d(TAG, "Failed")
+    }
+
+    private fun confirmInitiated() {
+        Log.d(TAG, "Initiated")
+    }
+
+    private fun updateUI() {
+        Log.d(TAG,"Updated Successfully")
+        findNavController().navigate(R.id.action_setUsernameFragment_to_mainActivity2)
+    }
 
 
     private fun checkInputs(name: String, username: String): Boolean {
