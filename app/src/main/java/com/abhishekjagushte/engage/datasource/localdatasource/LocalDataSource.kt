@@ -28,4 +28,8 @@ class LocalDataSource @Inject constructor (
         )
         databaseDao.insertMeinContacts(contact)
     }
+
+    fun addMyDetailsContactInContacts(contact: Contact){
+        databaseDao.insertMeinContacts(contact)
+    }
 }

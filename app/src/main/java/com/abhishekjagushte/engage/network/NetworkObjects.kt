@@ -3,16 +3,16 @@ package com.abhishekjagushte.engage.network
 import com.abhishekjagushte.engage.database.Contact
 import java.util.*
 
-data class Profile(
-    val id: String,
-    val name: String,
-    val username: String,
+data class Profile constructor(
+    val id: String = "",
+    val name: String = "",
+    val username: String = "",
     val bio: String = "I am using Engage!",
     val dp_thmb: String? = "",
     val dp_url: String? = "",
     val device_type: Int = 1,
-    val joinTimeStamp: Date,
-    val notificationChannelID: String,
+    val joinTimeStamp: Date? = null,
+    val notificationChannelID: String = "",
     val contacts: List<String> = listOf<String>(),
     val pending: List<String> = listOf<String>(),
     val requested: List<String> = listOf<String>(),

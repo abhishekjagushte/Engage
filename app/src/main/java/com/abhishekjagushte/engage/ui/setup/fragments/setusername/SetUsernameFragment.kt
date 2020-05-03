@@ -69,9 +69,7 @@ class SetUsernameFragment: Fragment() {
         viewModel.changeCompleteStatus.observe(viewLifecycleOwner, Observer {
             when(it){
                 Constants.LOCAL_DB_SUCCESS -> updateUI()
-                Constants.INITIATED -> confirmInitiated()
                 Constants.FIREBASE_CHANGE_FAILED -> confirmFailed()
-                Constants.FIREBASE_CHANGE_COMPLETE -> viewModel.setUsernameLocalDB()
                 Constants.LOCAL_DB_FAILED -> confirmFailed()
                 else -> Log.d(TAG,"Not initiated")
             }
@@ -95,9 +93,6 @@ class SetUsernameFragment: Fragment() {
         Log.d(TAG, "Failed")
     }
 
-    private fun confirmInitiated() {
-        Log.d(TAG, "Initiated")
-    }
 
     private fun updateUI() {
         Log.d(TAG,"Updated Successfully")

@@ -10,7 +10,6 @@ import kotlinx.coroutines.*
 import javax.inject.Inject
 
 class SignUpFragmentViewModel @Inject constructor(
-    private val authRepository: AuthRepository,
     private val dataRepository: DataRepository) : ViewModel() {
     private val TAG: String = "SignUpFragmentViewModel"
 
@@ -27,7 +26,7 @@ class SignUpFragmentViewModel @Inject constructor(
     private val coroutineScope = CoroutineScope(Dispatchers.Main + coroutineJob)
 
     fun firebaseSignup(email: String, password: String) {
-        authRepository.signup(email, password).addOnSuccessListener {
+        dataRepository.signup(email, password).addOnSuccessListener {
             Log.d(TAG,"Sign up success")
 
             coroutineScope.launch {

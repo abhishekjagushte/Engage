@@ -14,4 +14,6 @@ object Constants {
     const val CONTACTS_PENDING = 2
     const val CONTACTS_REQUESTED = 3
     const val CONTACTS_UNKNOWN = 4
+
+    const val FIREBASE_USER_ID_FIELD_NAME = "id"
 }

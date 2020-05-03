@@ -2,16 +2,18 @@ package com.abhishekjagushte.engage.ui.setup.fragments.login
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.abhishekjagushte.engage.EngageApplication
 import com.abhishekjagushte.engage.R
-import com.abhishekjagushte.engage.database.AppDatabase
+import com.abhishekjagushte.engage.utils.Constants
 import com.google.android.material.textfield.TextInputEditText
 import javax.inject.Inject
 
@@ -36,13 +38,21 @@ class LoginFragment : Fragment() {
         val loginButton = view.findViewById<Button>(R.id.login_button)
 
 
+        viewModel.completeStatus.observe(viewLifecycleOwner, Observer {
+            when(it){
+                Constants.LOCAL_DB_SUCCESS -> {
+                    Log.d(TAG, "Successfully logged in")
+                }
+            }
+        })
+
         loginButton.setOnClickListener {
 
             val email = emailInput.text.toString()
             val password = passwordInput.text.toString()
 
             if(email.isNotEmpty() && password.isNotEmpty()){
-                viewModel.firebaseSignIn(email,password)
+                viewModel.login(email,password)
             }
 
         }

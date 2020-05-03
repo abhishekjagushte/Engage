@@ -1,10 +1,13 @@
 package com.abhishekjagushte.engage.ui.setup.fragments.login
 
+import android.provider.SyncStateContract
 import android.util.Log
 import android.widget.Toast
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.abhishekjagushte.engage.repository.AuthRepository
 import com.abhishekjagushte.engage.repository.DataRepository
+import com.abhishekjagushte.engage.utils.Constants
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -13,7 +16,6 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class LoginFragmentViewModel @Inject constructor(
-    private val authRepository: AuthRepository,
     private val dataRepository: DataRepository
 ) : ViewModel(){
 
@@ -23,15 +25,16 @@ class LoginFragmentViewModel @Inject constructor(
     private val viewModelJob = Job()
     private val coroutineScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
+    val completeStatus = MutableLiveData<String>()
+    val errorMessage = MutableLiveData<String>()
 
-    fun firebaseSignIn(email: String, password: String){
-        authRepository.login(email, password).addOnSuccessListener {
-            Log.d(TAG, " Success")
+    init {
+        completeStatus.value = Constants.NOT_INITIATED
+        errorMessage.value = ""
+    }
 
-
-        }.addOnFailureListener{
-            Log.d(TAG, " Something went wrong ${it.message}")
-        }
+    fun login(email: String, password: String){
+        dataRepository.login(email, password, completeStatus)
     }
 
 }
