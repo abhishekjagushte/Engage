@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.abhishekjagushte.engage.EngageApplication
 import com.abhishekjagushte.engage.R
 import com.abhishekjagushte.engage.utils.Constants
@@ -41,7 +42,7 @@ class LoginFragment : Fragment() {
         viewModel.completeStatus.observe(viewLifecycleOwner, Observer {
             when(it){
                 Constants.LOCAL_DB_SUCCESS -> {
-                    Log.d(TAG, "Successfully logged in")
+                    updateUI()
                 }
             }
         })
@@ -58,6 +59,10 @@ class LoginFragment : Fragment() {
         }
 
         return view
+    }
+
+    private fun updateUI() {
+        findNavController().navigate(R.id.action_loginFragment_to_mainActivity2)
     }
 
     override fun onAttach(context: Context) {
