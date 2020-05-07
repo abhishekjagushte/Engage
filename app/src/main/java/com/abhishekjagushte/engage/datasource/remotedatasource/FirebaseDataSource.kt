@@ -4,6 +4,7 @@ import com.abhishekjagushte.engage.network.Profile
 import com.abhishekjagushte.engage.utils.Constants
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.tasks.await
@@ -25,6 +26,23 @@ class FirebaseDataSource @Inject constructor(
             .limit(1)
             .get()
 
+    }
+
+    fun searchUnknownContacts(query: String): Pair<Query, Query> {
+        val start = query.substring(0..query.length-2)
+        val end = query + (query.get(query.length-1) + 1)
+
+        val nameQuery = firestore.collection("users")
+            .whereGreaterThanOrEqualTo("name", start)
+            .whereLessThan("name", end)
+            .orderBy("name").limit(5)
+
+        val usernameQuery = firestore.collection("users")
+            .whereGreaterThanOrEqualTo("username", start)
+            .whereLessThan("username", end)
+            .orderBy("username").limit(5)
+
+        return Pair(first = nameQuery, second = usernameQuery)
     }
 
 }

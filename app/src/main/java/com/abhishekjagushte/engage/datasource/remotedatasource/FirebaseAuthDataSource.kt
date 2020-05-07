@@ -6,6 +6,7 @@ import com.abhishekjagushte.engage.utils.Constants
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.iid.FirebaseInstanceId
 import java.util.*
@@ -16,6 +17,7 @@ class FirebaseAuthDataSource @Inject constructor(
     private val firestore: FirebaseFirestore
 ){
     fun signUp(email: String, password: String): Task<AuthResult> {
+
         return mAuth.createUserWithEmailAndPassword(email, password)
     }
 
@@ -27,7 +29,11 @@ class FirebaseAuthDataSource @Inject constructor(
         return mAuth.currentUser!!.uid
     }
 
-    fun setNameAndUsername(name: String, username: String, notificationChannelID: String): Task<Void> {
+    fun getCurrentUser(): FirebaseUser? {
+        return mAuth.currentUser
+    }
+
+    fun setNameAndUsername(name: String, username: String, notificationChannelID: String): Pair<Task<Void>, Profile> {
 
         val id = getCurrentUserUID()
 
@@ -39,7 +45,7 @@ class FirebaseAuthDataSource @Inject constructor(
                 notificationChannelID = notificationChannelID
             )
 
-        return firestore.collection(Constants.FIREBASE_USERS_COLLECTION).document(id).set(profile)
+        return Pair(firestore.collection(Constants.FIREBASE_USERS_COLLECTION).document(username).set(profile), profile)
     }
 
 }

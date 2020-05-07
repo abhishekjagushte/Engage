@@ -1,6 +1,7 @@
 package com.abhishekjagushte.engage.network
 
 import com.abhishekjagushte.engage.database.Contact
+import com.abhishekjagushte.engage.utils.Constants
 import java.util.*
 
 data class Profile constructor(
@@ -12,11 +13,7 @@ data class Profile constructor(
     val dp_url: String? = "",
     val device_type: Int = 1,
     val joinTimeStamp: Date? = null,
-    val notificationChannelID: String = "",
-    val contacts: List<String> = listOf<String>(),
-    val pending: List<String> = listOf<String>(),
-    val requested: List<String> = listOf<String>(),
-    val suggested: List<String> = listOf<String>()
+    val notificationChannelID: String = ""
 )
 
 fun Profile.convertDomainObject(type: Int): Contact{

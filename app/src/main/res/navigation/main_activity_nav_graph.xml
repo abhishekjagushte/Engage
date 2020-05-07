@@ -19,10 +19,19 @@
         android:id="@+id/searchFragment"
         android:name="com.abhishekjagushte.engage.ui.main.fragments.search.SearchFragment"
         android:label="search_fragment"
-        tools:layout="@layout/search_fragment" />
+        tools:layout="@layout/search_fragment" >
+        <action
+            android:id="@+id/action_searchFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+    </fragment>
     <fragment
         android:id="@+id/peopleFragment"
         android:name="com.abhishekjagushte.engage.ui.main.fragments.people.PeopleFragment"
         android:label="people_fragment"
         tools:layout="@layout/people_fragment" />
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.abhishekjagushte.engage.ui.main.fragments.profile.ProfileFragment"
+        android:label="profile_fragment"
+        tools:layout="@layout/profile_fragment" />
 </navigation>

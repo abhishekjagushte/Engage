@@ -1,5 +1,6 @@
 package com.abhishekjagushte.engage.di
 
+import android.app.Application
 import android.content.Context
 import com.abhishekjagushte.engage.database.AppDatabase
 import com.abhishekjagushte.engage.database.DatabaseDao
@@ -10,7 +11,7 @@ import dagger.Provides
 class LocalStorageModule() {
 
     @Provides
-    fun providesLocalDatabase(applicationContext: Context): DatabaseDao{
-        return AppDatabase.getInstance(applicationContext).databaseDao
+    fun providesLocalDatabase(application: Application): DatabaseDao{
+        return AppDatabase.getInstance(application.applicationContext).databaseDao
     }
 }

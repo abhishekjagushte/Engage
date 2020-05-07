@@ -1,10 +1,15 @@
 package com.abhishekjagushte.engage.di
 
+import android.app.Activity
 import android.app.Application
 import android.content.Context
 import androidx.lifecycle.ViewModelProvider
 import com.abhishekjagushte.engage.EngageApplication
+import com.abhishekjagushte.engage.SplashScreen
 import com.abhishekjagushte.engage.repository.DataRepository
+import com.abhishekjagushte.engage.ui.main.MainActivity
+import com.abhishekjagushte.engage.ui.main.fragments.chatlist.ChatListComponent
+import com.abhishekjagushte.engage.ui.main.fragments.search.di.SearchComponent
 import com.abhishekjagushte.engage.ui.setup.fragments.login.di.LoginComponent
 import com.abhishekjagushte.engage.ui.setup.fragments.setusername.di.SetUsernameComponent
 import com.abhishekjagushte.engage.ui.setup.fragments.signup.di.SignUpComponent
@@ -22,15 +27,22 @@ import javax.inject.Singleton
 @Singleton
 @Component(modules =
         [LocalStorageModule::class,
-        NetworkModule::class, ViewModelBuilderModule::class,
-        SubcomponentsModule::class])
+            NetworkModule::class,
+            ViewModelBuilderModule::class,
+            SubcomponentsModule::class])
 interface AppComponent: AndroidInjector<EngageApplication>{
 
     @Component.Factory
     interface Factory{
-        fun create(@BindsInstance applicationContext: Context): AppComponent
+        fun create(@BindsInstance application: Application): AppComponent
     }
 
+    fun inject(splashScreen: SplashScreen)
+    fun inject(mainActivity: MainActivity)
+
+
+    fun addSearchComponent(): SearchComponent.Factory
+    fun addChatListComponent(): ChatListComponent.Factory
     fun addLoginComponent(): LoginComponent.Factory
     fun addSignUpComponent(): SignUpComponent.Factory
     fun addSetUsernameComponent(): SetUsernameComponent.Factory
@@ -47,7 +59,11 @@ abstract class ViewModelBuilderModule {
 }
 
 
-@Module(subcomponents = [LoginComponent::class, SignUpComponent::class, SetUsernameComponent::class])
+@Module(subcomponents = [LoginComponent::class,
+    SignUpComponent::class,
+    SetUsernameComponent::class,
+    ChatListComponent::class,
+    SearchComponent::class])
 object SubcomponentsModule
 
 

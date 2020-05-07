@@ -38,23 +38,3 @@ class LoginFragmentViewModel @Inject constructor(
     }
 
 }
-
-//FirebaseSignin Content
-//mAuth = FirebaseAuth.getInstance()
-//mAuth.signInWithEmailAndPassword(email, password).addOnSuccessListener {
-//
-//    coroutineScope.launch {
-//        val profile = repository.fireBaseGetDataSignIn(mAuth.currentUser!!.uid)
-//
-//        if(profile !== null){
-//            repository.addDataLocalSignIn(profile,email,password)
-//            Log.d(TAG, "Login Completed")
-//        }
-//        else{
-//            Log.d(TAG, "Error encountered, please try again")
-//        }
-//    }
-//}.addOnFailureListener {
-//    exception -> Log.d(TAG, exception.stackTrace.toString())
-//}
-//
