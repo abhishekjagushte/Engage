@@ -26,6 +26,8 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".ui.main.fragments.profile.ProfileActivity" />
+
         <service
             android:name="com.abhishekjagushte.engage.notifications.NotificationHandler"
             android:exported="false">

@@ -6,9 +6,11 @@ import android.content.Context
 import androidx.lifecycle.ViewModelProvider
 import com.abhishekjagushte.engage.EngageApplication
 import com.abhishekjagushte.engage.SplashScreen
+import com.abhishekjagushte.engage.notifications.NotificationHandler
 import com.abhishekjagushte.engage.repository.DataRepository
 import com.abhishekjagushte.engage.ui.main.MainActivity
 import com.abhishekjagushte.engage.ui.main.fragments.chatlist.ChatListComponent
+import com.abhishekjagushte.engage.ui.main.fragments.profile.di.ProfileComponent
 import com.abhishekjagushte.engage.ui.main.fragments.search.di.SearchComponent
 import com.abhishekjagushte.engage.ui.setup.fragments.login.di.LoginComponent
 import com.abhishekjagushte.engage.ui.setup.fragments.setusername.di.SetUsernameComponent
@@ -41,6 +43,8 @@ interface AppComponent: AndroidInjector<EngageApplication>{
     fun inject(mainActivity: MainActivity)
 
 
+    fun inject(notificationHandler: NotificationHandler)
+    fun addProfileComponent(): ProfileComponent.Factory
     fun addSearchComponent(): SearchComponent.Factory
     fun addChatListComponent(): ChatListComponent.Factory
     fun addLoginComponent(): LoginComponent.Factory
@@ -63,7 +67,8 @@ abstract class ViewModelBuilderModule {
     SignUpComponent::class,
     SetUsernameComponent::class,
     ChatListComponent::class,
-    SearchComponent::class])
+    SearchComponent::class,
+    ProfileComponent::class])
 object SubcomponentsModule
 
 

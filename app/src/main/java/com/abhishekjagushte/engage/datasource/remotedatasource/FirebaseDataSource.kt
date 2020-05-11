@@ -1,14 +1,11 @@
 package com.abhishekjagushte.engage.datasource.remotedatasource
 
-import com.abhishekjagushte.engage.network.Profile
 import com.abhishekjagushte.engage.utils.Constants
 import com.google.android.gms.tasks.Task
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.QuerySnapshot
-import com.google.firebase.firestore.ktx.toObject
-import kotlinx.coroutines.tasks.await
+import com.google.firebase.firestore.*
+import java.util.*
 import javax.inject.Inject
+import kotlin.collections.HashMap
 
 class FirebaseDataSource @Inject constructor(
     private val firestore: FirebaseFirestore
@@ -38,11 +35,21 @@ class FirebaseDataSource @Inject constructor(
             .orderBy("name").limit(5)
 
         val usernameQuery = firestore.collection("users")
-            .whereGreaterThanOrEqualTo("username", start)
-            .whereLessThan("username", end)
+            .whereGreaterThanOrEqualTo("username", start.toLowerCase(Locale.ROOT))
+            .whereLessThan("username", end.toLowerCase(Locale.ROOT))
             .orderBy("username").limit(5)
 
+        //TODO Make this query a single query
+
         return Pair(first = nameQuery, second = usernameQuery)
+    }
+
+    fun getContactFirestoreFromUsername(username: String): Task<DocumentSnapshot> {
+        return firestore.collection(Constants.FIREBASE_USERS_COLLECTION).document(username).get()
+    }
+
+    fun addFriend(request: HashMap<String, Any>): Task<DocumentReference> {
+        return firestore.collection(Constants.FIREBASE_CONNECTION_REQUEST_COLLECTION).add(request)
     }
 
 }

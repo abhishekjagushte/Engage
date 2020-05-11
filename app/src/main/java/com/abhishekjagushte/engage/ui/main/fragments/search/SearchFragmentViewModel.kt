@@ -5,12 +5,10 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import com.abhishekjagushte.engage.EngageApplication
 import com.abhishekjagushte.engage.R
 import com.abhishekjagushte.engage.network.Profile
 import com.abhishekjagushte.engage.repository.DataRepository
-import com.google.firebase.firestore.ktx.toObject
+import com.abhishekjagushte.engage.utils.Constants
 import kotlinx.coroutines.*
 import javax.inject.Inject
 
@@ -25,15 +23,21 @@ class SearchFragmentViewModel @Inject constructor(
     val viewModelScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
 
-
     val _searchResults = MutableLiveData<List<DataItem>>()
-
     val searchResults: LiveData<List<DataItem>>
         get() = _searchResults
+
+
+    init {
+        _searchResults.value = listOf<DataItem>()
+    }
 
     fun onSearchTextQueryChanged(query: String){
 
         //First Check in conversation list
+        //TODO Search needs a whole lot of optimization
+        //TODO Find a way to eliminate duplicate search results (matching from name and username)
+        //TODO find a way to minimize the number of queries and reads happening
 
         viewModelScope.launch {
             withContext(Dispatchers.IO){
@@ -77,45 +81,56 @@ class SearchFragmentViewModel @Inject constructor(
                 Log.d(TAG,"Size = ${_searchResults.value?.size}")
 
 
-                val queries = dataRepository.searchUnknownContacts(query)
+                //TODO possibly store all results in a list while one session of searching or implement recent searches
+                if(_searchResults.value?.size!! < 5 && query.length > 5)
+                {
+                    val queries = dataRepository.searchUnknownContacts(query)
 
-                queries.first.addSnapshotListener { nameQuerySnapshot, firebaseFirestoreException ->
+                    queries.first.addSnapshotListener { nameQuerySnapshot, firebaseFirestoreException ->
 
-                    Log.d(TAG,"Querying Succeeded")
+                        Log.d(TAG,"Querying Succeeded")
 
-                    if(nameQuerySnapshot!=null && nameQuerySnapshot.size()>0){
+                        if(nameQuerySnapshot!=null && nameQuerySnapshot.size()>0){
 
-                        _searchResults.value = _searchResults.value?.plus(DataItem.Header(app.resources.getString(R.string.addcontacts)))
+                            _searchResults.value = _searchResults.value?.plus(DataItem.Header(app.resources.getString(R.string.addcontacts)))
 
-                        for(doc in nameQuerySnapshot.documents){
-                            _searchResults.value = _searchResults.value?.plus(
-                                DataItem.SearchDataItem(SearchData(
-                                doc.get("name").toString(),
-                                null,
-                                    doc.get("username").toString())
-                            )) }
+                            //TODO Maybe save the document recieved here and pass it to profile activity
+                            for(doc in nameQuerySnapshot.documents){
+                                val profile = doc.toObject(Profile::class.java)
+                                _searchResults.value = _searchResults.value?.plus(
+                                    DataItem.SearchDataItem(SearchData(
+                                        doc.get("name").toString(),
+                                        null,
+                                        doc.get("username").toString(),
+                                        Constants.SEARCHDATA_CONTACT)
+                                    ))
+                            }
                         }
 
-                        if(searchList.size<10) {
+                        if(_searchResults.value?.size!! < 10) {
                             queries.second.addSnapshotListener { usernameQuerySnapshot, firebaseFirestoreException2 ->
 
                                 if(usernameQuerySnapshot!=null && usernameQuerySnapshot.size()>0){
-                                    for(doc in usernameQuerySnapshot.documents!!){
+                                    for(doc in usernameQuerySnapshot.documents){
                                         _searchResults.value = _searchResults.value?.plus(
                                             DataItem.SearchDataItem(SearchData(
                                                 doc.get("name").toString(),
                                                 null,
-                                                doc.get("username").toString())
-                                        )) }
+                                                doc.get("username").toString(),
+                                                Constants.SEARCHDATA_CONTACT)
+                                            )) }
                                 }
+                            }
                         }
-
                     }
                 }
-
             }
         }
-
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        viewModelJob.cancel()
+        Log.d(TAG, "OnClear")
+    }
 }

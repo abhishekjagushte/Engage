@@ -9,6 +9,23 @@ class LocalDataSource @Inject constructor (private val databaseDao: DatabaseDao)
 
     private val TAG = "LocalDataSource"
 
+    //Profile Fragment Viewmodel
+    fun getContactFromUsername(username: String): List<Contact> {
+        return databaseDao.getContactFromUsername(username)
+    }
+
+    fun updateContact(contact: Contact){
+        databaseDao.updateContact(contact)
+    }
+
+    fun addContact(contact: Contact){
+        databaseDao.insertNewContact(contact)
+    }
+
+    fun getMyDetails(): ContactNameUsername{
+        return databaseDao.getMyDetails()[0]
+    }
+
     fun getCurrentLoggedInUserCredentials(userData: MutableLiveData<UserData?>){
         val users = databaseDao.getCurrentLoggedInUser()
         getCountUserData()
@@ -46,7 +63,6 @@ class LocalDataSource @Inject constructor (private val databaseDao: DatabaseDao)
     fun searchForSuggestedContacts(query: String): List<SearchResultContact> {
         return databaseDao.searchForSuggestedContacts(query)
     }
-
 
     fun addContactsTest(){
         databaseDao.insertNewContact(Contact(

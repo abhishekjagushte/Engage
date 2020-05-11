@@ -2,6 +2,7 @@ package com.abhishekjagushte.engage.utils
 
 object Constants {
     const val FIREBASE_USERS_COLLECTION: String = "users"
+    const val FIREBASE_CONNECTION_REQUEST_COLLECTION = "connection-requests"
     const val NOT_INITIATED = "NOT INITIATED"
     const val INITIATED = "INITIATED"
     const val FIREBASE_CHANGE_COMPLETE = "FIREBASE_COMPLETE"
@@ -9,6 +10,8 @@ object Constants {
     const val LOCAL_DB_CHANGE_INITIATED = "LOCAL_DB_CHANGE_INITIATED"
     const val LOCAL_DB_SUCCESS = "LOCAL_DB_SUCCESS"
     const val LOCAL_DB_FAILED = "LOCAL_DB_FAILED"
+
+    const val SEND_FR_TYPE = 1
 
     //Contacts constants
     const val CONTACTS_ME = 0
@@ -33,6 +36,10 @@ object Constants {
     const val CHATLIST_TYPE_121 = 1
     const val CHATLIST_TYPE_M2M = 2
 
+    //SearchData types
+    const val SEARCHDATA_CONTACT = 1
+    const val SEARCHDATA_CONVERSATION = 2
+
 }
 
 //Contacts
@@ -54,6 +61,8 @@ object Constants {
 /*
     The data class holder for search results from firebase as well as the local database is now
     defined in search package in main ui
+
+    Anything that doesn't need to be displayed will go in extras in SearchData
 
  */
 

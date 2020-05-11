@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.abhishekjagushte.engage.R
 import com.abhishekjagushte.engage.utils.Constants
 
-class SearchAdapter : ListAdapter<DataItem, RecyclerView.ViewHolder>(
+class SearchAdapter(val clickListener: SearchDataListener) : ListAdapter<DataItem, RecyclerView.ViewHolder>(
     SearchResultDiffUtilCallback()
 ){
 
@@ -33,7 +33,7 @@ class SearchAdapter : ListAdapter<DataItem, RecyclerView.ViewHolder>(
         when(holder){
             is SearchDataViewHolder -> {
                 val searchResult = getItem(position) as DataItem.SearchDataItem
-                holder.bind(searchResult)
+                holder.bind(searchResult, clickListener, getItem(position))
             }
             is HeaderViewHolder -> {
                 val header = getItem(position) as DataItem.Header
@@ -48,12 +48,23 @@ class SearchDataViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
 
     private var title: TextView = itemView.findViewById(R.id.title_line_text)
     private var subtitle: TextView = itemView.findViewById(R.id.subtitle_line_text)
+    private lateinit var searchResultItem: SearchData
 
-    fun bind(item: DataItem.SearchDataItem){
+    fun bind(
+        item: DataItem.SearchDataItem,
+        clickListener: SearchDataListener,
+        dataItem: DataItem
+    ){
         val searchData = item.searchData
 
         title.text = searchData.title
         subtitle.text = searchData.subtitle
+
+        searchResultItem = (dataItem as DataItem.SearchDataItem).searchData
+
+        itemView.setOnClickListener{
+            clickListener.onClick(searchResultItem)
+        }
     }
 
     companion object{
@@ -107,4 +118,8 @@ sealed class DataItem{
     data class Header(val title: String): DataItem(){
         override val id = Constants.HEADER_ID_RECYCLERVIEW
     }
+}
+
+class SearchDataListener(val clickListener: (SearchData) -> Unit){
+    fun onClick(searchData: SearchData) = clickListener(searchData)
 }

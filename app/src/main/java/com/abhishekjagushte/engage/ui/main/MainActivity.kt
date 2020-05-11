@@ -3,6 +3,7 @@ package com.abhishekjagushte.engage.ui.main
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Looper
+import android.util.Log
 import android.widget.Toast
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
@@ -17,6 +18,8 @@ class MainActivity : AppCompatActivity() {
 
     @Inject lateinit var dataRepository: DataRepository
 
+    private val TAG = "MainActivity"
+
     val mainActivityJob = Job()
     val mainActivityScope = CoroutineScope(Dispatchers.Main + mainActivityJob)
 
@@ -26,6 +29,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         dataRepository.addContactsTest()
+
+        dataRepository.getNotificationChannelID().addOnSuccessListener {
+            Log.d(TAG, it.token)
+        }
 
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_nav_view)
 

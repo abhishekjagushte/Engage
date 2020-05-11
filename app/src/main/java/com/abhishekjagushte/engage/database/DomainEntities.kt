@@ -11,14 +11,14 @@ class Contact(
     @PrimaryKey
     val username: String,
 
-    val name: String,
+    var name: String,
     val nickname: String = name,
 
     @ColumnInfo(defaultValue = "I am using Engage!")
-    val bio: String = "I am using Engage!",
+    var bio: String = "I am using Engage!",
 
     @ColumnInfo(name="dp_thmb", typeAffinity = ColumnInfo.BLOB)
-    val dp_thmb: ByteArray? = null,
+    var dp_thmb: ByteArray? = null,
     val type: Int,
 
     @ColumnInfo(name="time_stamp")
@@ -89,9 +89,19 @@ data class CommonGroups(
 )
 
 data class SearchResultConversation(
-   val name:String,
-   val username: String,
-   val type: Int
+    val name:String,
+    val username: String,
+    val type: Int,
+    val networkID: String
+//    val lastMessageData: String? = null,
+//    val lastMessageTime: String? = null,
+//    val status: Int = -1 //the extra data will go into map for searchdata
+)
+
+
+data class ContactNameUsername(
+    val name: String,
+    val username: String
 )
 
 data class SearchResultContact(

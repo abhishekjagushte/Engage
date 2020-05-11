@@ -3,7 +3,7 @@ package com.abhishekjagushte.engage.repository
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.abhishekjagushte.engage.database.Contact
-import com.abhishekjagushte.engage.database.SearchResultConversation
+import com.abhishekjagushte.engage.database.ContactNameUsername
 import com.abhishekjagushte.engage.datasource.localdatasource.FirebaseInstanceSource
 import com.abhishekjagushte.engage.datasource.localdatasource.LocalDataSource
 import com.abhishekjagushte.engage.datasource.remotedatasource.FirebaseAuthDataSource
@@ -18,11 +18,13 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.toObject
+import com.google.firebase.iid.InstanceIdResult
 import kotlinx.coroutines.*
-import java.lang.Exception
 import javax.inject.Inject
 
 class DataRepository @Inject constructor(
@@ -65,7 +67,6 @@ class DataRepository @Inject constructor(
         }
     }
 
-
     fun setNameAndUsername(name: String, username: String, completeStatus: MutableLiveData<String>){
         firebaseInstanceId.getNotificationChannelID()
             .addOnCompleteListener(OnCompleteListener { task ->
@@ -103,6 +104,11 @@ class DataRepository @Inject constructor(
     }
 
 
+    fun getNotificationChannelID(): Task<InstanceIdResult> {
+        return firebaseInstanceId.getNotificationChannelID()
+    }
+
+
     fun searchForConversations(query: String): List<SearchData> {
         return localDataSource.searchForConversations(query).convertSearchDataConversations()
     }
@@ -122,6 +128,28 @@ class DataRepository @Inject constructor(
 
 
     //Internal Repo Functions
+
+    //Profile Fragment
+    fun getContactFromUsername(username: String): List<Contact> {
+        return localDataSource.getContactFromUsername(username)
+    }
+
+    fun getContactFirestoreFromUsername(username: String): Task<DocumentSnapshot> {
+        return firebaseDataSource.getContactFirestoreFromUsername(username)
+    }
+
+    fun updateContact(contact: Contact){
+        localDataSource.updateContact(contact)
+    }
+
+    fun getMydetails(): ContactNameUsername{
+        return localDataSource.getMyDetails()
+    }
+
+    fun addFriend(request: HashMap<String, Any>): Task<DocumentReference> {
+        return firebaseDataSource.addFriend(request)
+    }
+
 
     fun getCurrentUser(): FirebaseUser? {
         return authDataSource.getCurrentUser()
@@ -164,6 +192,30 @@ class DataRepository @Inject constructor(
 
     fun getCountContacts(): Int {
         return localDataSource.getCountContacts()
+    }
+
+
+
+    //Notification Manager
+
+    fun friendRequestRecieved(data: MutableMap<String, String>) {
+        val name = data.get("name")
+        val username = data.get("username")
+
+        if(name !=null && username!=null){
+            val contact = Contact(
+                name = name,
+                username = username,
+                type = Constants.CONTACTS_PENDING,
+                networkID = "" //Will be updated when the data is fetched
+            )
+
+            repoScope.launch {
+                withContext(Dispatchers.IO){
+                    localDataSource.addContact(contact)
+                }
+            }
+        }
     }
 
 }

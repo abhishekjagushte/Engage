@@ -20,4 +20,10 @@
     <string name="contacts">Contacts</string>
     <string name="suggested">Suggested</string>
     <string name="addcontacts">Add Contacts</string>
+    <string name="display_picture">Display Picture</string>
+    <string name="bio">Bio</string>
+    <string name="add_friend">Add Friend</string>
+    <string name="friends">Friends</string>
+    <string name="sent">Sent</string>
+    <string name="FR_received_msg">%1$s (%2$s) sent you a friend request</string>
 </resources>
