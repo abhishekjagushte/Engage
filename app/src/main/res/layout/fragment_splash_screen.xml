@@ -8,7 +8,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".SplashScreen">
+        tools:context=".ui.SplashScreenFragment">
 
 <!--        <fragment-->
 <!--            android:id="@+id/splash_screen_nav_host"-->

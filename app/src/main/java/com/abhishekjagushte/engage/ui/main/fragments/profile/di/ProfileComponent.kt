@@ -1,6 +1,6 @@
 package com.abhishekjagushte.engage.ui.main.fragments.profile.di
 
-import com.abhishekjagushte.engage.ui.main.fragments.profile.ProfileActivity
+import com.abhishekjagushte.engage.ui.main.fragments.profile.ProfileFragment
 import dagger.Subcomponent
 
 
@@ -11,6 +11,6 @@ interface ProfileComponent {
         fun create(): ProfileComponent
     }
 
-    fun inject(fragment: ProfileActivity)
+    fun inject(fragment: ProfileFragment)
 }
 

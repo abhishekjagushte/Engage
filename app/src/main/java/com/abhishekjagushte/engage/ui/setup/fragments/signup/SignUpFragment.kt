@@ -14,7 +14,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.abhishekjagushte.engage.EngageApplication
 import com.abhishekjagushte.engage.R
-import com.abhishekjagushte.engage.databinding.SignUpFragmentBinding
 import com.google.android.material.textfield.TextInputEditText
 import javax.inject.Inject
 
@@ -32,7 +31,7 @@ class SignUpFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view =  inflater.inflate(R.layout.sign_up_fragment, container, false)
+        val view =  inflater.inflate(R.layout.fragment_sign_up, container, false)
 
         val emailInput = view.findViewById<TextInputEditText>(R.id.email_input)
         val passwordInput = view.findViewById<TextInputEditText>(R.id.password_input)

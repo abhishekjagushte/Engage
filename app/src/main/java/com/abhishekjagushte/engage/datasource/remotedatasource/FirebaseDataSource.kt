@@ -1,5 +1,6 @@
 package com.abhishekjagushte.engage.datasource.remotedatasource
 
+import android.util.Log
 import com.abhishekjagushte.engage.utils.Constants
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.*
@@ -10,6 +11,8 @@ import kotlin.collections.HashMap
 class FirebaseDataSource @Inject constructor(
     private val firestore: FirebaseFirestore
 ){
+
+    private val TAG: String = "FirebaseDataSource"
 
     fun checkUsername(username: String): Task<QuerySnapshot> {
         //TODO replace users with constant
@@ -22,7 +25,6 @@ class FirebaseDataSource @Inject constructor(
             .whereEqualTo(Constants.FIREBASE_USER_ID_FIELD_NAME, uid)
             .limit(1)
             .get()
-
     }
 
     fun searchUnknownContacts(query: String): Pair<Query, Query> {
@@ -52,4 +54,8 @@ class FirebaseDataSource @Inject constructor(
         return firestore.collection(Constants.FIREBASE_CONNECTION_REQUEST_COLLECTION).add(request)
     }
 
+    fun updateNotificationChannelID(id: String, username: String): Task<Void> {
+        Log.d(TAG, "Inside firebase datasource")
+        return firestore.collection("users").document(username).update("notificationChannelID", id)
+    }
 }

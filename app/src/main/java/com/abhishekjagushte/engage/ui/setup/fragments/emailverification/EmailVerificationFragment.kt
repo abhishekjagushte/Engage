@@ -14,7 +14,7 @@ class EmailVerificationFragment : Fragment(){
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.email_verification_fragment, container, false)
+        val view = inflater.inflate(R.layout.fragment_email_verification, container, false)
         return view
     }
 

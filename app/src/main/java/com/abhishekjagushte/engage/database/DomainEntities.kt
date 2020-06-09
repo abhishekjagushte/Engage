@@ -27,7 +27,6 @@ class Contact(
 
 @Entity(tableName = "suggested_contacts")
 data class SuggestedContacts(
-
     @PrimaryKey
     val username: String,
     val name: String,

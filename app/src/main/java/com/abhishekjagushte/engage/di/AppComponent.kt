@@ -1,13 +1,12 @@
 package com.abhishekjagushte.engage.di
 
-import android.app.Activity
 import android.app.Application
-import android.content.Context
 import androidx.lifecycle.ViewModelProvider
 import com.abhishekjagushte.engage.EngageApplication
-import com.abhishekjagushte.engage.SplashScreen
+import com.abhishekjagushte.engage.ui.SplashScreenFragment
 import com.abhishekjagushte.engage.notifications.NotificationHandler
 import com.abhishekjagushte.engage.repository.DataRepository
+import com.abhishekjagushte.engage.ui.chat.fragments.chat.ChatComponent
 import com.abhishekjagushte.engage.ui.main.MainActivity
 import com.abhishekjagushte.engage.ui.main.fragments.chatlist.ChatListComponent
 import com.abhishekjagushte.engage.ui.main.fragments.profile.di.ProfileComponent
@@ -19,7 +18,6 @@ import dagger.Binds
 import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
-import dagger.android.AndroidInjectionModule
 import dagger.android.AndroidInjector
 import javax.inject.Singleton
 
@@ -39,10 +37,11 @@ interface AppComponent: AndroidInjector<EngageApplication>{
         fun create(@BindsInstance application: Application): AppComponent
     }
 
-    fun inject(splashScreen: SplashScreen)
+    fun inject(splashScreen: SplashScreenFragment)
     fun inject(mainActivity: MainActivity)
 
 
+    fun addChatComponent(): ChatComponent.Factory
     fun inject(notificationHandler: NotificationHandler)
     fun addProfileComponent(): ProfileComponent.Factory
     fun addSearchComponent(): SearchComponent.Factory
@@ -68,7 +67,8 @@ abstract class ViewModelBuilderModule {
     SetUsernameComponent::class,
     ChatListComponent::class,
     SearchComponent::class,
-    ProfileComponent::class])
+    ProfileComponent::class,
+    ChatComponent::class])
 object SubcomponentsModule
 
 

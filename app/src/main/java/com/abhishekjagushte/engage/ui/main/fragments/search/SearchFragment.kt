@@ -1,7 +1,6 @@
 package com.abhishekjagushte.engage.ui.main.fragments.search
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -12,20 +11,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Toast
-import androidx.databinding.adapters.TextViewBindingAdapter
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.NavigationUI
 import androidx.recyclerview.widget.RecyclerView
 import com.abhishekjagushte.engage.EngageApplication
 
 import com.abhishekjagushte.engage.R
-import com.abhishekjagushte.engage.ui.main.fragments.profile.ARGUMENT_NAME
-import com.abhishekjagushte.engage.ui.main.fragments.profile.ARGUMENT_USERNAME
-import com.abhishekjagushte.engage.ui.main.fragments.profile.ProfileActivity
-import com.abhishekjagushte.engage.ui.setup.fragments.login.LoginFragmentViewModel
 import com.abhishekjagushte.engage.utils.Constants
+import com.google.android.material.appbar.AppBarLayout
 import javax.inject.Inject
 
 class SearchFragment : Fragment() {
@@ -35,6 +34,8 @@ class SearchFragment : Fragment() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
+    lateinit var appBar: AppBarLayout
+    lateinit var toolbar: Toolbar
 
     private val viewModel by viewModels<SearchFragmentViewModel> { viewModelFactory }
 
@@ -42,12 +43,11 @@ class SearchFragment : Fragment() {
         fun newInstance() = SearchFragment()
     }
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.search_fragment, container, false)
+        val view = inflater.inflate(R.layout.fragment_search, container, false)
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
         val searchBar = view.findViewById<EditText>(R.id.search_bar)
 
@@ -78,13 +78,13 @@ class SearchFragment : Fragment() {
                     "username" to searchData.subtitle
                 )
 
-                val intent = Intent(context, ProfileActivity::class.java)
-                intent.putExtra(ARGUMENT_NAME, profileMap.get("name"))
-                intent.putExtra(ARGUMENT_USERNAME, profileMap.get("username"))
-                startActivity(intent)
+//                val intent = Intent(context, ProfileActivity::class.java)
+//                intent.putExtra(ARGUMENT_NAME, profileMap.get("name"))
+//                intent.putExtra(ARGUMENT_USERNAME, profileMap.get("username"))
+//                startActivity(intent)
 
-//                findNavController().navigate(SearchFragmentDirections
-//                    .actionSearchFragmentToProfileFragment(profileMap.get("username")!!, profileMap.get("name")!!))
+                findNavController().navigate(SearchFragmentDirections
+                    .actionSearchFragmentToProfileActivity(profileMap.get("name")!!, profileMap.get("username")!!))
             }
             else if(searchData.type == Constants.SEARCHDATA_CONVERSATION){
                 TODO("Implement navigate to chat activity")
@@ -108,6 +108,17 @@ class SearchFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         (requireActivity().application as EngageApplication).appComponent.addSearchComponent().create().inject(this)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val navController = Navigation.findNavController(view)
+        val appBarConfiguration = AppBarConfiguration.Builder(R.id.searchFragment).build()
+
+        appBar = view.findViewById(R.id.app_bar)
+        toolbar = view.findViewById(R.id.toolbar)
+        NavigationUI.setupWithNavController(toolbar, navController, appBarConfiguration)
     }
 
 }

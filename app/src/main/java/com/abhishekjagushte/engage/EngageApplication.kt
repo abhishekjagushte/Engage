@@ -17,7 +17,6 @@ class EngageApplication : Application(){
 //        return DaggerAppComponent.builder().build()
 //    }
 
-
     val appComponent: AppComponent by lazy {
         initializeComponent()
     }

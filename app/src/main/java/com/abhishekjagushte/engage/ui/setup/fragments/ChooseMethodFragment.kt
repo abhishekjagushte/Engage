@@ -16,7 +16,7 @@ class ChooseMethodFragment : Fragment(){
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.choose_method_fragment, container, false)
+        val view = inflater.inflate(R.layout.fragment_choose_method, container, false)
 
         val loginButton = view.findViewById<Button>(R.id.login_button)
         val signupButton = view.findViewById<Button>(R.id.signup_button)

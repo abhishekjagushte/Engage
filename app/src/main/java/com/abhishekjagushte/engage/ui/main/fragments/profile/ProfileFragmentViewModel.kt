@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.abhishekjagushte.engage.database.Contact
 import com.abhishekjagushte.engage.network.Profile
+import com.abhishekjagushte.engage.network.convertDomainObject
 import com.abhishekjagushte.engage.repository.DataRepository
 import com.abhishekjagushte.engage.utils.Constants
 import kotlinx.coroutines.*
@@ -14,14 +15,16 @@ import javax.inject.Inject
 
 const val FRIEND_REQUEST_SENT = 1
 
-class ProfileActivityViewModel @Inject constructor(
+class ProfileFragmentViewModel @Inject constructor(
     private val dataRepository: DataRepository
 ) : ViewModel() {
-
 
     private val TAG = "ProfileFragmentVM"
     private val viewModelJob = Job()
     private val viewModelScope = CoroutineScope(Dispatchers.Main + viewModelJob)
+
+    private var networkProfile: Profile? = null
+    lateinit var localContact: Contact ////////////////////////////////Local contact variable
 
     private val _profileDisplay = MutableLiveData<ProfileDisplay>()
     val profileDisplay: LiveData<ProfileDisplay>
@@ -44,13 +47,14 @@ class ProfileActivityViewModel @Inject constructor(
                 val contacts = dataRepository.getContactFromUsername(username)
 
                 if (contacts.isEmpty()) {
-
                     //In case of unknown contacts
 
                     dataRepository.getContactFirestoreFromUsername(username)
                         .addOnSuccessListener {
                             if (it != null) {
                                 val profile = it.toObject(Profile::class.java)
+                                networkProfile = profile
+
                                 if (profile != null) {
                                     _profileDisplay.postValue(profile
                                         .convertToProfileDisplay(Constants.CONTACTS_UNKNOWN))
@@ -60,7 +64,8 @@ class ProfileActivityViewModel @Inject constructor(
                         }
                 } else {
                     val contact = contacts[0]
-
+                    Log.d(TAG, "" + contact.type+"***")
+                    localContact = contact
                     val localProfileDisplay = contact.convertToProfileDisplay()
 
                     _profileDisplay.postValue(localProfileDisplay)
@@ -70,33 +75,36 @@ class ProfileActivityViewModel @Inject constructor(
                             if (it != null) {
                                 val profile = it.toObject(Profile::class.java)
                                 if (profile != null) {
+                                        Log.d(TAG, "${profile.name} ${profile.username}")
 
-
+                                    networkProfile = profile
                                     //This part is for updating contact information
                                     val networkProfileDisplay = profile.convertToProfileDisplay(contact.type)
 
                                     if(localProfileDisplay != networkProfileDisplay){
                                         _profileDisplay.postValue(networkProfileDisplay)
-
+                                        Log.d(TAG, "Changed")
                                         contact.bio = networkProfileDisplay.bio
                                         contact.dp_thmb = networkProfileDisplay.dp_thmb
                                         contact.name = networkProfileDisplay.name
-
-                                        dataRepository.updateContact(contact)
+                                        viewModelScope.launch {
+                                         withContext(Dispatchers.IO){
+                                             dataRepository.updateContact(contact)
+                                         }
+                                        }
                                     }
                                 }
                                 Log.d(TAG, profile.toString())
                             }
                         }
-
                 }
             }
         }
     }
 
-    fun addFriend(){
+    fun addFriend() {
         viewModelScope.launch {
-            withContext(Dispatchers.IO){
+            withContext(Dispatchers.IO) {
                 val myDetails = dataRepository.getMydetails()
                 val request = hashMapOf<String, Any>(
                     "senderID" to myDetails.username,
@@ -108,10 +116,44 @@ class ProfileActivityViewModel @Inject constructor(
 
                 dataRepository.addFriend(request).addOnSuccessListener {
                     _actionStatus.value = FRIEND_REQUEST_SENT
+                    viewModelScope.launch {
+                        withContext(Dispatchers.IO) {
+                            //dataRepository.addContact(networkProfile!!.convertDomainObject(Constants.CONTACTS_REQUESTED))
+                        }
+                    }
                 }
+            }
+        }
+    }
 
-                //TODO("update local database")
+    fun acceptRequest() {
+        if (networkProfile != null) {
+            viewModelScope.launch {
+                withContext(Dispatchers.IO) {
+                    val myDetails = dataRepository.getMydetails()
+                    val request = hashMapOf<String, Any>(
+                        "senderID" to myDetails.username,
+                        "senderName" to myDetails.name,
+                        "receiverID" to profileDisplay.value!!.username,
+                        "timeStamp" to Date().toString(),
+                        "type" to Constants.ACCEPT_FR_TYPE
+                    )
 
+                    dataRepository.addFriend(request).addOnSuccessListener {
+                        _actionStatus.value = FRIEND_REQUEST_SENT
+
+                        //Replace Strategy already there so i can use addContact
+                        viewModelScope.launch {
+                            withContext(Dispatchers.IO) {
+                                dataRepository.addContact(
+                                    networkProfile!!.convertDomainObject(
+                                        Constants.CONTACTS_CONFIRMED
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
     }

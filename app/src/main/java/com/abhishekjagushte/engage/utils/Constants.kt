@@ -11,7 +11,9 @@ object Constants {
     const val LOCAL_DB_SUCCESS = "LOCAL_DB_SUCCESS"
     const val LOCAL_DB_FAILED = "LOCAL_DB_FAILED"
 
+    //Contacts Handling
     const val SEND_FR_TYPE = 1
+    const val ACCEPT_FR_TYPE = 2
 
     //Contacts constants
     const val CONTACTS_ME = 0
@@ -39,6 +41,10 @@ object Constants {
     //SearchData types
     const val SEARCHDATA_CONTACT = 1
     const val SEARCHDATA_CONVERSATION = 2
+
+    //Argument Constants
+    const val ARGUMENT_NAME = "name"
+    const val ARGUMENT_USERNAME = "username"
 
 }
 

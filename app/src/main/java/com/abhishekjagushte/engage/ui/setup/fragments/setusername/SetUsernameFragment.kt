@@ -33,7 +33,7 @@ class SetUsernameFragment: Fragment() {
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.set_username_fragment, container, false)
+        val view = inflater.inflate(R.layout.fragment_set_username, container, false)
 
         val nameInput = view.findViewById<TextInputEditText>(R.id.name_input)
         val usernameInput = view.findViewById<TextInputEditText>(R.id.username_input)
@@ -96,7 +96,7 @@ class SetUsernameFragment: Fragment() {
 
     private fun updateUI() {
         Log.d(TAG,"Updated Successfully")
-        findNavController().navigate(R.id.action_setUsernameFragment_to_mainActivity2)
+        findNavController().navigate(R.id.action_global_chatListFragment)
     }
 
 

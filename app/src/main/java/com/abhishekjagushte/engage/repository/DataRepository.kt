@@ -46,7 +46,7 @@ class DataRepository @Inject constructor(
             Log.d(TAG, "Login Success")
             repoScope.launch {
                 withContext(Dispatchers.IO){
-                    signUpAddCredentialsLocal(email, password)
+                    signUpAddCredentialsLocal (email, password)
                     val i = localDataSource.getCountUserData()
                     Log.d(TAG,"Credentials Added number of entries = $i")
                 }
@@ -103,6 +103,26 @@ class DataRepository @Inject constructor(
             })
     }
 
+    fun updateNotificationChannelID(id: String){
+        repoScope.launch {
+            withContext(Dispatchers.IO){
+
+                val c = localDataSource.getMyDetails()
+
+                Log.d(TAG, c.username + "****************")
+
+                firebaseDataSource.updateNotificationChannelID(id, c.username).addOnFailureListener {
+
+                    getNotificationChannelID().addOnSuccessListener {
+                        Log.d(TAG, "failed ${it.token}")
+                        firebaseDataSource.updateNotificationChannelID(it.token, c.username)
+                    }.addOnSuccessListener {
+                        Log.d(TAG, "Updated successfully")
+                    }
+                }
+            }
+        }
+    }
 
     fun getNotificationChannelID(): Task<InstanceIdResult> {
         return firebaseInstanceId.getNotificationChannelID()
@@ -180,6 +200,10 @@ class DataRepository @Inject constructor(
     }
 
 
+    fun addContact(contact: Contact){
+        localDataSource.addContact(contact)
+    }
+
 
     fun addContactsTest(){
         repoScope.launch {
@@ -193,8 +217,6 @@ class DataRepository @Inject constructor(
     fun getCountContacts(): Int {
         return localDataSource.getCountContacts()
     }
-
-
 
     //Notification Manager
 
@@ -218,6 +240,25 @@ class DataRepository @Inject constructor(
         }
     }
 
+    fun friendRequestAccepted(data: Map<String, String>) {
+        val name = data.get("name")
+        val username = data.get("username")
+
+        if(name !=null && username!=null){
+            val contact = Contact(
+                name = name,
+                username = username,
+                type = Constants.CONTACTS_CONFIRMED,
+                networkID = "" //Will be updated when the data is fetched
+            )
+
+            repoScope.launch {
+                withContext(Dispatchers.IO){
+                    localDataSource.addContact(contact) //Replace strategy so no worries
+                }
+            }
+        }
+    }
 }
 
 

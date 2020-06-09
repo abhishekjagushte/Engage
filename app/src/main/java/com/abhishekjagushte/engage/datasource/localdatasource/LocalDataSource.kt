@@ -64,6 +64,7 @@ class LocalDataSource @Inject constructor (private val databaseDao: DatabaseDao)
         return databaseDao.searchForSuggestedContacts(query)
     }
 
+
     fun addContactsTest(){
         databaseDao.insertNewContact(Contact(
             name = "Abhishek Jagushte",

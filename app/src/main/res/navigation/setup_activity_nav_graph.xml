@@ -10,7 +10,7 @@
         android:id="@+id/chooseMethodFragment"
         android:name="com.abhishekjagushte.engage.ui.setup.fragments.ChooseMethodFragment"
         android:label="choose_method_fragment"
-        tools:layout="@layout/choose_method_fragment" >
+        tools:layout="@layout/fragment_choose_method" >
         <action
             android:id="@+id/action_chooseMethodFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
@@ -22,7 +22,7 @@
         android:id="@+id/loginFragment"
         android:name="com.abhishekjagushte.engage.ui.setup.fragments.login.LoginFragment"
         android:label="login_fragment"
-        tools:layout="@layout/login_fragment" >
+        tools:layout="@layout/fragment_login" >
         <action
             android:id="@+id/action_loginFragment_to_mainActivity2"
             app:destination="@id/mainActivity2" />
@@ -31,7 +31,7 @@
         android:id="@+id/signUpFragment"
         android:name="com.abhishekjagushte.engage.ui.setup.fragments.signup.SignUpFragment"
         android:label="sign_up_fragment"
-        tools:layout="@layout/sign_up_fragment" >
+        tools:layout="@layout/fragment_sign_up" >
         <action
             android:id="@+id/action_signUpFragment_to_setUsernameFragment"
             app:destination="@id/setUsernameFragment" />
@@ -40,7 +40,7 @@
         android:id="@+id/setUsernameFragment"
         android:name="com.abhishekjagushte.engage.ui.setup.fragments.setusername.SetUsernameFragment"
         android:label="set_username_fragment"
-        tools:layout="@layout/set_username_fragment" >
+        tools:layout="@layout/fragment_set_username" >
         <argument
             android:name="email"
             app:argType="string" />

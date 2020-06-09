@@ -17,7 +17,6 @@ class FirebaseAuthDataSource @Inject constructor(
     private val firestore: FirebaseFirestore
 ){
     fun signUp(email: String, password: String): Task<AuthResult> {
-
         return mAuth.createUserWithEmailAndPassword(email, password)
     }
 
