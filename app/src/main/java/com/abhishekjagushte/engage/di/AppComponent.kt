@@ -3,10 +3,12 @@ package com.abhishekjagushte.engage.di
 import android.app.Application
 import androidx.lifecycle.ViewModelProvider
 import com.abhishekjagushte.engage.EngageApplication
-import com.abhishekjagushte.engage.ui.SplashScreenFragment
 import com.abhishekjagushte.engage.notifications.NotificationHandler
 import com.abhishekjagushte.engage.repository.DataRepository
+import com.abhishekjagushte.engage.ui.SplashScreenFragment
 import com.abhishekjagushte.engage.ui.chat.fragments.chat.ChatComponent
+import com.abhishekjagushte.engage.ui.chat.fragments.chat.fragments.chatscreen.di.ChatScreenComponent
+import com.abhishekjagushte.engage.ui.chat.fragments.chat.fragments.eventscreen.di.EventComponent
 import com.abhishekjagushte.engage.ui.main.MainActivity
 import com.abhishekjagushte.engage.ui.main.fragments.chatlist.ChatListComponent
 import com.abhishekjagushte.engage.ui.main.fragments.profile.di.ProfileComponent
@@ -21,8 +23,6 @@ import dagger.Module
 import dagger.android.AndroidInjector
 import javax.inject.Singleton
 
-
-//TODO if this doent work use the support library dagger-android-support
 
 @Singleton
 @Component(modules =
@@ -41,6 +41,8 @@ interface AppComponent: AndroidInjector<EngageApplication>{
     fun inject(mainActivity: MainActivity)
 
 
+    fun addEventScreenComponent(): EventComponent.Factory
+    fun addChatScreenComponent(): ChatScreenComponent.Factory
     fun addChatComponent(): ChatComponent.Factory
     fun inject(notificationHandler: NotificationHandler)
     fun addProfileComponent(): ProfileComponent.Factory
@@ -68,15 +70,7 @@ abstract class ViewModelBuilderModule {
     ChatListComponent::class,
     SearchComponent::class,
     ProfileComponent::class,
-    ChatComponent::class])
+    ChatComponent::class,
+    ChatScreenComponent::class,
+    EventComponent::class])
 object SubcomponentsModule
-
-
-
-
-//    @Component.Builder
-//    interface Builder{
-//        @BindsInstance
-//        fun application(application: Application)
-//        fun build(): AppComponent
-//    }

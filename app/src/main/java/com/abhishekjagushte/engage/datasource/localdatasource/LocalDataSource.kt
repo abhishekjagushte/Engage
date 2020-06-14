@@ -22,8 +22,8 @@ class LocalDataSource @Inject constructor (private val databaseDao: DatabaseDao)
         databaseDao.insertNewContact(contact)
     }
 
-    fun getMyDetails(): ContactNameUsername{
-        return databaseDao.getMyDetails()[0]
+    fun getMyDetails(): ContactNameUsername?{
+        return databaseDao.getMyDetails()
     }
 
     fun getCurrentLoggedInUserCredentials(userData: MutableLiveData<UserData?>){
@@ -111,5 +111,9 @@ class LocalDataSource @Inject constructor (private val databaseDao: DatabaseDao)
 
     fun getCountContacts(): Int {
         return databaseDao.getCountContacts()
+    }
+
+    fun getConversationIDFromUsername(username: String): String? {
+        return databaseDao.getConversationIDFromUsername(username)
     }
 }

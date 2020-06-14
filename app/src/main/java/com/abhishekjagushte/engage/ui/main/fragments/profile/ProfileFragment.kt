@@ -127,7 +127,8 @@ class ProfileFragment : Fragment() {
                 Constants.CONTACTS_PENDING -> viewModel.acceptRequest()
 
                 Constants.CONTACTS_CONFIRMED -> {
-                    navController.navigate(R.id.action_profileActivity_to_chatFragment)
+                    navController.navigate(ProfileFragmentDirections
+                        .actionProfileActivityToChatFragment(viewModel.localContact.username, null))
                 }
             }
         }

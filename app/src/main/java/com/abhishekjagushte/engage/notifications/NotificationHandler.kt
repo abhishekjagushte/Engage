@@ -2,24 +2,16 @@ package com.abhishekjagushte.engage.notifications
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.media.RingtoneManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import androidx.navigation.NavController
 import androidx.navigation.NavDeepLinkBuilder
-import androidx.navigation.Navigation
 import com.abhishekjagushte.engage.EngageApplication
 import com.abhishekjagushte.engage.R
 import com.abhishekjagushte.engage.repository.DataRepository
-import com.abhishekjagushte.engage.ui.main.MainActivity
-import com.abhishekjagushte.engage.ui.main.fragments.profile.ARGUMENT_NAME
-import com.abhishekjagushte.engage.ui.main.fragments.profile.ARGUMENT_USERNAME
-import com.abhishekjagushte.engage.ui.main.fragments.profile.ProfileFragment
 import com.abhishekjagushte.engage.utils.Constants
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -38,7 +30,7 @@ class NotificationHandler : FirebaseMessagingService(){
 
     override fun onNewToken(p0: String) {
         super.onNewToken(p0)
-
+        (application as EngageApplication).appComponent.inject(this)
         dataRepository.updateNotificationChannelID(p0)
         Log.d(TAG, "Notification token updated $p0")
     }

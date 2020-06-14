@@ -2,6 +2,7 @@ package com.abhishekjagushte.engage.ui.chat.fragments.chat
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -10,7 +11,6 @@ import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
-import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.viewpager2.widget.ViewPager2
@@ -24,13 +24,11 @@ class ChatFragment : Fragment() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
-    private val viewModel by viewModels<ChatViewModel> { viewModelFactory }
+    val viewModel by viewModels<ChatViewModel> { viewModelFactory }
     private lateinit var appBar: AppBarLayout
     private lateinit var toolbar: Toolbar
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-      }
+    private val TAG = "ChatFragment"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,13 +48,15 @@ class ChatFragment : Fragment() {
 
         appBar = view.findViewById(R.id.app_bar)
         toolbar = view.findViewById(R.id.toolbar)
-
-
         NavigationUI.setupWithNavController(toolbar, navController, appBarConfiguration)
+
+        val args = ChatFragmentArgs.fromBundle(requireArguments())
+        viewModel.setConversationID(args.username, args.conversationID)
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         (requireActivity().application as EngageApplication).appComponent.addChatComponent().create().inject(this)
     }
+
 }

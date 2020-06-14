@@ -15,6 +15,10 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import java.time.Instant
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 
@@ -39,6 +43,19 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
             Log.d(TAG, it.token)
             dataRepository.updateNotificationChannelID(it.token)
         }
+
+        Log.d(TAG, DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.now()))
+        Log.d(TAG, OffsetDateTime.now().toString())
+
+        //dataRepository.addTestDateData()
+        //dataRepository.getTestDateData()
+
+
+        val date = Instant.now()
+        val offsetDateTime = date
+            .atOffset(ZoneOffset.UTC)
+
+        Log.d(TAG, DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(offsetDateTime))
 
         Log.d(TAG+"********", intent?.dataString?:"Not Found")
 

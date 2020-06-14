@@ -1,5 +1,6 @@
 package com.abhishekjagushte.engage.database
 
+import androidx.lifecycle.LiveData
 import androidx.room.*
 
 @Dao
@@ -30,7 +31,7 @@ interface DatabaseDao{
     fun updateContact(contact: Contact)
 
     @Query("SELECT name, username FROM contacts WHERE type == 0")
-    fun getMyDetails(): List<ContactNameUsername>
+    fun getMyDetails(): ContactNameUsername?
 
 
     // Search Queries
@@ -48,4 +49,15 @@ interface DatabaseDao{
 
     @Query("SELECT COUNT(*) FROM contacts")
     fun getCountContacts(): Int
+
+
+    ///////////////////////////////////////////////////////////////////////////
+    // ChatScreen Fragment
+    ///////////////////////////////////////////////////////////////////////////
+
+    @Query("SELECT networkID from conversations WHERE username == :username")
+    fun getConversationIDFromUsername(username: String): String?
+
+    @Query("SELECT * FROM message_view WHERE conversationID == :conversationID ORDER BY timeStamp")
+    fun getMessageView(conversationID: String): LiveData<MessageView>
 }

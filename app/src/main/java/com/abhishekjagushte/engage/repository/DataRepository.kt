@@ -8,6 +8,7 @@ import com.abhishekjagushte.engage.datasource.localdatasource.FirebaseInstanceSo
 import com.abhishekjagushte.engage.datasource.localdatasource.LocalDataSource
 import com.abhishekjagushte.engage.datasource.remotedatasource.FirebaseAuthDataSource
 import com.abhishekjagushte.engage.datasource.remotedatasource.FirebaseDataSource
+import com.abhishekjagushte.engage.datasource.remotedatasource.FunctionsSource
 import com.abhishekjagushte.engage.network.Profile
 import com.abhishekjagushte.engage.network.convertDomainObject
 import com.abhishekjagushte.engage.ui.main.fragments.search.SearchData
@@ -23,6 +24,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.toObject
+import com.google.firebase.functions.HttpsCallableResult
 import com.google.firebase.iid.InstanceIdResult
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -31,7 +33,8 @@ class DataRepository @Inject constructor(
     private val authDataSource: FirebaseAuthDataSource,
     private val localDataSource: LocalDataSource,
     private val firebaseDataSource: FirebaseDataSource,
-    private val firebaseInstanceId: FirebaseInstanceSource
+    private val firebaseInstanceId: FirebaseInstanceSource,
+    private val functionsSource: FunctionsSource
 ){
     private val TAG: String = "DataRepository"
 
@@ -41,6 +44,9 @@ class DataRepository @Inject constructor(
 
     //Functions that send Status to Viewmodels.....
     fun login(email: String, password: String, completeStatus: MutableLiveData<String>){
+
+        TODO("Implement the import of contacts and conversations while logging in compulsory!")
+
         authDataSource.login(email, password).addOnSuccessListener {
             val uid = authDataSource.getCurrentUserUID()
             Log.d(TAG, "Login Success")
@@ -107,18 +113,21 @@ class DataRepository @Inject constructor(
         repoScope.launch {
             withContext(Dispatchers.IO){
 
-                val c = localDataSource.getMyDetails()
+                    val c = localDataSource.getMyDetails()
 
-                Log.d(TAG, c.username + "****************")
+                if(c!=null){
+                    Log.d(TAG, c.username + "****************")
 
-                firebaseDataSource.updateNotificationChannelID(id, c.username).addOnFailureListener {
+                    firebaseDataSource.updateNotificationChannelID(id, c.username)
+                        .addOnFailureListener {
 
-                    getNotificationChannelID().addOnSuccessListener {
-                        Log.d(TAG, "failed ${it.token}")
-                        firebaseDataSource.updateNotificationChannelID(it.token, c.username)
-                    }.addOnSuccessListener {
-                        Log.d(TAG, "Updated successfully")
-                    }
+                            getNotificationChannelID().addOnSuccessListener {
+                                Log.d(TAG, "failed ${it.token}")
+                                firebaseDataSource.updateNotificationChannelID(it.token, c.username)
+                            }.addOnSuccessListener {
+                                Log.d(TAG, "Updated successfully")
+                            }
+                        }
                 }
             }
         }
@@ -162,7 +171,7 @@ class DataRepository @Inject constructor(
         localDataSource.updateContact(contact)
     }
 
-    fun getMydetails(): ContactNameUsername{
+    fun getMydetails(): ContactNameUsername?{
         return localDataSource.getMyDetails()
     }
 
@@ -258,6 +267,31 @@ class DataRepository @Inject constructor(
                 }
             }
         }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // ChatList Fragment stuff
+    ///////////////////////////////////////////////////////////////////////////
+
+    fun getConversationIDFromUsername(username: String): String?{
+        return localDataSource.getConversationIDFromUsername(username)
+    }
+
+    // TODO: 6/11/2020 implement this after completing the checking for already available thing
+    fun createNewChat121(request: HashMap<String, String>): Task<HttpsCallableResult> {
+        return functionsSource.createNewChat121(request)
+    }
+
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Test
+    ///////////////////////////////////////////////////////////////////////////
+    fun addTestDateData(){
+        firebaseDataSource.addTestDateData();
+    }
+
+    fun getTestDateData(){
+        firebaseDataSource.getTestDateData()
     }
 }
 

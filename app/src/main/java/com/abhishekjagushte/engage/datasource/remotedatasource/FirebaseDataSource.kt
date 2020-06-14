@@ -1,12 +1,17 @@
 package com.abhishekjagushte.engage.datasource.remotedatasource
 
 import android.util.Log
+import com.abhishekjagushte.engage.network.DateTest
 import com.abhishekjagushte.engage.utils.Constants
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.*
+import com.google.firebase.firestore.ktx.toObject
+import java.time.LocalDateTime
+import java.time.OffsetDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
 import java.util.*
 import javax.inject.Inject
-import kotlin.collections.HashMap
 
 class FirebaseDataSource @Inject constructor(
     private val firestore: FirebaseFirestore
@@ -57,5 +62,32 @@ class FirebaseDataSource @Inject constructor(
     fun updateNotificationChannelID(id: String, username: String): Task<Void> {
         Log.d(TAG, "Inside firebase datasource")
         return firestore.collection("users").document(username).update("notificationChannelID", id)
+    }
+
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Test
+    ///////////////////////////////////////////////////////////////////////////
+    fun addTestDateData() {
+        firestore.collection("test").document().set(DateTest(name = "Panda1"))
+        firestore.collection("test").document().set(DateTest(name = "Panda2"))
+
+    }
+
+    fun getTestDateData() {
+        firestore.collection("test").orderBy("offsetDateTime").get().addOnSuccessListener {
+            for(doc in it.documents){
+
+                val dateTest = doc.toObject<DateTest>()
+                val date = dateTest!!.offsetDateTime
+                val offsetDateTime: LocalDateTime = date!!.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
+
+                Log.d(TAG, "${dateTest!!.name} + $offsetDateTime + ${dateTest.offsetDateTime.toString()}")
+
+                val d = Date.from(offsetDateTime.toInstant(ZoneOffset.MAX))
+
+                Log.d(TAG, "Converted = ${d.toString()}")
+            }
+        }
     }
 }

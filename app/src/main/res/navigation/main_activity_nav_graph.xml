@@ -9,7 +9,11 @@
         android:id="@+id/chatListFragment"
         android:name="com.abhishekjagushte.engage.ui.main.fragments.chatlist.ChatListFragment"
         android:label="chat_list_fragment"
-        tools:layout="@layout/fragment_chat_list" />
+        tools:layout="@layout/fragment_chat_list" >
+        <action
+            android:id="@+id/action_chatListFragment_to_chatFragment"
+            app:destination="@id/chatFragment" />
+    </fragment>
     <fragment
         android:id="@+id/eventsFragment"
         android:name="com.abhishekjagushte.engage.ui.main.fragments.events.EventsFragment"
@@ -22,7 +26,12 @@
         tools:layout="@layout/fragment_search" >
         <action
             android:id="@+id/action_searchFragment_to_profileActivity"
-            app:destination="@id/profileFragment" />
+            app:destination="@id/profileFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left" />
+        <action
+            android:id="@+id/action_searchFragment_to_chatFragment"
+            app:destination="@id/chatFragment" />
     </fragment>
     <fragment
         android:id="@+id/peopleFragment"
@@ -46,7 +55,9 @@
             app:argType="string" />
         <action
             android:id="@+id/action_profileActivity_to_chatFragment"
-            app:destination="@id/chatFragment" />
+            app:destination="@id/chatFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left" />
     </fragment>
     <fragment
         android:id="@+id/testFragment"
@@ -57,7 +68,16 @@
         android:id="@+id/chatFragment"
         android:name="com.abhishekjagushte.engage.ui.chat.fragments.chat.ChatFragment"
         android:label="fragment_chat"
-        tools:layout="@layout/fragment_chat" />
+        tools:layout="@layout/fragment_chat" >
+        <argument
+            android:name="username"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="conversationID"
+            app:argType="string"
+            app:nullable="true" />
+    </fragment>
 
     <fragment
         android:id="@+id/splashScreen"
@@ -84,10 +104,14 @@
             tools:layout="@layout/fragment_choose_method" >
             <action
                 android:id="@+id/action_chooseMethodFragment_to_loginFragment"
-                app:destination="@id/loginFragment" />
+                app:destination="@id/loginFragment"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/slide_out_left" />
             <action
                 android:id="@+id/action_chooseMethodFragment_to_signUpFragment"
-                app:destination="@id/signUpFragment" />
+                app:destination="@id/signUpFragment"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/slide_out_left" />
         </fragment>
         <fragment
             android:id="@+id/loginFragment"
@@ -101,7 +125,9 @@
             tools:layout="@layout/fragment_sign_up" >
             <action
                 android:id="@+id/action_signUpFragment_to_setUsernameFragment"
-                app:destination="@id/setUsernameFragment" />
+                app:destination="@id/setUsernameFragment"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/slide_out_left" />
         </fragment>
         <fragment
             android:id="@+id/setUsernameFragment"
@@ -118,7 +144,8 @@
 
         <action
             android:id="@+id/action_global_chatListFragment"
-            app:destination="@id/chatListFragment" />
+            app:destination="@id/chatListFragment"
+            app:enterAnim="@anim/slide_in_right" />
 
     </navigation>
 

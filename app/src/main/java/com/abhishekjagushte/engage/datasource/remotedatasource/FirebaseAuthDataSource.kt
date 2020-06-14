@@ -1,6 +1,5 @@
 package com.abhishekjagushte.engage.datasource.remotedatasource
 
-import androidx.lifecycle.LiveData
 import com.abhishekjagushte.engage.network.Profile
 import com.abhishekjagushte.engage.utils.Constants
 import com.google.android.gms.tasks.Task
@@ -8,7 +7,8 @@ import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.iid.FirebaseInstanceId
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.*
 import javax.inject.Inject
 
@@ -36,13 +36,13 @@ class FirebaseAuthDataSource @Inject constructor(
 
         val id = getCurrentUserUID()
 
-            val profile = Profile(
-                name = name,
-                username = username,
-                id = id,
-                joinTimeStamp = Date(),
-                notificationChannelID = notificationChannelID
-            )
+        val profile = Profile(
+            name = name,
+            username = username,
+            id = id,
+            joinTimeStamp = Date(),
+            notificationChannelID = notificationChannelID
+        )
 
         return Pair(firestore.collection(Constants.FIREBASE_USERS_COLLECTION).document(username).set(profile), profile)
     }

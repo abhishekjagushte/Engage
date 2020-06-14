@@ -2,10 +2,14 @@ package com.abhishekjagushte.engage.di
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.firestore.FirebaseFirestoreSettings
+import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.iid.FirebaseInstanceId
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
+
 
 @Module
 class NetworkModule (){
@@ -13,7 +17,13 @@ class NetworkModule (){
     @Provides
     @Singleton
     fun provideFirebaseDataSource(): FirebaseFirestore{
-        return FirebaseFirestore.getInstance()
+
+        val firestore = FirebaseFirestore.getInstance()
+        val settings = FirebaseFirestoreSettings.Builder()
+            .setTimestampsInSnapshotsEnabled(true)
+            .build()
+        firestore.setFirestoreSettings(settings)
+        return firestore
     }
 
     @Provides
@@ -26,6 +36,12 @@ class NetworkModule (){
     @Singleton
     fun provideFirebaseInstanceSource(): FirebaseInstanceId{
         return FirebaseInstanceId.getInstance()
+    }
+
+    @Provides
+    @Singleton
+    fun provideFirebaseFunctionsSource(): FirebaseFunctions{
+        return FirebaseFunctions.getInstance()
     }
 
 }

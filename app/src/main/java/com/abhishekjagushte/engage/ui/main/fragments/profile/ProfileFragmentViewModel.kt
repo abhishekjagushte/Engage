@@ -9,6 +9,7 @@ import com.abhishekjagushte.engage.network.Profile
 import com.abhishekjagushte.engage.network.convertDomainObject
 import com.abhishekjagushte.engage.repository.DataRepository
 import com.abhishekjagushte.engage.utils.Constants
+import com.google.firebase.functions.FirebaseFunctions
 import kotlinx.coroutines.*
 import java.util.*
 import javax.inject.Inject
@@ -81,9 +82,9 @@ class ProfileFragmentViewModel @Inject constructor(
                                     //This part is for updating contact information
                                     val networkProfileDisplay = profile.convertToProfileDisplay(contact.type)
 
-                                    if(localProfileDisplay != networkProfileDisplay){
+                                    if(!localProfileDisplay.equals( networkProfileDisplay)){
                                         _profileDisplay.postValue(networkProfileDisplay)
-                                        Log.d(TAG, "Changed")
+                                        Log.d(TAG, "Changed + ${networkProfileDisplay.timeStampString}")
                                         contact.bio = networkProfileDisplay.bio
                                         contact.dp_thmb = networkProfileDisplay.dp_thmb
                                         contact.name = networkProfileDisplay.name
@@ -107,7 +108,7 @@ class ProfileFragmentViewModel @Inject constructor(
             withContext(Dispatchers.IO) {
                 val myDetails = dataRepository.getMydetails()
                 val request = hashMapOf<String, Any>(
-                    "senderID" to myDetails.username,
+                    "senderID" to myDetails!!.username,
                     "senderName" to myDetails.name,
                     "receiverID" to profileDisplay.value!!.username,
                     "timeStamp" to Date().toString(),
@@ -118,7 +119,7 @@ class ProfileFragmentViewModel @Inject constructor(
                     _actionStatus.value = FRIEND_REQUEST_SENT
                     viewModelScope.launch {
                         withContext(Dispatchers.IO) {
-                            //dataRepository.addContact(networkProfile!!.convertDomainObject(Constants.CONTACTS_REQUESTED))
+                            dataRepository.addContact(networkProfile!!.convertDomainObject(Constants.CONTACTS_REQUESTED))
                         }
                     }
                 }
@@ -132,7 +133,7 @@ class ProfileFragmentViewModel @Inject constructor(
                 withContext(Dispatchers.IO) {
                     val myDetails = dataRepository.getMydetails()
                     val request = hashMapOf<String, Any>(
-                        "senderID" to myDetails.username,
+                        "senderID" to myDetails!!.username,
                         "senderName" to myDetails.name,
                         "receiverID" to profileDisplay.value!!.username,
                         "timeStamp" to Date().toString(),
@@ -190,12 +191,42 @@ fun Profile.convertToProfileDisplay(type: Int): ProfileDisplay {
 }
 
 
-class ProfileDisplay(
+data class ProfileDisplay(
     val name: String,
     val username: String,
     val dp_thmb: ByteArray? = null,
     val bio: String,
     val timeStampString: String,
     val type: Int
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as ProfileDisplay
+
+        if (name != other.name) return false
+        if (username != other.username) return false
+        if (dp_thmb != null) {
+            if (other.dp_thmb == null) return false
+            if (!dp_thmb.contentEquals(other.dp_thmb)) return false
+        } else if (other.dp_thmb != null) return false
+        if (bio != other.bio) return false
+        if (timeStampString != other.timeStampString) return false
+        if (type != other.type) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + username.hashCode()
+        result = 31 * result + (dp_thmb?.contentHashCode() ?: 0)
+        result = 31 * result + bio.hashCode()
+        result = 31 * result + timeStampString.hashCode()
+        result = 31 * result + type
+        return result
+    }
+}
+
 

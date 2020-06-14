@@ -1,6 +1,8 @@
 package com.abhishekjagushte.engage.database
 
 import androidx.room.*
+import java.time.LocalDateTime
+import java.util.Date;
 
 @Entity(tableName = "contacts")
 class Contact(
@@ -44,21 +46,24 @@ data class UserData(
 @Entity(tableName = "conversations")
 class Conversation(
     @PrimaryKey
-    val networkID: String,
-    val name: String,
+    val networkID: String, //the conversationID for the conversation
+    val name: String, //the name will be displayed on the chat_list so this can be name or nickname in case of 121
+                        // and group name in case of M2M
 
     //Username for 121 chats so that we can use the username of the contact to update any required dp or bio
     val username: String? = null,
 
     @ColumnInfo(name="dp_thmb", typeAffinity = ColumnInfo.BLOB)
-    val dp_thmb: ByteArray? = null,
+    val dp_thmb: ByteArray? = null, //the thumbnail of dp
 
-    val type: Int,
-    val status: Int,
-    val priority: Int,
-    val lastMessageID: String? = null,
-    val dp_url: String? = null,
-    val desc: String? = null
+    val type: Int, // determines whether the conversation is 121 or M2M
+    val priority: Int = 0, //one can set priority if he wants to receive these messages atop
+    val lastMessageID: String? = null, //the id of the last message that will contain the information about the message to be displayed
+    val dp_url: String? = null, //the url to dp
+    val desc: String? = null, //possible group description in case of M2M
+    val active: Int //this if 1 says that this conversation should be displayed in chat_list and this being 0
+                    //is significant to store conversationID of inactive chats that are synced while first time insatll
+                    // of login or reinstall (during login, if backup not restored all 121 chats are active=0
 )
 
 @Entity(tableName = "contacts_chats_cross_ref", primaryKeys = ["username", "networkID"])
@@ -86,6 +91,56 @@ data class CommonGroups(
     )
     val groups: List<Conversation>
 )
+
+
+@Entity(tableName = "messages")
+class Message(
+
+    @PrimaryKey
+    val messageID: String,
+    val conversationID: String,
+    val type: Int?, //states whether type is text or media
+    val status: Int?, //status of message required for if message read by other party
+    val needs_push: Int?, //determines whether push needs to be done if device was offline
+    val timeStamp: LocalDateTime?, //this timestamp will be the timestamp while sending the message
+    val data: String?, //the data of message
+    val senderID: String?, //the senderID of the message
+    val receiverID: String?, //the receiverID for the message
+    val deleted: Int = 0, //if 1 then the message is deleted else 0 or null
+
+    //Media
+    val mime_type: String?, //the mime type
+    val server_url: String?, // the cloud url for the media
+    val local_uri: String?, //local uri (the file path) for the media
+    val latitude: Double?, //latitude for location sharing
+    val longitude: Double?, //logitude for location sharing
+
+    @ColumnInfo(name="dp_thmb", typeAffinity = ColumnInfo.BLOB)
+    val thumb_nail: ByteArray?, //thumbnail for the media
+
+    val reply_toID: String?
+)
+
+@DatabaseView(value = "SELECT contacts.nickname, messages.messageID, messages.conversationID ,messages.type, messages.status, messages.timeStamp, messages.data, messages.senderID, messages.receiverID, messages.deleted, messages.mime_type, messages.server_url, messages.local_uri, messages.latitude, messages.longitude, messages.reply_toID FROM contacts INNER JOIN messages ON messages.senderID = contacts.network_id", viewName = "message_view")
+data class MessageView(
+    val nickname: String?,
+    val messageID: String,
+    val conversationID: String,
+    val type: Int?,
+    val status: Int?,
+    val timeStamp: LocalDateTime?,
+    val data: String?,
+    val senderID: String?,
+    val receiverID: String?,
+    val deleted: Int,
+    val mime_type: String?,
+    val server_url: String?,
+    val local_uri: String?,
+    val latitude: Double?,
+    val longitude: Double?,
+    val reply_toID: String?
+)
+
 
 data class SearchResultConversation(
     val name:String,
