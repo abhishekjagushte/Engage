@@ -46,6 +46,29 @@ object Constants {
     const val ARGUMENT_NAME = "name"
     const val ARGUMENT_USERNAME = "username"
 
+    //Chat constants
+    const val TYPE_MY_MSG = 0
+    const val TYPE_OTHER_MSG = 1
+    const val STATUS_NOT_SENT = 0
+    const val STATUS_SENT_BUT_NOT_DELIVERED = 1
+    const val STATUS_SENT_BUT_NOT_READ = 2
+    const val STATUS_SENT_AND_READ = 3
+
+    const val NEEDS_PUSH_YES = 1
+    const val NEEDS_PUSH_NO = 2
+
+    const val DELETED_NO = 1
+    const val DELETED_YES = 2
+
+    const val MIME_TYPE_TEXT = "text/plain"
+
+    //Conversation types
+    const val CONVERSATION_TYPE_121 = 1
+    const val CONVERSATION_TYPE_M2M = 2
+
+    const val CONVERSATION_ACTIVE_YES = 1
+    const val CONVERSATION_ACTIVE_NO = 2
+
 }
 
 //Contacts

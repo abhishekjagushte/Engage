@@ -20,6 +20,7 @@ import javax.inject.Inject
 
 const val TYPE_FR_ACCEPTED = 1
 const val TYPE_FR_RECEIVED = 2
+const val TYPE_MSG_RECEIVED_121 =  3
 
 class NotificationHandler : FirebaseMessagingService(){
 
@@ -54,6 +55,10 @@ class NotificationHandler : FirebaseMessagingService(){
                 "2" -> {
                     buildNotification(p0.data, TYPE_FR_ACCEPTED)
                     dataRepository.friendRequestAccepted(p0.data)
+                }
+
+                "3" -> {
+                    Log.d(TAG, "onMessageReceived: ${p0.data.toString()}")
                 }
             }
         }

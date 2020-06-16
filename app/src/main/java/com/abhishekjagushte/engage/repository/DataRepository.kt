@@ -1,9 +1,12 @@
 package com.abhishekjagushte.engage.repository
 
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.abhishekjagushte.engage.database.Contact
 import com.abhishekjagushte.engage.database.ContactNameUsername
+import com.abhishekjagushte.engage.database.Message
+import com.abhishekjagushte.engage.database.MessageView
 import com.abhishekjagushte.engage.datasource.localdatasource.FirebaseInstanceSource
 import com.abhishekjagushte.engage.datasource.localdatasource.LocalDataSource
 import com.abhishekjagushte.engage.datasource.remotedatasource.FirebaseAuthDataSource
@@ -282,6 +285,31 @@ class DataRepository @Inject constructor(
         return functionsSource.createNewChat121(request)
     }
 
+    fun getChats(conversationID: String): LiveData<List<Message>> {
+        return localDataSource.getChats(conversationID)
+    }
+
+    fun saveTextMessage121Local(
+        message: String,
+        conversationID: String,
+        myUsername: String,
+        otherUsername: String
+    ) {
+        localDataSource.saveTextMessage121Local(message, conversationID, myUsername, otherUsername)
+    }
+
+    fun addConversation121(username: String, conversationID: String){
+        localDataSource.addConversation121(username, conversationID)
+    }
+
+    fun getUnsentMessages(): LiveData<List<Message>> {
+        return localDataSource.getUnsentMessages()
+    }
+
+    fun pushMessage(message: Message) {
+        localDataSource.pushMessage(message)//Since pushing messaage is more of a job for local databse updation, it is done in local db source
+    }
+
 
     ///////////////////////////////////////////////////////////////////////////
     // Test
@@ -293,6 +321,7 @@ class DataRepository @Inject constructor(
     fun getTestDateData(){
         firebaseDataSource.getTestDateData()
     }
+
 }
 
 

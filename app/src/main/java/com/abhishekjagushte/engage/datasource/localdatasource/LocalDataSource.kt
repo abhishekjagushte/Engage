@@ -1,11 +1,24 @@
 package com.abhishekjagushte.engage.datasource.localdatasource
 
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.abhishekjagushte.engage.database.*
+import com.abhishekjagushte.engage.utils.Constants
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.*
+import kotlinx.coroutines.tasks.await
+import java.lang.Exception
+import java.time.LocalDateTime
 import javax.inject.Inject
 
-class LocalDataSource @Inject constructor (private val databaseDao: DatabaseDao){
+class LocalDataSource @Inject constructor (
+    private val databaseDao: DatabaseDao,
+    private val firestore: FirebaseFirestore
+){
+
+    private val job: Job = Job()
+    private val localDBScope = CoroutineScope(Dispatchers.Main + job)
 
     private val TAG = "LocalDataSource"
 
@@ -116,4 +129,81 @@ class LocalDataSource @Inject constructor (private val databaseDao: DatabaseDao)
     fun getConversationIDFromUsername(username: String): String? {
         return databaseDao.getConversationIDFromUsername(username)
     }
+
+    fun getChats(conversationID: String): LiveData<List<Message>> {
+        return databaseDao.getChats(conversationID)
+    }
+
+    fun saveTextMessage121Local(
+        message: String,
+        conversationID: String,
+        myUsername: String,
+        otherUsername: String
+    ) {
+        val msg = Message(
+            messageID = firestore.collection("conversations121/$conversationID/chats").document().id,
+            conversationID = conversationID,
+            type = Constants.TYPE_MY_MSG,
+            status = Constants.STATUS_NOT_SENT,
+            needs_push = Constants.NEEDS_PUSH_YES,
+            timeStamp = LocalDateTime.now(),
+            data = message,
+            senderID = myUsername,
+            receiverID = otherUsername,
+            deleted = Constants.DELETED_NO,
+            mime_type = Constants.MIME_TYPE_TEXT,
+            conType = Constants.CONVERSATION_TYPE_121
+        )
+
+        databaseDao.insertMessage(msg)
+        try {
+            Log.d(
+                TAG,
+                "saveTextMessage121Local: ${databaseDao.getChatsCount(conversationID).size}"
+            )
+        }catch (e: Exception){
+            e.printStackTrace()
+        }
+        }
+
+    fun addConversation121(username: String, conversationID: String){
+        val conversation = Conversation(
+            networkID = conversationID,
+            name = databaseDao.getNameFromUsername(username),
+            username = username,
+            type = Constants.CONVERSATION_TYPE_121,
+            active = Constants.CONVERSATION_ACTIVE_YES
+        )
+
+        databaseDao.insertConversation(conversation)
+    }
+
+    fun getUnsentMessages(): LiveData<List<Message>> {
+        return databaseDao.getUnsentMessages()
+    }
+
+    fun pushMessage(message: Message) {
+        when(message.conType){
+            Constants.CONVERSATION_TYPE_121 -> {
+                firestore.collection("conversations121/${message.conversationID}/chats")
+                    .document(message.messageID)
+                    .set(message.convertNetworkMessage())
+                    .addOnSuccessListener {
+
+                        localDBScope.launch {
+                            withContext(Dispatchers.IO) {
+                                message.status = Constants.STATUS_SENT_BUT_NOT_DELIVERED
+                                databaseDao.updateMessage(message)
+                                Log.d(TAG, "pushMessage: ${message.data} sent")
+                            }
+                        }
+                    }
+            }
+
+            Constants.CONVERSATION_TYPE_M2M -> {
+
+            }
+        }
+    }
+
 }

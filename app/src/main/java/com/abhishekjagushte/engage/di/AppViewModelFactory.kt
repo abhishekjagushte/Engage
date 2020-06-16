@@ -2,6 +2,8 @@ package com.abhishekjagushte.engage.di
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import dagger.Binds
+import dagger.Module
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -34,4 +36,13 @@ class AppViewModelFactory @Inject constructor(
             throw RuntimeException(e)
         }
     }
+}
+
+@Module
+abstract class ViewModelBuilderModule {
+
+    @Binds
+    abstract fun bindViewModelFactory(
+        factory: AppViewModelFactory
+    ): ViewModelProvider.Factory
 }

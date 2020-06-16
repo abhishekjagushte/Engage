@@ -58,6 +58,29 @@ interface DatabaseDao{
     @Query("SELECT networkID from conversations WHERE username == :username")
     fun getConversationIDFromUsername(username: String): String?
 
-    @Query("SELECT * FROM message_view WHERE conversationID == :conversationID ORDER BY timeStamp")
-    fun getMessageView(conversationID: String): LiveData<MessageView>
+    @Query("SELECT * FROM messages WHERE conversationID == :conversationID ORDER BY timeStamp")
+    fun getChats(conversationID: String): LiveData<List<Message>>
+
+    @Insert
+    fun insertConversation(conversation: Conversation)
+
+    @Query("SELECT * FROM messages WHERE conversationID == :conversationID ORDER BY timeStamp")
+    fun getChatsCount(conversationID: String): List<Message>
+
+    @Insert
+    fun insertMessage(message: Message)
+
+    @Query("SELECT COUNT(*) FROM message_view")
+    fun testCOuntMessages(): Int
+
+    @Query("SELECT nickname FROM contacts WHERE username == :username")
+    fun getNameFromUsername(username: String): String
+
+
+    @Query("SELECT * FROM messages WHERE status == 0")
+    fun getUnsentMessages(): LiveData<List<Message>>
+
+    @Update
+    fun updateMessage(message: Message)
+
 }

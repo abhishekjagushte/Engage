@@ -44,13 +44,12 @@ data class DateTest constructor(
 )
 
 
-class Message(
+class MessageNetwork(
     val messageID: String,
     val conversationID: String,
-    val type: Int?, //states whether type is text or media
 
     @ServerTimestamp
-    val timeStamp: Date?, //this timestamp will be the timestamp while sending the message
+    val timeStamp: Date?=null, //this timestamp will be the timestamp while sending the message
 
     val data: String?, //the data of message
     val senderID: String?, //the senderID of the message
@@ -58,11 +57,11 @@ class Message(
 
     //Media
     val mime_type: String?, //the mime type
-    val server_url: String?, // the cloud url for the media
-    val latitude: Double?, //latitude for location sharing
-    val longitude: Double?, //logitude for location sharing
+    val server_url: String?=null, // the cloud url for the media
+    val latitude: Double?=null, //latitude for location sharing
+    val longitude: Double?=null, //logitude for location sharing
 
-    val thumb_nail: ByteArray?, //thumbnail for the media
+    val thumb_nail: ByteArray?=null, //thumbnail for the media
 
-    val reply_toID: String?
+    val reply_toID: String?=null
 )

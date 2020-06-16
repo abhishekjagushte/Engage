@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -18,6 +19,8 @@ import com.abhishekjagushte.engage.EngageApplication
 
 import com.abhishekjagushte.engage.R
 import com.abhishekjagushte.engage.databinding.FragmentChatListBinding
+import com.abhishekjagushte.engage.ui.main.MainActivity
+import com.abhishekjagushte.engage.ui.main.MainActivityViewModel
 import com.google.android.material.appbar.AppBarLayout
 import javax.inject.Inject
 
@@ -26,6 +29,7 @@ class ChatListFragment : Fragment() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
+
 
     lateinit var appBar: AppBarLayout
     lateinit var toolbar: Toolbar
@@ -46,6 +50,7 @@ class ChatListFragment : Fragment() {
             R.layout.fragment_chat_list, container, false)
         //return inflater.inflate(R.layout.fragment_chat_list, container, false)
 
+        (requireActivity() as MainActivity).viewModel.printPanda()
         viewModel.showUserDataCount()
 
         viewModel.testText.observe(viewLifecycleOwner, Observer {

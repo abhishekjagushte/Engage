@@ -1,22 +1,20 @@
 package com.abhishekjagushte.engage.di
 
 import android.app.Application
-import androidx.lifecycle.ViewModelProvider
 import com.abhishekjagushte.engage.EngageApplication
 import com.abhishekjagushte.engage.notifications.NotificationHandler
-import com.abhishekjagushte.engage.repository.DataRepository
 import com.abhishekjagushte.engage.ui.SplashScreenFragment
 import com.abhishekjagushte.engage.ui.chat.fragments.chat.ChatComponent
 import com.abhishekjagushte.engage.ui.chat.fragments.chat.fragments.chatscreen.di.ChatScreenComponent
 import com.abhishekjagushte.engage.ui.chat.fragments.chat.fragments.eventscreen.di.EventComponent
 import com.abhishekjagushte.engage.ui.main.MainActivity
+import com.abhishekjagushte.engage.ui.main.MainComponent
 import com.abhishekjagushte.engage.ui.main.fragments.chatlist.ChatListComponent
 import com.abhishekjagushte.engage.ui.main.fragments.profile.di.ProfileComponent
 import com.abhishekjagushte.engage.ui.main.fragments.search.di.SearchComponent
 import com.abhishekjagushte.engage.ui.setup.fragments.login.di.LoginComponent
 import com.abhishekjagushte.engage.ui.setup.fragments.setusername.di.SetUsernameComponent
 import com.abhishekjagushte.engage.ui.setup.fragments.signup.di.SignUpComponent
-import dagger.Binds
 import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
@@ -40,7 +38,7 @@ interface AppComponent: AndroidInjector<EngageApplication>{
     fun inject(splashScreen: SplashScreenFragment)
     fun inject(mainActivity: MainActivity)
 
-
+    fun addMainComponent(): MainComponent.Factory
     fun addEventScreenComponent(): EventComponent.Factory
     fun addChatScreenComponent(): ChatScreenComponent.Factory
     fun addChatComponent(): ChatComponent.Factory
@@ -51,20 +49,13 @@ interface AppComponent: AndroidInjector<EngageApplication>{
     fun addLoginComponent(): LoginComponent.Factory
     fun addSignUpComponent(): SignUpComponent.Factory
     fun addSetUsernameComponent(): SetUsernameComponent.Factory
-    fun getDataRepository(): DataRepository
-}
-
-@Module
-abstract class ViewModelBuilderModule {
-
-    @Binds
-    abstract fun bindViewModelFactory(
-        factory: AppViewModelFactory
-    ): ViewModelProvider.Factory
 }
 
 
-@Module(subcomponents = [LoginComponent::class,
+
+
+@Module(subcomponents =
+    [LoginComponent::class,
     SignUpComponent::class,
     SetUsernameComponent::class,
     ChatListComponent::class,
@@ -72,5 +63,6 @@ abstract class ViewModelBuilderModule {
     ProfileComponent::class,
     ChatComponent::class,
     ChatScreenComponent::class,
-    EventComponent::class])
+    EventComponent::class,
+    MainComponent::class])
 object SubcomponentsModule

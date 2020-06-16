@@ -1,8 +1,8 @@
 package com.abhishekjagushte.engage.database
 
 import androidx.room.*
+import com.abhishekjagushte.engage.network.MessageNetwork
 import java.time.LocalDateTime
-import java.util.Date;
 
 @Entity(tableName = "contacts")
 class Contact(
@@ -99,8 +99,8 @@ class Message(
     @PrimaryKey
     val messageID: String,
     val conversationID: String,
-    val type: Int?, //states whether type is text or media
-    val status: Int?, //status of message required for if message read by other party
+    val type: Int?, //states whether the message is mine or other's
+    var status: Int?, //status of message required for if message read by other party
     val needs_push: Int?, //determines whether push needs to be done if device was offline
     val timeStamp: LocalDateTime?, //this timestamp will be the timestamp while sending the message
     val data: String?, //the data of message
@@ -110,18 +110,33 @@ class Message(
 
     //Media
     val mime_type: String?, //the mime type
-    val server_url: String?, // the cloud url for the media
-    val local_uri: String?, //local uri (the file path) for the media
-    val latitude: Double?, //latitude for location sharing
-    val longitude: Double?, //logitude for location sharing
+    val server_url: String?=null, // the cloud url for the media
+    val local_uri: String?=null, //local uri (the file path) for the media
+    val latitude: Double?=null, //latitude for location sharing
+    val longitude: Double?=null, //logitude for location sharing
 
     @ColumnInfo(name="dp_thmb", typeAffinity = ColumnInfo.BLOB)
-    val thumb_nail: ByteArray?, //thumbnail for the media
+    val thumb_nail: ByteArray?=null, //thumbnail for the media
 
-    val reply_toID: String?
-)
+    val reply_toID: String?=null,
 
-@DatabaseView(value = "SELECT contacts.nickname, messages.messageID, messages.conversationID ,messages.type, messages.status, messages.timeStamp, messages.data, messages.senderID, messages.receiverID, messages.deleted, messages.mime_type, messages.server_url, messages.local_uri, messages.latitude, messages.longitude, messages.reply_toID FROM contacts INNER JOIN messages ON messages.senderID = contacts.network_id", viewName = "message_view")
+    //@Ignore val name: String?=null, //for other messages
+
+    val conType: Int
+){
+    fun convertNetworkMessage(): MessageNetwork{
+        return MessageNetwork(
+            messageID = messageID,
+            conversationID = conversationID,
+            data = data,
+            senderID = senderID,
+            receiverID = receiverID,
+            mime_type = mime_type
+        )
+    }
+}
+
+@DatabaseView(value = "SELECT contacts.nickname, messages.messageID, messages.conversationID ,messages.type, messages.status, messages.timeStamp, messages.data, messages.senderID, messages.receiverID, messages.deleted, messages.mime_type, messages.server_url, messages.local_uri, messages.latitude, messages.longitude, messages.reply_toID FROM contacts INNER JOIN messages ON messages.receiverID = contacts.network_id", viewName = "message_view")
 data class MessageView(
     val nickname: String?,
     val messageID: String,
