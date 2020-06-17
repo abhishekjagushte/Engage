@@ -1,5 +1,7 @@
 package com.abhishekjagushte.engage.ui.main
 
+import android.icu.text.SimpleDateFormat
+import android.icu.util.TimeZone
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -21,8 +23,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import java.time.Instant
 import java.time.OffsetDateTime
+import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import java.util.*
 import javax.inject.Inject
 
 
@@ -54,7 +58,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         NavigationUI.setupWithNavController(bottomNavigationView,navController)
         navController.addOnDestinationChangedListener(this)
 
-        //test()
+        test()
 
         setUnsentMessageSender()
     }
@@ -102,8 +106,8 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
 //            dataRepository.updateNotificationChannelID(it.token)
 //        }
 
-        Log.d(TAG, DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.now()))
-        Log.d(TAG, OffsetDateTime.now().toString())
+//        Log.d(TAG, DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.now()))
+//        Log.d(TAG, OffsetDateTime.now().toString())
 
         //val f = FirebaseFirestore.getInstance()
         //Log.d(TAG, f.collection("users").document().id + "is the id")
@@ -111,13 +115,26 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         //dataRepository.addTestDateData()
         //dataRepository.getTestDateData()
 
+//
+        val date = Instant.parse("2020-06-17T08:06:58.133Z")
+        //Log.d(TAG, "test: ${date.toString()} is the instant")
+        
+//        val offsetDateTime = OffsetDateTime.now()
+//        Log.d(TAG, "test: ${offsetDateTime}")
+//
+//
+//        Log.d(TAG, DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(offsetDateTime))
+//
+//        Log.d(TAG+"********", intent?.dataString?:"Not Found")
 
-        val date = Instant.now()
-        val offsetDateTime = date
-            .atOffset(ZoneOffset.UTC)
+//        val o = OffsetDateTime.now(ZoneOffset.UTC)
 
-        Log.d(TAG, DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(offsetDateTime))
+        val time = 1592406179920
+        //val sdf = SimpleDateFormat("MMM dd, yyyy HH:mm:ss")
+        //val sdf = SimpleDateFormat("yyyy-MM-dd.HH:mm:ss", Locale.ENGLISH)
+        val sdf = SimpleDateFormat("HH:mm", Locale.ENGLISH)
+        sdf.setTimeZone(TimeZone.getDefault())
+        println(sdf.format(time))
 
-        Log.d(TAG+"********", intent?.dataString?:"Not Found")
     }
 }

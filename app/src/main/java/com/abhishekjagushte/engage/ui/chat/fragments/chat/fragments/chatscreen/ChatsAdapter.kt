@@ -1,5 +1,6 @@
 package com.abhishekjagushte.engage.ui.chat.fragments.chat.fragments.chatscreen
 
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -13,13 +14,18 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.logging.Handler
 
 const val MY_TEXT_MESSAGE = 1
 const val OTHER_TEXT_MESSAGE = 2
 
-class ChatsAdapter: ListAdapter<ChatDataItem, RecyclerView.ViewHolder>(ChatDiffCallBack()){
+class ChatsAdapter(
+    private val recyclerView: RecyclerView,
+    private val handler: android.os.Handler = android.os.Handler(Looper.getMainLooper())
+): ListAdapter<ChatDataItem, RecyclerView.ViewHolder>(ChatDiffCallBack()){
 
     private val adapterScope = CoroutineScope(Dispatchers.Default)
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when(viewType){
@@ -61,7 +67,13 @@ class ChatsAdapter: ListAdapter<ChatDataItem, RecyclerView.ViewHolder>(ChatDiffC
                         else
                             ChatDataItem.OtherTextMessage(it)
                     })
+
+                    handler.post {
+                        recyclerView.scrollToPosition(itemCount)
+                    }
+                    
             }
+
         }
     }
 

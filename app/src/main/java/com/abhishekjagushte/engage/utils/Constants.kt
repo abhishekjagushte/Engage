@@ -46,13 +46,18 @@ object Constants {
     const val ARGUMENT_NAME = "name"
     const val ARGUMENT_USERNAME = "username"
 
-    //Chat constants
+    ///////////////////////////////////////////////////////////////////////////
+    // Chats
+    ///////////////////////////////////////////////////////////////////////////
     const val TYPE_MY_MSG = 0
     const val TYPE_OTHER_MSG = 1
+
+
     const val STATUS_NOT_SENT = 0
     const val STATUS_SENT_BUT_NOT_DELIVERED = 1
     const val STATUS_SENT_BUT_NOT_READ = 2
     const val STATUS_SENT_AND_READ = 3
+    const val STATUS_RECEIVED_BUT_NOT_READ = 4
 
     const val NEEDS_PUSH_YES = 1
     const val NEEDS_PUSH_NO = 2

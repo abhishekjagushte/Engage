@@ -102,7 +102,7 @@ class Message(
     val type: Int?, //states whether the message is mine or other's
     var status: Int?, //status of message required for if message read by other party
     val needs_push: Int?, //determines whether push needs to be done if device was offline
-    val timeStamp: LocalDateTime?, //this timestamp will be the timestamp while sending the message
+    val timeStamp: Long?, //this timestamp will be the timestamp while sending the message
     val data: String?, //the data of message
     val senderID: String?, //the senderID of the message
     val receiverID: String?, //the receiverID for the message

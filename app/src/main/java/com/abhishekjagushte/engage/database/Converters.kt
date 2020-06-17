@@ -1,14 +1,20 @@
 package com.abhishekjagushte.engage.database
 
+import android.util.Log
 import androidx.room.TypeConverter
 import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 class Converters {
 
+    private val TAG="Converters"
+
     @TypeConverter
     fun toLocalDateTime(value: String?): LocalDateTime? {
-        return LocalDateTime.parse(value)
+        val l =  LocalDateTime.parse(value)
+        Log.d(TAG, "toLocalDateTime: ${l.atZone(ZoneId.systemDefault()).toString()}")
+        return l
     }
 
     @TypeConverter

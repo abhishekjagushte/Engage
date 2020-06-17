@@ -10,6 +10,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
 import java.lang.Exception
 import java.time.LocalDateTime
+import java.time.ZoneOffset
 import javax.inject.Inject
 
 class LocalDataSource @Inject constructor (
@@ -146,7 +147,7 @@ class LocalDataSource @Inject constructor (
             type = Constants.TYPE_MY_MSG,
             status = Constants.STATUS_NOT_SENT,
             needs_push = Constants.NEEDS_PUSH_YES,
-            timeStamp = LocalDateTime.now(),
+            timeStamp = System.currentTimeMillis(),
             data = message,
             senderID = myUsername,
             receiverID = otherUsername,
@@ -204,6 +205,14 @@ class LocalDataSource @Inject constructor (
 
             }
         }
+    }
+
+    fun getConversation(conversationID: String): Conversation? {
+        return databaseDao.getConversation(conversationID)
+    }
+
+    fun insertMessage(message: Message) {
+        databaseDao.insertMessage(message)
     }
 
 }

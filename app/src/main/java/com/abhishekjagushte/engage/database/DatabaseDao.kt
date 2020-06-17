@@ -83,4 +83,7 @@ interface DatabaseDao{
     @Update
     fun updateMessage(message: Message)
 
+    @Query("SELECT * FROM conversations WHERE networkID == :conversationID")
+    fun getConversation(conversationID: String):Conversation?
+
 }

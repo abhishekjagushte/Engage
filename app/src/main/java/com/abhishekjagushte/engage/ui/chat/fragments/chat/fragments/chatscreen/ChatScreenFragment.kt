@@ -2,6 +2,7 @@ package com.abhishekjagushte.engage.ui.chat.fragments.chat.fragments.chatscreen
 
 import android.content.Context
 import android.os.Bundle
+import android.text.Editable
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -36,9 +37,12 @@ class ChatScreenFragment : Fragment(R.layout.fragment_chat_screen) {
         //Setting shared viewmodel in this fragment's viewmodel
         viewModel.sharedViewModel = SharedViewModel
 
-        recyclerView.layoutManager = LinearLayoutManager(context)
-        chatsAdapter = ChatsAdapter()
+        val linearLayoutManager = LinearLayoutManager(context)
+        linearLayoutManager.stackFromEnd = true
+        recyclerView.layoutManager = linearLayoutManager
+        chatsAdapter = ChatsAdapter(recyclerView)
         recyclerView.adapter = chatsAdapter
+        recyclerView.smoothScrollToPosition(chatsAdapter.itemCount)
 
         SharedViewModel.chatState.observe(viewLifecycleOwner, Observer {
             if(it==ChatState.EXISTING){
@@ -50,8 +54,12 @@ class ChatScreenFragment : Fragment(R.layout.fragment_chat_screen) {
 
         send_button.setOnClickListener {
             val message = message_input.text.toString()
-            if(!message.isEmpty())
+            if(!message.isEmpty()) {
                 SharedViewModel.sendTextMessage121(message)
+                message_input.text.clear()
+                recyclerView.smoothScrollToPosition(chatsAdapter.itemCount)
+            }
+
         }
 
     }
@@ -63,6 +71,7 @@ class ChatScreenFragment : Fragment(R.layout.fragment_chat_screen) {
 
                 Log.d(TAG, "Size of list = ${l.size}")
                 chatsAdapter.updateList(l)
+                recyclerView.smoothScrollToPosition(chatsAdapter.itemCount)
             })
         }
     }

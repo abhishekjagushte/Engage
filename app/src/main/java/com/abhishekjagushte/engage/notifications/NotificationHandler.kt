@@ -11,6 +11,7 @@ import androidx.core.app.NotificationCompat
 import androidx.navigation.NavDeepLinkBuilder
 import com.abhishekjagushte.engage.EngageApplication
 import com.abhishekjagushte.engage.R
+import com.abhishekjagushte.engage.database.Message
 import com.abhishekjagushte.engage.repository.DataRepository
 import com.abhishekjagushte.engage.utils.Constants
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -59,6 +60,9 @@ class NotificationHandler : FirebaseMessagingService(){
 
                 "3" -> {
                     Log.d(TAG, "onMessageReceived: ${p0.data.toString()}")
+                    val msg = mapToMessage121(p0.data)
+                    dataRepository.receiveMessage121(msg)
+
                 }
             }
         }
@@ -124,6 +128,45 @@ class NotificationHandler : FirebaseMessagingService(){
         }
     }
 
+    //{server_url=, thumb_nail=, conversationID=KqU3ipvZEs1bSfFZo4tF,
+// messageID=NOJi0osuUGNRYksathbp, latitude=, reply_toID=, mime_type=text/plain,
+// data=hio, type=3, timeStamp=1592412297920, longitude=, receiverID=pandaa25, senderID=pandaa24}
+    private fun mapToMessage121(data: Map<String, String>): Message{
+        val messageID = data.get("messageID")
+        val conversationID = data.get("conversationID")
+        val server_url = data.get("server_url")
+        val thumb_nail = data.get("thumb_nail")
+        val latitude = if((data["latitude"] ?: error("")).isEmpty()) null else (data["latitude"] ?: error("")).toDouble()
+        val longitude = if((data["longitude"] ?: error("")).isEmpty()) null else (data["longitude"] ?: error("")).toDouble()
+        val reply_toID = data.get("reply_toID")
+        val receiverID = data.get("receiverID")
+        val senderID = data.get("senderID")
+        val timeStamp = data.get("timeStamp")
+        val mdata = data.get("data")
+        val mime_type = data.get("mime_type")
+
+        return Message(
+            messageID = messageID!!,
+            conversationID = conversationID!!,
+            timeStamp = timeStamp!!.toLong(),
+            data = mdata,
+            senderID = senderID,
+            receiverID = receiverID,
+            mime_type = mime_type,
+            server_url = server_url,
+            latitude = latitude,
+            longitude = longitude,
+            thumb_nail = null,
+            reply_toID = reply_toID,
+
+            type = Constants.TYPE_OTHER_MSG,
+            status = Constants.STATUS_RECEIVED_BUT_NOT_READ,
+            local_uri = null,
+            needs_push = Constants.NEEDS_PUSH_NO,
+            deleted = Constants.DELETED_NO,
+            conType = Constants.CONVERSATION_TYPE_121
+        )
+    }
 }
 
 

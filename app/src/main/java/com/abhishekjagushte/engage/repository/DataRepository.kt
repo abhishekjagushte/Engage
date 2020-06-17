@@ -310,6 +310,17 @@ class DataRepository @Inject constructor(
         localDataSource.pushMessage(message)//Since pushing messaage is more of a job for local databse updation, it is done in local db source
     }
 
+    fun receiveMessage121(message: Message){
+        repoScope.launch {
+            withContext(Dispatchers.IO){
+                if(localDataSource.getConversation(message.conversationID)==null)
+                    localDataSource.addConversation121(message.senderID!!, message.conversationID)
+
+                localDataSource.insertMessage(message)
+            }
+        }
+    }
+
 
     ///////////////////////////////////////////////////////////////////////////
     // Test
