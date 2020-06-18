@@ -1,11 +1,9 @@
 package com.abhishekjagushte.engage.ui.chat.fragments.chat.fragments.chatscreen
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.abhishekjagushte.engage.database.MessageView
 import com.abhishekjagushte.engage.repository.DataRepository
-import com.abhishekjagushte.engage.ui.chat.fragments.chat.ChatState
 import com.abhishekjagushte.engage.ui.chat.fragments.chat.ChatViewModel
 import javax.inject.Inject
 

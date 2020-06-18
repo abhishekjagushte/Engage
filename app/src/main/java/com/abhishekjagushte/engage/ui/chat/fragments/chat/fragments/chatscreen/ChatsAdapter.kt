@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.abhishekjagushte.engage.database.Message
 import com.abhishekjagushte.engage.database.MessageView
+import com.abhishekjagushte.engage.databinding.TextMessage121ContainerLeftBinding
 import com.abhishekjagushte.engage.databinding.TextMessageContainerLeftBinding
 import com.abhishekjagushte.engage.databinding.TextMessageContainerRightBinding
 import kotlinx.coroutines.CoroutineScope
@@ -57,7 +58,7 @@ class ChatsAdapter(
         }
     }
 
-    fun updateList(list: List<Message>?) {
+    fun updateList(list: List<MessageView>?) {
         adapterScope.launch {
             if(list!=null)
                 withContext(Dispatchers.Main) {
@@ -68,20 +69,28 @@ class ChatsAdapter(
                             ChatDataItem.OtherTextMessage(it)
                     })
 
-                    handler.post {
-                        recyclerView.scrollToPosition(0)
-                    }
-
             }
 
         }
+    }
+
+    override fun onCurrentListChanged(
+        previousList: MutableList<ChatDataItem>,
+        currentList: MutableList<ChatDataItem>
+    ) {
+        super.onCurrentListChanged(previousList, currentList)
+        handler.post  {
+            recyclerView.scrollToPosition(0)
+
+        }
+
     }
 
 }
 
 class MyTextMessageViewHolder private constructor(val binding: TextMessageContainerRightBinding): RecyclerView.ViewHolder(binding.root){
 
-    fun bind(message: Message){
+    fun bind(message: MessageView){
         binding.message = message
         binding.executePendingBindings()
     }
@@ -96,9 +105,9 @@ class MyTextMessageViewHolder private constructor(val binding: TextMessageContai
     }
 }
 
-class OtherTextMessageViewHolder private constructor(val binding: TextMessageContainerLeftBinding): RecyclerView.ViewHolder(binding.root){
+class OtherTextMessageViewHolder private constructor(val binding: TextMessage121ContainerLeftBinding): RecyclerView.ViewHolder(binding.root){
 
-    fun bind(message: Message){
+    fun bind(message: MessageView){
         binding.message = message
         binding.executePendingBindings()
     }
@@ -106,7 +115,7 @@ class OtherTextMessageViewHolder private constructor(val binding: TextMessageCon
     companion object{
         fun from(parent: ViewGroup): OtherTextMessageViewHolder {
             val layoutInflater = LayoutInflater.from(parent.context)
-            val binding = TextMessageContainerLeftBinding.inflate(layoutInflater, parent, false)
+            val binding = TextMessage121ContainerLeftBinding.inflate(layoutInflater, parent, false)
 
             return OtherTextMessageViewHolder(binding)
         }
@@ -128,12 +137,12 @@ sealed class ChatDataItem{
     abstract val id: String
     abstract val deleted: Int //for deleted status we will show the message is deleted
 
-    data class MyTextMessage(val message: Message): ChatDataItem() {
+    data class MyTextMessage(val message: MessageView): ChatDataItem() {
         override val id = message.messageID
         override val deleted: Int = message.deleted
     }
 
-    data class OtherTextMessage(val message: Message): ChatDataItem(){
+    data class OtherTextMessage(val message: MessageView): ChatDataItem(){
         override val id = message.messageID
         override val deleted: Int = message.deleted
     }

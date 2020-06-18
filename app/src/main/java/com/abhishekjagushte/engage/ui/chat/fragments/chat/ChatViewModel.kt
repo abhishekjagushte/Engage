@@ -15,6 +15,10 @@ enum class ChatState{
     NEW, EXISTING
 }
 
+enum class ChatType{
+    CHAT_TYPE_121, CHAT_TYPE_M2M
+}
+
 class ChatViewModel @Inject constructor(
     private val dataRepository: DataRepository
 ) : ViewModel(){
@@ -45,13 +49,23 @@ class ChatViewModel @Inject constructor(
 
         if(conversationID!=null) {
             this.conversationID = conversationID
-            Log.d(TAG, "setConversationID: $conversationID")
-            _chatState.value = ChatState.EXISTING
+            //this is to set senderid and receiverid in messages
+            getUsernameFromConversationID(conversationID)
         }
         else{
             getConversationIDFromUsername(username)
             this.username = username
             Log.d(TAG, "setConversationID: $username")
+        }
+    }
+
+    private fun getUsernameFromConversationID(conversationID: String) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO){
+                myUsername = dataRepository.getMydetails()!!.username
+                username = dataRepository.getUsernameFromConversationID(conversationID)
+                _chatState.postValue(ChatState.EXISTING)
+            }
         }
     }
 
@@ -91,7 +105,7 @@ class ChatViewModel @Inject constructor(
     }
 
 
-    fun getChatsAll(): LiveData<List<Message>> {
+    fun getChatsAll(): LiveData<List<MessageView>> {
         return dataRepository.getChats(conversationID!!)
     }
 

@@ -1,16 +1,12 @@
 package com.abhishekjagushte.engage.ui.chat.fragments.chat.fragments.chatscreen
 
-import android.icu.text.SimpleDateFormat
-import android.icu.util.TimeZone
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
-import com.abhishekjagushte.engage.database.Message
 import com.abhishekjagushte.engage.database.MessageView
 import com.abhishekjagushte.engage.utils.StringFormatting
-import java.util.*
 
 @BindingAdapter("setTimeString")
-fun TextView.setTimeString(message: Message){
+fun TextView.setTimeString(message: MessageView){
     val localDateTime = message.timeStamp
     localDateTime!!.let {
         text = StringFormatting.getTime(it)
@@ -18,7 +14,7 @@ fun TextView.setTimeString(message: Message){
 }
 
 @BindingAdapter("setSenderName")
-fun TextView.setSenderName(message: Message){
-    text = ""
+fun TextView.setSenderName(message: MessageView){
+    text = message.nickname
 }
 

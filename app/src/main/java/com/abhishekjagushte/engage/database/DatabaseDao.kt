@@ -58,8 +58,8 @@ interface DatabaseDao{
     @Query("SELECT networkID from conversations WHERE username == :username")
     fun getConversationIDFromUsername(username: String): String?
 
-    @Query("SELECT * FROM messages WHERE conversationID == :conversationID ORDER BY timeStamp DESC")
-    fun getChats(conversationID: String): LiveData<List<Message>>
+    @Query("SELECT * FROM message_view WHERE conversationID == :conversationID ORDER BY timeStamp DESC")
+    fun getChats(conversationID: String): LiveData<List<MessageView>>
 
     @Insert
     fun insertConversation(conversation: Conversation)
@@ -85,5 +85,8 @@ interface DatabaseDao{
 
     @Query("SELECT * FROM conversations WHERE networkID == :conversationID")
     fun getConversation(conversationID: String):Conversation?
+
+    @Query("SELECT username FROM conversations WHERE networkID == :conversationID")
+    fun getUsernameFromConversationID(conversationID: String): String
 
 }

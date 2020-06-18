@@ -2,7 +2,6 @@ package com.abhishekjagushte.engage.ui.chat.fragments.chat.fragments.chatscreen
 
 import android.content.Context
 import android.os.Bundle
-import android.text.Editable
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -10,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.abhishekjagushte.engage.EngageApplication
 import com.abhishekjagushte.engage.R
 import com.abhishekjagushte.engage.ui.chat.fragments.chat.ChatFragment
@@ -42,6 +42,14 @@ class ChatScreenFragment : Fragment(R.layout.fragment_chat_screen) {
         linearLayoutManager.reverseLayout = true
         recyclerView.layoutManager = linearLayoutManager
         chatsAdapter = ChatsAdapter(recyclerView)
+        chatsAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver(){
+            override fun onChanged() {
+                super.onChanged()
+                Log.d(TAG, "onChanged: inside onChanged")
+                recyclerView.scrollToPosition(0)
+            }
+        })
+
         recyclerView.adapter = chatsAdapter
 
         SharedViewModel.chatState.observe(viewLifecycleOwner, Observer {
@@ -53,7 +61,7 @@ class ChatScreenFragment : Fragment(R.layout.fragment_chat_screen) {
         })
 
         send_button.setOnClickListener {
-            val message = message_input.text.toString()
+            val message = message_input.text.toString().trim()
             if(!message.isEmpty()) {
                 SharedViewModel.sendTextMessage121(message)
                 message_input.text.clear()

@@ -1,15 +1,8 @@
 package com.abhishekjagushte.engage.network
 
-import androidx.annotation.Keep
-import androidx.room.ColumnInfo
-import androidx.room.PrimaryKey
 import com.abhishekjagushte.engage.database.Contact
-import com.google.firebase.Timestamp
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ServerTimestamp
-import java.time.LocalDateTime
 import java.util.*
-import kotlin.collections.HashMap
 
 data class Profile constructor(
     val id: String = "",

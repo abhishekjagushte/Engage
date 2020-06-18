@@ -5,11 +5,9 @@ import android.icu.util.TimeZone
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
@@ -21,11 +19,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import java.time.Instant
-import java.time.OffsetDateTime
-import java.time.ZoneId
-import java.time.ZoneOffset
-import java.time.format.DateTimeFormatter
 import java.util.*
 import javax.inject.Inject
 
@@ -38,7 +31,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
 
     private val TAG = "MainActivity"
 
-    val mainActivityJob = Job()
+    private val mainActivityJob = Job()
     val mainActivityScope = CoroutineScope(Dispatchers.Main + mainActivityJob)
     private lateinit var bottomNavigationView: BottomNavigationView
 
@@ -53,7 +46,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         val viewModelFactory = MainActivityViewModelFactory(dataRepository)
         viewModel = ViewModelProvider(this, viewModelFactory).get(MainActivityViewModel::class.java)
 
-        bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_nav_view)
+        bottomNavigationView = findViewById(R.id.bottom_nav_view)
         val navController = findNavController(R.id.main_activity_nav_host);
         NavigationUI.setupWithNavController(bottomNavigationView,navController)
         navController.addOnDestinationChangedListener(this)
@@ -116,7 +109,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         //dataRepository.getTestDateData()
 
 //
-        val date = Instant.parse("2020-06-17T08:06:58.133Z")
+//        val date = Instant.parse("2020-06-17T08:06:58.133Z")
         //Log.d(TAG, "test: ${date.toString()} is the instant")
         
 //        val offsetDateTime = OffsetDateTime.now()
@@ -133,7 +126,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         //val sdf = SimpleDateFormat("MMM dd, yyyy HH:mm:ss")
         //val sdf = SimpleDateFormat("yyyy-MM-dd.HH:mm:ss", Locale.ENGLISH)
         val sdf = SimpleDateFormat("HH:mm", Locale.ENGLISH)
-        sdf.setTimeZone(TimeZone.getDefault())
+        sdf.timeZone = TimeZone.getDefault()
         println(sdf.format(time))
 
     }

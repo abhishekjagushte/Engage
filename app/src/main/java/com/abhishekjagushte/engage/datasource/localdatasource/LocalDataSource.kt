@@ -7,10 +7,6 @@ import com.abhishekjagushte.engage.database.*
 import com.abhishekjagushte.engage.utils.Constants
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.*
-import kotlinx.coroutines.tasks.await
-import java.lang.Exception
-import java.time.LocalDateTime
-import java.time.ZoneOffset
 import javax.inject.Inject
 
 class LocalDataSource @Inject constructor (
@@ -131,7 +127,7 @@ class LocalDataSource @Inject constructor (
         return databaseDao.getConversationIDFromUsername(username)
     }
 
-    fun getChats(conversationID: String): LiveData<List<Message>> {
+    fun getChats(conversationID: String): LiveData<List<MessageView>> {
         return databaseDao.getChats(conversationID)
     }
 
@@ -213,6 +209,10 @@ class LocalDataSource @Inject constructor (
 
     fun insertMessage(message: Message) {
         databaseDao.insertMessage(message)
+    }
+
+    fun getUsernameFromConversationID(conversationID: String): String {
+        return databaseDao.getUsernameFromConversationID(conversationID)
     }
 
 }

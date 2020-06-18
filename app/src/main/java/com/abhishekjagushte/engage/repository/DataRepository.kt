@@ -285,7 +285,7 @@ class DataRepository @Inject constructor(
         return functionsSource.createNewChat121(request)
     }
 
-    fun getChats(conversationID: String): LiveData<List<Message>> {
+    fun getChats(conversationID: String): LiveData<List<MessageView>> {
         return localDataSource.getChats(conversationID)
     }
 
@@ -319,6 +319,10 @@ class DataRepository @Inject constructor(
                 localDataSource.insertMessage(message)
             }
         }
+    }
+
+    fun getUsernameFromConversationID(conversationID: String): String {
+        return localDataSource.getUsernameFromConversationID(conversationID)
     }
 
 

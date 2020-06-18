@@ -2,7 +2,6 @@ package com.abhishekjagushte.engage.database
 
 import androidx.room.*
 import com.abhishekjagushte.engage.network.MessageNetwork
-import java.time.LocalDateTime
 
 @Entity(tableName = "contacts")
 class Contact(
