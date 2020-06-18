@@ -136,14 +136,17 @@ class Message(
     }
 }
 
-@DatabaseView(value = "SELECT contacts.nickname, messages.messageID, messages.conversationID ,messages.type, messages.status, messages.timeStamp, messages.data, messages.senderID, messages.receiverID, messages.deleted, messages.mime_type, messages.server_url, messages.local_uri, messages.latitude, messages.longitude, messages.reply_toID FROM contacts INNER JOIN messages ON messages.receiverID = contacts.network_id", viewName = "message_view")
+@DatabaseView(value = "SELECT contacts.nickname, messages.messageID, messages.conversationID ,messages.type, messages.status," +
+        " messages.timeStamp, messages.data, messages.senderID, messages.receiverID, messages.deleted, messages.mime_type, " +
+        "messages.server_url, messages.local_uri, messages.latitude, messages.longitude," +
+        " messages.reply_toID FROM contacts INNER JOIN messages ON messages.receiverID = contacts.username", viewName = "message_view")
 data class MessageView(
     val nickname: String?,
     val messageID: String,
     val conversationID: String,
     val type: Int?,
     val status: Int?,
-    val timeStamp: LocalDateTime?,
+    val timeStamp: Long?,
     val data: String?,
     val senderID: String?,
     val receiverID: String?,

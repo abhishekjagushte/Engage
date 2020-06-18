@@ -46,6 +46,7 @@ class ChatViewModel @Inject constructor(
         if(conversationID!=null) {
             this.conversationID = conversationID
             Log.d(TAG, "setConversationID: $conversationID")
+            _chatState.value = ChatState.EXISTING
         }
         else{
             getConversationIDFromUsername(username)

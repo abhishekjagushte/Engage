@@ -87,7 +87,9 @@ class SearchFragment : Fragment() {
                     .actionSearchFragmentToProfileActivity(profileMap.get("name")!!, profileMap.get("username")!!))
             }
             else if(searchData.type == Constants.SEARCHDATA_CONVERSATION){
-                TODO("Implement navigate to chat activity")
+                val conID = searchData.extras.get("networkID") as String
+                Log.d(TAG, "onCreateView: $conID")
+                findNavController().navigate(SearchFragmentDirections.actionSearchFragmentToChatFragment(null, conID))
             }
 
 

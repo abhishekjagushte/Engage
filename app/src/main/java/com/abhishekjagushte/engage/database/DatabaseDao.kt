@@ -58,7 +58,7 @@ interface DatabaseDao{
     @Query("SELECT networkID from conversations WHERE username == :username")
     fun getConversationIDFromUsername(username: String): String?
 
-    @Query("SELECT * FROM messages WHERE conversationID == :conversationID ORDER BY timeStamp")
+    @Query("SELECT * FROM messages WHERE conversationID == :conversationID ORDER BY timeStamp DESC")
     fun getChats(conversationID: String): LiveData<List<Message>>
 
     @Insert

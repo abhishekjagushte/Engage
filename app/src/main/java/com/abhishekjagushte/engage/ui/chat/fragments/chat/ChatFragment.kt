@@ -51,6 +51,7 @@ class ChatFragment : Fragment() {
         NavigationUI.setupWithNavController(toolbar, navController, appBarConfiguration)
 
         val args = ChatFragmentArgs.fromBundle(requireArguments())
+        Log.d(TAG, "onViewCreated: ${args.conversationID}")
         viewModel.setConversationID(args.username, args.conversationID)
     }
 

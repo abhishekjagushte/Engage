@@ -39,10 +39,10 @@ class ChatScreenFragment : Fragment(R.layout.fragment_chat_screen) {
 
         val linearLayoutManager = LinearLayoutManager(context)
         linearLayoutManager.stackFromEnd = true
+        linearLayoutManager.reverseLayout = true
         recyclerView.layoutManager = linearLayoutManager
         chatsAdapter = ChatsAdapter(recyclerView)
         recyclerView.adapter = chatsAdapter
-        recyclerView.smoothScrollToPosition(chatsAdapter.itemCount)
 
         SharedViewModel.chatState.observe(viewLifecycleOwner, Observer {
             if(it==ChatState.EXISTING){
@@ -57,7 +57,6 @@ class ChatScreenFragment : Fragment(R.layout.fragment_chat_screen) {
             if(!message.isEmpty()) {
                 SharedViewModel.sendTextMessage121(message)
                 message_input.text.clear()
-                recyclerView.smoothScrollToPosition(chatsAdapter.itemCount)
             }
 
         }
@@ -71,7 +70,6 @@ class ChatScreenFragment : Fragment(R.layout.fragment_chat_screen) {
 
                 Log.d(TAG, "Size of list = ${l.size}")
                 chatsAdapter.updateList(l)
-                recyclerView.smoothScrollToPosition(chatsAdapter.itemCount)
             })
         }
     }

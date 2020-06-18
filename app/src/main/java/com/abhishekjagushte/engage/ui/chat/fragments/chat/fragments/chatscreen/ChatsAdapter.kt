@@ -69,9 +69,9 @@ class ChatsAdapter(
                     })
 
                     handler.post {
-                        recyclerView.scrollToPosition(itemCount)
+                        recyclerView.scrollToPosition(0)
                     }
-                    
+
             }
 
         }
