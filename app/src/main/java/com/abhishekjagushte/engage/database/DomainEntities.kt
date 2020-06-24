@@ -80,7 +80,7 @@ class Conversation(
       conversations.conversationID, conversations.type AS conType,  messages.messageID, messages.timeStamp, messages.data, messages.mime_type ,messages.type,
       messages.status, messages.senderID, contacts.nickname FROM conversations
       LEFT JOIN messages ON conversations.lastMessageID == messages.messageID
-      LEFT JOIN contacts ON messages.senderID == contacts.username
+      LEFT JOIN contacts ON conversations.username == contacts.username
 """, viewName = "conversation_view")
 data class ConversationView(
     var name: String?,

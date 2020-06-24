@@ -2,6 +2,7 @@ package com.abhishekjagushte.engage.ui.main.fragments.chatlist
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,6 +37,7 @@ class ChatListFragment : Fragment() {
     private lateinit var chatListAdapter: ChatListAdapter
 
     private val viewModel by viewModels<ChatListViewModel> { viewModelFactory }
+    private val TAG = "ChatListFragment"
 
     companion object {
         fun newInstance() = ChatListFragment()
@@ -76,7 +78,7 @@ class ChatListFragment : Fragment() {
     private fun observeChatList(){
         viewModel.getConversationList().observe(viewLifecycleOwner, Observer {
             it?.let{
-                println(it)
+                Log.d(TAG, "observeChatList: ${it.size} + $it")
                 chatListAdapter.updateList(it)
             }
         })

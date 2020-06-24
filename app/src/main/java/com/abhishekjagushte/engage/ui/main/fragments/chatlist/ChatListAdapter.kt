@@ -1,5 +1,6 @@
 package com.abhishekjagushte.engage.ui.main.fragments.chatlist
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.navigation.NavController
@@ -20,8 +21,10 @@ const val NOT_DECIDED = 2
 class ChatListAdapter : ListAdapter<ChatListDataItem, RecyclerView.ViewHolder> (ChatListDiffCallback()){
 
     private val adapterScope = CoroutineScope(Dispatchers.Default)
+private val TAG = "ChatListAdapter"
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        Log.d(TAG, "onCreateViewHolder: Called")
         return when(viewType){
             CHAT_LIST_ITEM -> ChatListItemViewHolder.from(parent)
             else -> throw ClassCastException("Unknown viewType $viewType")
@@ -66,7 +69,7 @@ class ChatListItemViewHolder(val binding: ConversationItemBinding): RecyclerView
         binding.conversationView = conversationView
         binding.executePendingBindings()
 
-        binding.root.setOnClickListener {
+        binding.dataContainer.setOnClickListener {
             navController.navigate(ChatListFragmentDirections
                 .actionChatListFragmentToChatFragment(null, conversationView.conversationID))
         }
