@@ -15,17 +15,5 @@ class ChatScreenViewModel @Inject constructor(
 
     private var _chats =  MutableLiveData<List<MessageView>>()
 
-//    fun getChats(){
-//        if(sharedViewModel.chatState == ChatState.EXISTING)
-//        {
-//            chats = dataRepository.getChats(sharedViewModel.conversationID.va)
-//        }
-//    }
-//
-//    fun sendMessage(message: String){
-//        if(sharedViewModel.chatState == ChatState.NEW){
-//
-//        }
-//    }
 
 }

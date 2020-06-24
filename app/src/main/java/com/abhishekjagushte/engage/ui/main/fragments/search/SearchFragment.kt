@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -25,6 +26,10 @@ import com.abhishekjagushte.engage.EngageApplication
 import com.abhishekjagushte.engage.R
 import com.abhishekjagushte.engage.utils.Constants
 import com.google.android.material.appbar.AppBarLayout
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class SearchFragment : Fragment() {
@@ -36,6 +41,7 @@ class SearchFragment : Fragment() {
     lateinit var viewModelFactory: ViewModelProvider.Factory
     lateinit var appBar: AppBarLayout
     lateinit var toolbar: Toolbar
+    lateinit var adapter: SearchAdapter
 
     private val viewModel by viewModels<SearchFragmentViewModel> { viewModelFactory }
 
@@ -51,23 +57,19 @@ class SearchFragment : Fragment() {
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
         val searchBar = view.findViewById<EditText>(R.id.search_bar)
 
-        searchBar.addTextChangedListener(object : TextWatcher{
-            override fun afterTextChanged(s: Editable?) {
-
+        var job: Job?= null
+        searchBar.addTextChangedListener { editable ->
+            job?.cancel()
+            job = MainScope().launch {
+                delay(Constants.SEARCH_TIME_DELAY)
+                editable?.let{
+                    if(editable.toString().isNotEmpty())
+                        viewModel.onSearchTextQueryChanged(editable.toString())
+                }
             }
+        }
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if(s.toString().isNotEmpty())
-                    viewModel.onSearchTextQueryChanged(s.toString())
-            }
-
-        })
-
-        val adapter = SearchAdapter( SearchDataListener { searchData ->
+        adapter = SearchAdapter( SearchDataListener { searchData ->
             Toast.makeText(context, searchData.title, Toast.LENGTH_SHORT).show()
 
             if(searchData.type == Constants.SEARCHDATA_CONTACT){
@@ -77,11 +79,6 @@ class SearchFragment : Fragment() {
                     "name" to searchData.title,
                     "username" to searchData.subtitle
                 )
-
-//                val intent = Intent(context, ProfileActivity::class.java)
-//                intent.putExtra(ARGUMENT_NAME, profileMap.get("name"))
-//                intent.putExtra(ARGUMENT_USERNAME, profileMap.get("username"))
-//                startActivity(intent)
 
                 findNavController().navigate(SearchFragmentDirections
                     .actionSearchFragmentToProfileActivity(profileMap.get("name")!!, profileMap.get("username")!!))

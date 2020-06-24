@@ -43,7 +43,7 @@ class NotificationHandler : FirebaseMessagingService(){
 
         (application as EngageApplication).appComponent.inject(this)
         Log.d(TAG, "Inside onMessageReceived")
-        Log.d(TAG, "Data size ${p0.data.size}")
+        Log.d(TAG, "Data size ${p0.data.size} + ${p0.data}")
 
         //Check if data is available
         if(p0.data.size>0){
@@ -62,7 +62,6 @@ class NotificationHandler : FirebaseMessagingService(){
                     Log.d(TAG, "onMessageReceived: ${p0.data.toString()}")
                     val msg = mapToMessage121(p0.data)
                     dataRepository.receiveMessage121(msg)
-
                 }
             }
         }
@@ -88,6 +87,7 @@ class NotificationHandler : FirebaseMessagingService(){
                 args.putString(Constants.ARGUMENT_NAME, data.get(Constants.ARGUMENT_NAME))
                 makeNotification(title, content, args, R.id.profileFragment)
             }
+
 
         }
     }
@@ -132,32 +132,33 @@ class NotificationHandler : FirebaseMessagingService(){
 // messageID=NOJi0osuUGNRYksathbp, latitude=, reply_toID=, mime_type=text/plain,
 // data=hio, type=3, timeStamp=1592412297920, longitude=, receiverID=pandaa25, senderID=pandaa24}
     private fun mapToMessage121(data: Map<String, String>): Message{
-        val messageID = data.get("messageID")
-        val conversationID = data.get("conversationID")
-        val server_url = data.get("server_url")
-        val thumb_nail = data.get("thumb_nail")
+        val messageID = data["messageID"]
+        val conversationID = data["conversationID"]
+        val serverUrl = data["server_url"]
+        val thumbNail = data["thumb_nail"]
         val latitude = if((data["latitude"] ?: error("")).isEmpty()) null else (data["latitude"] ?: error("")).toDouble()
         val longitude = if((data["longitude"] ?: error("")).isEmpty()) null else (data["longitude"] ?: error("")).toDouble()
-        val reply_toID = data.get("reply_toID")
-        val receiverID = data.get("receiverID")
-        val senderID = data.get("senderID")
-        val timeStamp = data.get("timeStamp")
-        val mdata = data.get("data")
-        val mime_type = data.get("mime_type")
+        val replyToid = data["reply_toID"]
+        val receiverID = data["receiverID"]
+        val senderID = data["senderID"]
+        val timeStamp = data["timeStamp"]
+        val mdata = data["data"]
+        val mime_type = data["mime_type"]
 
         return Message(
             messageID = messageID!!,
             conversationID = conversationID!!,
-            timeStamp = timeStamp!!.toLong(),
+            timeStamp = System.currentTimeMillis(),
+            serverTimestamp = timeStamp!!.toLong(),
             data = mdata,
             senderID = senderID,
             receiverID = receiverID,
             mime_type = mime_type,
-            server_url = server_url,
+            server_url = serverUrl,
             latitude = latitude,
             longitude = longitude,
             thumb_nail = null,
-            reply_toID = reply_toID,
+            reply_toID = replyToid,
 
             type = Constants.TYPE_OTHER_MSG,
             status = Constants.STATUS_RECEIVED_BUT_NOT_READ,

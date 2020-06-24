@@ -1,7 +1,9 @@
 package com.abhishekjagushte.engage.ui.main.fragments.chatlist
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.abhishekjagushte.engage.database.ConversationView
 import com.abhishekjagushte.engage.repository.DataRepository
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -15,12 +17,8 @@ class ChatListViewModel @Inject constructor(
 
     val testText = MutableLiveData<String>()
 
-    fun showUserDataCount(){
-        uiScope.launch {
-            withContext(Dispatchers.IO){
-                testText.postValue("Number of Entries = ${dataRepository.getCountUserData()}")
-            }
-        }
+    fun getConversationList(): LiveData<List<ConversationView>> {
+        return dataRepository.getConversationList()
     }
 
 }

@@ -20,8 +20,6 @@ import com.google.android.material.appbar.AppBarLayout
 import javax.inject.Inject
 
 
-const val ARGUMENT_NAME = "name"
-const val ARGUMENT_USERNAME = "username"
 
 class ProfileFragment : Fragment() {
 
@@ -55,11 +53,12 @@ class ProfileFragment : Fragment() {
 
         (application as EngageApplication).appComponent.addProfileComponent().create().inject(this)
 
-        val name_text = view.findViewById<TextView>(R.id.name_text)
-        val username_text = view.findViewById<TextView>(R.id.username_text)
-        val timestampSteing_Text = view.findViewById<TextView>(R.id.timestamp_text)
-        val bio_text = view.findViewById<TextView>(R.id.bio_text)
+        val nameText = view.findViewById<TextView>(R.id.name_text)
+        val usernameText = view.findViewById<TextView>(R.id.username_text)
+        val timestampText = view.findViewById<TextView>(R.id.timestamp_text)
+        val bioText = view.findViewById<TextView>(R.id.bio_text)
         val button = view.findViewById<Button>(R.id.add_friend_button)
+
 
         val args by navArgs<ProfileFragmentArgs>()
         name = args.name
@@ -70,14 +69,22 @@ class ProfileFragment : Fragment() {
             username = arguments?.getString(Constants.ARGUMENT_USERNAME)
         }
 
-//        val args by navArgs<ProfileActivityArgs>()
-//        name = args.name
-//        username = args.username
+        var updated = false
+        viewModel.getProfileLive(username!!).observe(viewLifecycleOwner, Observer {
+            it.let{
+                viewModel.setProfileDisplay(it, username!!)
+                if(it!=null) {
+                    viewModel.localContact = it
+                    if(!updated) {
+                        viewModel.getUpdatedProfile(username!!)
+                        updated = true
+                    }
+                }
+            }
+        })
 
-        viewModel.setProfileDisplay(username as String)
-
-        name_text.text = name as String
-        username_text.text = username
+        nameText.text = name as String
+        usernameText.text = username
 
         viewModel.actionStatus.observe(viewLifecycleOwner, Observer {
             when (it) {
@@ -85,33 +92,40 @@ class ProfileFragment : Fragment() {
                     button.text = application.resources.getString(R.string.sent)
                     button.isClickable = false //TODO add unsend functionality
                 }
+
+                FRIEND_REQUEST_ACCEPTED -> {
+                    button.text = application.resources.getString((R.string.chat))
+                    button.isClickable = true
+                }
             }
         })
 
         viewModel.profileDisplay.observe(viewLifecycleOwner, Observer {
             if (it != null) {
-                name_text.text = it.name
-                username_text.text = it.username
-                bio_text.text = it.bio
-                timestampSteing_Text.text = it.timeStampString
+                nameText.text = it.name
+                usernameText.text = it.username
+                bioText.text = it.bio
+                timestampText.text = it.timeStampString
 
                 when (it.type) {
                     Constants.CONTACTS_UNKNOWN -> {
+                        button.isClickable = true
                         button.text = application.resources.getString(R.string.add_friend)
                     }
 
                     Constants.CONTACTS_CONFIRMED -> {
-                        //button.visibility = View.GONE
+                        button.isClickable = true
                         button.text = application.resources.getString(R.string.chat)
                     }
 
                     Constants.CONTACTS_REQUESTED -> {
-                        button.text = application.resources.getString(R.string.sent);
+                        button.text = application.resources.getString(R.string.sent)
                         button.isClickable = false
                     }
 
                     Constants.CONTACTS_PENDING -> {
-                        button.text = application.resources.getString(R.string.accept);
+                        button.isClickable = true
+                        button.text = application.resources.getString(R.string.accept)
                     }
                 }
 
@@ -132,116 +146,9 @@ class ProfileFragment : Fragment() {
                 }
             }
         }
-
-
-
     }
 
-}
-
-
-/*
-const val ARGUMENT_NAME = "name"
-const val ARGUMENT_USERNAME = "username"
-
-class ProfileActivity : AppCompatActivity() {
-
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
-
-    private val viewModel by viewModels<ProfileActivityViewModel> { viewModelFactory }
-    private val TAG = "ProfileFragment"
-    var name: String? = null
-    var username: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        (application as EngageApplication).appComponent.addProfileComponent().create().inject(this)
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.fragment_profile)
-
-        val name_text = findViewById<TextView>(R.id.name_text)
-        val username_text = findViewById<TextView>(R.id.username_text)
-        val timestampSteing_Text = findViewById<TextView>(R.id.timestamp_text)
-        val bio_text = findViewById<TextView>(R.id.bio_text)
-        val button = findViewById<Button>(R.id.add_friend_button)
-
-       val argsIntent = intent.extras
-
-        name = argsIntent?.getString(Constants.ARGUMENT_NAME)
-        username = argsIntent?.getString(Constants.ARGUMENT_USERNAME)
-
-        if(name.isNullOrBlank() || username.isNullOrBlank()){
-              val args by navArgs<ProfileActivityArgs>()
-            name = args.name
-            username = args.username
-        }
-
-//        val args by navArgs<ProfileActivityArgs>()
-//        name = args.name
-//        username = args.username
-
-        viewModel.setProfileDisplay(username as String)
-
-        name_text.text = name as String
-        username_text.text = username
-
-        viewModel.actionStatus.observe(this, Observer {
-            when (it) {
-                FRIEND_REQUEST_SENT -> {
-                    button.text = application.resources.getString(R.string.sent)
-                    button.isClickable = false //TODO add unsend functionality
-                }
-            }
-        })
-
-        viewModel.profileDisplay.observe(this, Observer {
-            if (it != null) {
-                name_text.text = it.name
-                username_text.text = it.username
-                bio_text.text = it.bio
-                timestampSteing_Text.text = it.timeStampString
-
-                when (it.type) {
-                    Constants.CONTACTS_UNKNOWN -> {
-                        button.text = application.resources.getString(R.string.add_friend)
-                    }
-
-                    Constants.CONTACTS_CONFIRMED -> {
-                        //button.visibility = View.GONE
-                        button.text = application.resources.getString(R.string.chat)
-                    }
-
-                    Constants.CONTACTS_REQUESTED -> {
-                        button.text = application.resources.getString(R.string.sent);
-                        button.isClickable = false
-                    }
-
-                    Constants.CONTACTS_PENDING -> {
-                        button.text = application.resources.getString(R.string.accept);
-                    }
-                }
-
-            }
-        })
-
-        button.setOnClickListener {
-            when (viewModel.profileDisplay.value!!.type) {
-                Constants.CONTACTS_UNKNOWN -> {
-                    viewModel.addFriend()
-                }
-
-                Constants.CONTACTS_PENDING -> viewModel.acceptRequest()
-
-                Constants.CONTACTS_CONFIRMED -> {
-                    val intent = Intent(this, ChatActivity::class.java)
-                    intent.putExtra(Constants.ARGUMENT_NAME, viewModel.localContact.name)
-                    intent.putExtra(Constants.ARGUMENT_USERNAME, viewModel.localContact.username)
-                    startActivity(intent)
-                }
-            }
-        }
+    private fun getUpdatedProfile(){
 
     }
 }
-
- */

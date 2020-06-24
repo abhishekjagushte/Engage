@@ -2,26 +2,26 @@ package com.abhishekjagushte.engage.ui.main.fragments.chatlist
 
 import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.abhishekjagushte.engage.EngageApplication
-
 import com.abhishekjagushte.engage.R
 import com.abhishekjagushte.engage.databinding.FragmentChatListBinding
 import com.abhishekjagushte.engage.ui.main.MainActivity
-import com.abhishekjagushte.engage.ui.main.MainActivityViewModel
 import com.google.android.material.appbar.AppBarLayout
+import kotlinx.android.synthetic.main.fragment_chat_list.*
 import javax.inject.Inject
 
 class ChatListFragment : Fragment() {
@@ -33,6 +33,7 @@ class ChatListFragment : Fragment() {
 
     lateinit var appBar: AppBarLayout
     lateinit var toolbar: Toolbar
+    private lateinit var chatListAdapter: ChatListAdapter
 
     private val viewModel by viewModels<ChatListViewModel> { viewModelFactory }
 
@@ -45,18 +46,8 @@ class ChatListFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         val binding = DataBindingUtil.inflate<FragmentChatListBinding>(inflater,
             R.layout.fragment_chat_list, container, false)
-        //return inflater.inflate(R.layout.fragment_chat_list, container, false)
-
-        (requireActivity() as MainActivity).viewModel.printPanda()
-        viewModel.showUserDataCount()
-
-        viewModel.testText.observe(viewLifecycleOwner, Observer {
-            binding.test.text = it
-        })
-
         return binding.root
     }
 
@@ -74,5 +65,20 @@ class ChatListFragment : Fragment() {
         appBar = view.findViewById(R.id.app_bar)
         toolbar = view.findViewById(R.id.toolbar)
         NavigationUI.setupWithNavController(toolbar, navController, appBarConfiguration)
+
+        recyclerView.layoutManager = LinearLayoutManager(context)
+        chatListAdapter = ChatListAdapter()
+        recyclerView.adapter = chatListAdapter
+
+        observeChatList()
+    }
+
+    private fun observeChatList(){
+        viewModel.getConversationList().observe(viewLifecycleOwner, Observer {
+            it?.let{
+                println(it)
+                chatListAdapter.updateList(it)
+            }
+        })
     }
 }

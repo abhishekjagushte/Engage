@@ -9,6 +9,8 @@ interface DatabaseDao{
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertNewContact(contact: Contact)
 
+
+
     @Insert
     fun insertMeinContacts(contact: Contact)
 
@@ -25,7 +27,7 @@ interface DatabaseDao{
     fun getCredentialsCount(): Int
 
     @Query("SELECT * FROM contacts WHERE username = :username")
-    fun getContactFromUsername(username: String): List<Contact>
+    fun getContactFromUsername(username: String): LiveData<Contact>
 
     @Update
     fun updateContact(contact: Contact)
@@ -38,7 +40,7 @@ interface DatabaseDao{
     //Pass username when type is 121 and pass networkID when M2M
     //in both cases when entering the chats activity, we need to fetch data from room
     //TODO later implement a join query for message data too
-    @Query("SELECT name, username, type, networkID FROM conversations WHERE name LIKE '%' || :query || '%' ")
+    @Query("SELECT name, username, type, conversationID FROM conversations WHERE name LIKE '%' || :query || '%' ")
     fun searchForConversations(query: String): List<SearchResultConversation>
 
     @Query("SELECT name, username FROM contacts WHERE name LIKE '%' || :query || '%' AND type > 0 ORDER BY type ASC")
@@ -55,13 +57,13 @@ interface DatabaseDao{
     // ChatScreen Fragment
     ///////////////////////////////////////////////////////////////////////////
 
-    @Query("SELECT networkID from conversations WHERE username == :username")
+    @Query("SELECT conversationID from conversations WHERE username == :username")
     fun getConversationIDFromUsername(username: String): String?
 
     @Query("SELECT * FROM message_view WHERE conversationID == :conversationID ORDER BY timeStamp DESC")
     fun getChats(conversationID: String): LiveData<List<MessageView>>
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertConversation(conversation: Conversation)
 
     @Query("SELECT * FROM messages WHERE conversationID == :conversationID ORDER BY timeStamp")
@@ -83,10 +85,25 @@ interface DatabaseDao{
     @Update
     fun updateMessage(message: Message)
 
-    @Query("SELECT * FROM conversations WHERE networkID == :conversationID")
+    @Query("SELECT * FROM conversations WHERE conversationID == :conversationID")
     fun getConversation(conversationID: String):Conversation?
 
-    @Query("SELECT username FROM conversations WHERE networkID == :conversationID")
+    @Query("SELECT username FROM conversations WHERE conversationID == :conversationID")
     fun getUsernameFromConversationID(conversationID: String): String
+
+    @Query("SELECT * FROM conversations WHERE type == 1")
+    fun getUnPushedConversations(): LiveData<List<Conversation>>
+
+    @Update
+    fun updateConversation(conversation: Conversation)
+
+    @Query("SELECT conversationID FROM contacts WHERE username == :username")
+    fun getConversationIDFromContacts(username: String): String
+
+    @Query("SELECT COUNT(*) FROM conversations WHERE conversationID == :conID")
+    fun checkConversationExists(conID: String): Int
+
+    @Query("SELECT * FROM conversation_view ORDER BY timeStamp DESC")
+    fun getConversationList() : LiveData<List<ConversationView>>
 
 }

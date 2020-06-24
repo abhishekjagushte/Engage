@@ -5,6 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
     entities = [Contact::class,
@@ -14,7 +15,7 @@ import androidx.room.TypeConverters
         SuggestedContacts::class,
         Message::class],
     version = 1,
-    views = arrayOf(MessageView::class),
+    views = [MessageView::class, ConversationView::class],
     exportSchema = false)
 @TypeConverters(Converters::class)
 
@@ -26,6 +27,16 @@ abstract class AppDatabase: RoomDatabase(){
 
         @Volatile
         private var INSTANCE: AppDatabase?= null
+        private val CONVERSATIONS_TRIGGER = object: RoomDatabase.Callback(){
+            override fun onCreate(db: SupportSQLiteDatabase) {
+                super.onCreate(db)
+                db.execSQL("CREATE TRIGGER IF NOT EXISTS conversations_trigger_message AFTER INSERT ON messages " +
+                        "BEGIN " +
+                        "UPDATE conversations SET lastMessageID = new.messageID WHERE conversationID = new.conversationID;" +
+                        "END; " +
+                        "END;")
+            }
+        }
 
         fun getInstance(context: Context): AppDatabase{
 
@@ -37,7 +48,8 @@ abstract class AppDatabase: RoomDatabase(){
                         context.applicationContext,
                         AppDatabase::class.java,
                         "engage_database"
-                    ).fallbackToDestructiveMigration()
+                    ).addCallback(CONVERSATIONS_TRIGGER)
+                        .fallbackToDestructiveMigration()
                         .build()
 
                     INSTANCE = instance

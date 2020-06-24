@@ -1,5 +1,6 @@
-package com.abhishekjagushte.engage.ui.main.fragments.chatlist
+package com.abhishekjagushte.engage.ui.main.fragments.chatlist.di
 
+import com.abhishekjagushte.engage.ui.main.fragments.chatlist.ChatListFragment
 import dagger.Subcomponent
 
 

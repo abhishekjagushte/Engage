@@ -54,7 +54,7 @@ fun SearchData.toSearchResultConversation(): SearchResultConversation{
         name = this.title,
         username = this.subtitle,
         //status = this.flag,
-        networkID = this.extras.get("networkID") as String,
+        conversationID = this.extras.get("networkID") as String,
         type = this.extras.get("conversation_type") as Int
     )
 }
@@ -82,7 +82,7 @@ fun List<SearchResultConversation>.convertSearchDataConversations(): List<Search
             //flag = it.status,
 
             extras = mapOf(
-                "networkID" to it.networkID,
+                "networkID" to it.conversationID,
                 "conversation_type" to it.type
             )
         )

@@ -6,7 +6,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.abhishekjagushte.engage.R
-import com.abhishekjagushte.engage.network.Profile
 import com.abhishekjagushte.engage.repository.DataRepository
 import com.abhishekjagushte.engage.utils.Constants
 import kotlinx.coroutines.*
@@ -33,6 +32,8 @@ class SearchFragmentViewModel @Inject constructor(
     }
 
     fun onSearchTextQueryChanged(query: String){
+
+        _searchResults.value = listOf()
 
         //First Check in conversation list
         //TODO Search needs a whole lot of optimization
@@ -82,7 +83,7 @@ class SearchFragmentViewModel @Inject constructor(
 
 
                 //TODO possibly store all results in a list while one session of searching or implement recent searches
-                if(_searchResults.value?.size!! < 5 && query.length > 5)
+                if(_searchResults.value?.size!! < 5)
                 {
                     val queries = dataRepository.searchUnknownContacts(query)
 
@@ -90,13 +91,17 @@ class SearchFragmentViewModel @Inject constructor(
 
                         Log.d(TAG,"Querying Succeeded")
 
+                        var nameQueryQ = 0
+
+                        //Matches the names
                         if(nameQuerySnapshot!=null && nameQuerySnapshot.size()>0){
 
                             _searchResults.value = _searchResults.value?.plus(DataItem.Header(app.resources.getString(R.string.addcontacts)))
 
+                            nameQueryQ = nameQuerySnapshot.size()
+
                             //TODO Maybe save the document recieved here and pass it to profile activity
                             for(doc in nameQuerySnapshot.documents){
-                                val profile = doc.toObject(Profile::class.java)
                                 _searchResults.value = _searchResults.value?.plus(
                                     DataItem.SearchDataItem(SearchData(
                                         doc.get("name").toString(),
@@ -107,10 +112,15 @@ class SearchFragmentViewModel @Inject constructor(
                             }
                         }
 
+                        //Matches the username
                         if(_searchResults.value?.size!! < 10) {
                             queries.second.addSnapshotListener { usernameQuerySnapshot, firebaseFirestoreException2 ->
 
                                 if(usernameQuerySnapshot!=null && usernameQuerySnapshot.size()>0){
+
+                                    if(nameQueryQ==0)
+                                    _searchResults.value = _searchResults.value?.plus(DataItem.Header(app.resources.getString(R.string.addcontacts)))
+
                                     for(doc in usernameQuerySnapshot.documents){
                                         _searchResults.value = _searchResults.value?.plus(
                                             DataItem.SearchDataItem(SearchData(

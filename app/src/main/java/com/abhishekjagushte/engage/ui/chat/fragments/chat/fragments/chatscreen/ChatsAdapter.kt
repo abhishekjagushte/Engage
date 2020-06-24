@@ -6,16 +6,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.abhishekjagushte.engage.database.Message
 import com.abhishekjagushte.engage.database.MessageView
 import com.abhishekjagushte.engage.databinding.TextMessage121ContainerLeftBinding
-import com.abhishekjagushte.engage.databinding.TextMessageContainerLeftBinding
 import com.abhishekjagushte.engage.databinding.TextMessageContainerRightBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.logging.Handler
 
 const val MY_TEXT_MESSAGE = 1
 const val OTHER_TEXT_MESSAGE = 2

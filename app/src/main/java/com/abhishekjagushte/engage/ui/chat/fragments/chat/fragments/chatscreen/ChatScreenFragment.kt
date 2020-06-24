@@ -5,18 +5,14 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.abhishekjagushte.engage.EngageApplication
 import com.abhishekjagushte.engage.R
 import com.abhishekjagushte.engage.ui.chat.fragments.chat.ChatFragment
-import com.abhishekjagushte.engage.ui.chat.fragments.chat.ChatState
 import com.abhishekjagushte.engage.ui.chat.fragments.chat.ChatViewModel
 import kotlinx.android.synthetic.main.fragment_chat_screen.*
-import javax.inject.Inject
 
 
 class ChatScreenFragment : Fragment(R.layout.fragment_chat_screen) {
@@ -25,17 +21,11 @@ class ChatScreenFragment : Fragment(R.layout.fragment_chat_screen) {
     private lateinit var SharedViewModel: ChatViewModel
     private lateinit var chatsAdapter: ChatsAdapter
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
-    val viewModel by viewModels<ChatScreenViewModel> { viewModelFactory }
-
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         SharedViewModel = (parentFragment as ChatFragment).viewModel
 
         //Setting shared viewmodel in this fragment's viewmodel
-        viewModel.sharedViewModel = SharedViewModel
 
         val linearLayoutManager = LinearLayoutManager(context)
         linearLayoutManager.stackFromEnd = true
@@ -52,12 +42,10 @@ class ChatScreenFragment : Fragment(R.layout.fragment_chat_screen) {
 
         recyclerView.adapter = chatsAdapter
 
-        SharedViewModel.chatState.observe(viewLifecycleOwner, Observer {
-            if(it==ChatState.EXISTING){
-                it.let{
+        SharedViewModel.conversationID.observe(viewLifecycleOwner, Observer {
+                it?.let{
                     observeChats()
                 }
-            }
         })
 
         send_button.setOnClickListener {
@@ -66,7 +54,6 @@ class ChatScreenFragment : Fragment(R.layout.fragment_chat_screen) {
                 SharedViewModel.sendTextMessage121(message)
                 message_input.text.clear()
             }
-
         }
 
     }
@@ -75,7 +62,6 @@ class ChatScreenFragment : Fragment(R.layout.fragment_chat_screen) {
         Log.d(TAG, "observeChats: observing chats")
         SharedViewModel.getChatsAll().let {
             it.observe(viewLifecycleOwner, Observer {l ->
-
                 Log.d(TAG, "Size of list = ${l.size}")
                 chatsAdapter.updateList(l)
             })

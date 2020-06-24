@@ -1,6 +1,7 @@
 package com.abhishekjagushte.engage.utils
 
 object Constants {
+    const val SEARCH_TIME_DELAY: Long = 500L
     const val FIREBASE_USERS_COLLECTION: String = "users"
     const val FIREBASE_CONNECTION_REQUEST_COLLECTION = "connection-requests"
     const val NOT_INITIATED = "NOT INITIATED"
@@ -65,6 +66,7 @@ object Constants {
     const val DELETED_NO = 1
     const val DELETED_YES = 2
 
+    //MIME Types
     const val MIME_TYPE_TEXT = "text/plain"
 
     //Conversation types
@@ -73,6 +75,11 @@ object Constants {
 
     const val CONVERSATION_ACTIVE_YES = 1
     const val CONVERSATION_ACTIVE_NO = 2
+
+    const val CONVERSATION_ID_INITIAL = "NONE"
+
+    const val CONVERSATION_NEEDS_PUSH_YES = 1
+    const val CONVERSATION_NEEDS_PUSH_NO = 0
 
 }
 

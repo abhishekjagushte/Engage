@@ -3,10 +3,7 @@ package com.abhishekjagushte.engage.repository
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.abhishekjagushte.engage.database.Contact
-import com.abhishekjagushte.engage.database.ContactNameUsername
-import com.abhishekjagushte.engage.database.Message
-import com.abhishekjagushte.engage.database.MessageView
+import com.abhishekjagushte.engage.database.*
 import com.abhishekjagushte.engage.datasource.localdatasource.FirebaseInstanceSource
 import com.abhishekjagushte.engage.datasource.localdatasource.LocalDataSource
 import com.abhishekjagushte.engage.datasource.remotedatasource.FirebaseAuthDataSource
@@ -94,19 +91,25 @@ class DataRepository @Inject constructor(
                     pair.first.addOnSuccessListener {
                         completeStatus.value = Constants.FIREBASE_CHANGE_COMPLETE
 
+                        Log.d(TAG, "setNameAndUsername: Firebase change complete")
+
                         repoScope.launch {
                             withContext(Dispatchers.IO) {
                                 try {
                                     addMyDetailsInContacts(pair.second.convertDomainObject(Constants.CONTACTS_ME))
                                     completeStatus.postValue(Constants.LOCAL_DB_SUCCESS)
+
+                                    Log.d(TAG, "setNameAndUsername: Local db changed")
                                 } catch (e: Exception) {
                                     completeStatus.postValue(Constants.LOCAL_DB_FAILED)
+                                    e.printStackTrace()
                                 }
                             }
                         }
                     }.addOnFailureListener {
                         completeStatus.value = Constants.FIREBASE_CHANGE_FAILED
                         Log.d(TAG,Constants.FIREBASE_CHANGE_FAILED)
+                        Log.d(TAG, "setNameAndUsername: firebase change failed")
                     }
                 }
             })
@@ -162,7 +165,7 @@ class DataRepository @Inject constructor(
     //Internal Repo Functions
 
     //Profile Fragment
-    fun getContactFromUsername(username: String): List<Contact> {
+    fun getContactFromUsername(username: String): LiveData<Contact> {
         return localDataSource.getContactFromUsername(username)
     }
 
@@ -255,18 +258,22 @@ class DataRepository @Inject constructor(
     fun friendRequestAccepted(data: Map<String, String>) {
         val name = data.get("name")
         val username = data.get("username")
+        val conID = data.get("conversationID")
+
+        Log.d(TAG, "friendRequestAccepted: $conID is the conversationID")
 
         if(name !=null && username!=null){
             val contact = Contact(
                 name = name,
                 username = username,
                 type = Constants.CONTACTS_CONFIRMED,
-                networkID = "" //Will be updated when the data is fetched
+                networkID = "", //Will be updated when the data is fetched
+                conversationID = conID
             )
 
             repoScope.launch {
                 withContext(Dispatchers.IO){
-                    localDataSource.addContact(contact) //Replace strategy so no worries
+                    localDataSource.updateContact(contact) //Replace strategy so no worries
                 }
             }
         }
@@ -325,6 +332,33 @@ class DataRepository @Inject constructor(
         return localDataSource.getUsernameFromConversationID(conversationID)
     }
 
+    fun getTemporaryConversationID(): String {
+        return localDataSource.getTemporaryConversationID()
+    }
+
+    fun getUnPushedConversations(): LiveData<List<Conversation>> {
+        return localDataSource.getUnPushedConversations()
+    }
+
+    fun updateConversation(conversation: Conversation) {
+        localDataSource.updateConversation(conversation)
+    }
+
+    fun getConversationIDFromContacts(username: String): String {
+        return localDataSource.getConversationIDFromContacts(username)
+    }
+
+    fun checkConversationExists(conID: String): Int {
+        return localDataSource.checkConversationExists(conID)
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Chat List fragment
+    ///////////////////////////////////////////////////////////////////////////
+
+    fun getConversationList(): LiveData<List<ConversationView>> {
+        return localDataSource.getConversationList()
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     // Test

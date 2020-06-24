@@ -54,7 +54,16 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         test()
 
         setUnsentMessageSender()
+        //setUnPushedConversationsPusher()
     }
+
+//    private fun setUnPushedConversationsPusher(){
+//        viewModel.getUnPushedConversations().observe(this , Observer {
+//            it?.let{
+//               viewModel.pushConversations(it)
+//            }
+//        })
+//    }
 
     private fun setUnsentMessageSender(){
         viewModel.getUnsentMessages().observe(this, Observer {
@@ -81,9 +90,10 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
             R.id.loginFragment -> bottomNavigationView.visibility = View.GONE
             R.id.setUsernameFragment -> bottomNavigationView.visibility = View.GONE
             R.id.signUpFragment -> bottomNavigationView.visibility = View.GONE
+            R.id.chooseMethodFragment -> bottomNavigationView.visibility = View.GONE
 
-            //Idk what destination is this
-            2131230819 -> bottomNavigationView.visibility = View.GONE
+//            //Idk what destination is this
+//            2131230819 -> bottomNavigationView.visibility = View.GONE
 
             else -> bottomNavigationView.visibility = View.VISIBLE
         }

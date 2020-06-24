@@ -20,7 +20,7 @@ class LocalDataSource @Inject constructor (
     private val TAG = "LocalDataSource"
 
     //Profile Fragment Viewmodel
-    fun getContactFromUsername(username: String): List<Contact> {
+    fun getContactFromUsername(username: String): LiveData<Contact> {
         return databaseDao.getContactFromUsername(username)
     }
 
@@ -144,6 +144,7 @@ class LocalDataSource @Inject constructor (
             status = Constants.STATUS_NOT_SENT,
             needs_push = Constants.NEEDS_PUSH_YES,
             timeStamp = System.currentTimeMillis(),
+            serverTimestamp = System.currentTimeMillis(),
             data = message,
             senderID = myUsername,
             receiverID = otherUsername,
@@ -165,7 +166,7 @@ class LocalDataSource @Inject constructor (
 
     fun addConversation121(username: String, conversationID: String){
         val conversation = Conversation(
-            networkID = conversationID,
+            conversationID = conversationID,
             name = databaseDao.getNameFromUsername(username),
             username = username,
             type = Constants.CONVERSATION_TYPE_121,
@@ -213,6 +214,39 @@ class LocalDataSource @Inject constructor (
 
     fun getUsernameFromConversationID(conversationID: String): String {
         return databaseDao.getUsernameFromConversationID(conversationID)
+    }
+
+    fun getTemporaryConversationID(): String {
+        return firestore.collection("conversations121").document().id
+    }
+
+    fun getUnPushedConversations(): LiveData<List<Conversation>> {
+        return databaseDao.getUnPushedConversations()
+    }
+
+//    fun isConversationPushed(conversationID: String): Boolean {
+//        val conversation = databaseDao.getConversation(conversationID)
+//        conversation?.let {
+//            if(conversation.needs_push ==0)
+//                return true
+//        }
+//        return false
+//    }
+
+    fun updateConversation(conversation: Conversation) {
+        databaseDao.updateConversation(conversation)
+    }
+
+    fun getConversationIDFromContacts(username: String): String {
+        return databaseDao.getConversationIDFromContacts(username)
+    }
+
+    fun checkConversationExists(conID: String): Int {
+        return databaseDao.checkConversationExists(conID)
+    }
+
+    fun getConversationList(): LiveData<List<ConversationView>> {
+        return databaseDao.getConversationList()
     }
 
 }

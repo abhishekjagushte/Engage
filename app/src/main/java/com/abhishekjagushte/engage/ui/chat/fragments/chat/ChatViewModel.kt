@@ -4,11 +4,10 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.abhishekjagushte.engage.database.Message
+import com.abhishekjagushte.engage.database.ConversationView
 import com.abhishekjagushte.engage.database.MessageView
 import com.abhishekjagushte.engage.repository.DataRepository
 import kotlinx.coroutines.*
-import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 enum class ChatState{
@@ -23,7 +22,9 @@ class ChatViewModel @Inject constructor(
     private val dataRepository: DataRepository
 ) : ViewModel(){
 
-    var conversationID: String?=null
+    private var _conversationID = MutableLiveData<String>()
+    val conversationID : LiveData<String>
+        get() = _conversationID
 
     private var username: String? = null//used to send in message 121
     private var myUsername: String?=null//used to send in message 121
@@ -38,9 +39,6 @@ class ChatViewModel @Inject constructor(
     val viewModelJob = Job()
     val viewModelScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
-    lateinit var chats: LiveData<List<Message>>
-
-
     init {
         _chatState.value = ChatState.NEW
     }
@@ -48,9 +46,10 @@ class ChatViewModel @Inject constructor(
     fun setConversationID(username: String?, conversationID: String?){
 
         if(conversationID!=null) {
-            this.conversationID = conversationID
+            _conversationID.value = conversationID
             //this is to set senderid and receiverid in messages
             getUsernameFromConversationID(conversationID)
+
         }
         else{
             getConversationIDFromUsername(username)
@@ -72,15 +71,82 @@ class ChatViewModel @Inject constructor(
     private fun getConversationIDFromUsername(username: String?) {
         viewModelScope.launch {
             withContext(Dispatchers.IO){
-
                 //Sets the myUsername here
                 myUsername = dataRepository.getMydetails()!!.username
+                val conID = dataRepository.getConversationIDFromContacts(username = username!!)
+                Log.d(TAG, "getConversationIDFromUsername: $conID")
+                _conversationID.postValue(conID)
 
+                if(dataRepository.checkConversationExists(conID)== 0){
+                    _chatState.postValue(ChatState.NEW)
+                    Log.d(TAG, "getConversationIDFromUsername: Worked")
+                }
+                else{
+                    _chatState.postValue(ChatState.EXISTING)
+                }
+            }
+        }
+    }
+
+    //If a conversationID already exists then it will be fetched while login and will be fetched automatically
+    //this funct is called only when there isn't a conID present already so i can create a new one over here
+    // and then make a converstaion by sending the conversationid from here in firebase
+
+    private fun createNewConversation121(username: String){
+        dataRepository.addConversation121(username, conversationID.value!!)
+    }
+
+
+    fun getChatsAll(): LiveData<List<MessageView>> {
+        return dataRepository.getChats(conversationID.value!!)
+    }
+
+    fun sendTextMessage121(message: String){
+        viewModelScope.launch {
+            withContext(Dispatchers.IO){
+                if(chatState.value == ChatState.NEW){
+                    //createNewChat121(username!!) //suspend function sets the conversationID
+                    createNewConversation121(username!!)
+
+                    Log.d(TAG, "sendMessage: The conversationID created and it is ${conversationID}")
+                    _chatState.postValue(ChatState.EXISTING)
+                    dataRepository.saveTextMessage121Local(
+                        message,
+                        conversationID.value!!,
+                        myUsername!!,
+                        username!!
+                    )
+                }
+                else {
+                    Log.d(TAG, "sendTextMessage121: sent")
+                    //sets the livedata for chats once the conversationID is initialized
+                    dataRepository.saveTextMessage121Local(
+                        message,
+                        conversationID.value!!,
+                        myUsername!!,
+                        username!!
+                    )
+                }
+            }
+        }
+    }
+
+
+
+}
+
+
+/*
+
+    private fun getConversationIDFromUsername(username: String?) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO){
+                //Sets the myUsername here
+                myUsername = dataRepository.getMydetails()!!.username
                 val conID = dataRepository.getConversationIDFromUsername(username = username!!)
                 if(conID == null){
                     _chatState.postValue(ChatState.NEW)
                     Log.d(TAG, "getConversationIDFromUsername: Worked")
-                    //createTestNewChat(username)
                 }
                 else{
                     conversationID = conID
@@ -90,43 +156,6 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    private suspend fun createNewChat121(username: String) {
-         val response = dataRepository.createNewChat121(hashMapOf(
-                "myID" to myUsername!!,
-                "otherID" to username
-            )).await()
-
-        response.data?.let {
-            val res = (it as HashMap<*, *>).get("conversationID")
-            Log.d(TAG, "createTestNewChat: $res is the new conversationID")
-            conversationID = res as String
-            dataRepository.addConversation121(username, res)
-        }
-    }
-
-
-    fun getChatsAll(): LiveData<List<MessageView>> {
-        return dataRepository.getChats(conversationID!!)
-    }
-
-    fun sendTextMessage121(message: String){
-        viewModelScope.launch {
-            withContext(Dispatchers.IO){
-                if(chatState.value == ChatState.NEW){
-                    createNewChat121(username!!) //suspend function sets the conversationID
-                    Log.d(TAG, "sendMessage: The conversationID created and it is ${conversationID}")
-                    _chatState.postValue(ChatState.EXISTING)
-                }
-                //sets the livedata for chats once the conversationID is initialized
-                dataRepository.saveTextMessage121Local(message, conversationID!!, myUsername!!, username!!)
-            }
-        }
-    }
-
-}
-
-
-/*
 private fun createNewChat121(username: String) {
         viewModelScope.launch {
             withContext(Dispatchers.IO){

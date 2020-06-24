@@ -1,24 +1,29 @@
 package com.abhishekjagushte.engage.database
 
-import android.util.Log
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import androidx.room.TypeConverter
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
+import java.io.ByteArrayOutputStream
 
 class Converters {
 
     private val TAG="Converters"
 
     @TypeConverter
-    fun toLocalDateTime(value: String?): LocalDateTime? {
-        val l =  LocalDateTime.parse(value)
-        Log.d(TAG, "toLocalDateTime: ${l.atZone(ZoneId.systemDefault()).toString()}")
-        return l
+    fun fromBitMap(bmp: Bitmap?): ByteArray?{
+        if(bmp == null)
+            return null
+        val outputStream = ByteArrayOutputStream()
+        bmp.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+        return outputStream.toByteArray()
     }
 
     @TypeConverter
-    fun fromLocalDateTime(localDateTime: LocalDateTime?): String? {
-        return localDateTime.toString()
+    fun toBitMap(byteArray: ByteArray?): Bitmap?{
+        if(byteArray==null)
+            return null
+
+        return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
     }
+
 }

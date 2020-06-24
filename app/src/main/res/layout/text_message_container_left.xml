@@ -3,8 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-<!--    Changed tempeorily from messageView to message-->
-
     <data>
         <variable
             name="message"
