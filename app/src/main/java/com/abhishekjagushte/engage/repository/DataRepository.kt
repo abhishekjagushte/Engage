@@ -11,18 +11,15 @@ import com.abhishekjagushte.engage.datasource.remotedatasource.FirebaseDataSourc
 import com.abhishekjagushte.engage.datasource.remotedatasource.FunctionsSource
 import com.abhishekjagushte.engage.network.Profile
 import com.abhishekjagushte.engage.network.convertDomainObject
-import com.abhishekjagushte.engage.ui.main.fragments.search.SearchData
-import com.abhishekjagushte.engage.ui.main.fragments.search.convertSearchDataContacts
-import com.abhishekjagushte.engage.ui.main.fragments.search.convertSearchDataConversations
+import com.abhishekjagushte.engage.ui.main.screens.search.SearchData
+import com.abhishekjagushte.engage.ui.main.screens.search.convertSearchDataContacts
+import com.abhishekjagushte.engage.ui.main.screens.search.convertSearchDataConversations
 import com.abhishekjagushte.engage.utils.Constants
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.*
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.functions.HttpsCallableResult
 import com.google.firebase.iid.InstanceIdResult
@@ -367,8 +364,13 @@ class DataRepository @Inject constructor(
         firebaseDataSource.addTestDateData();
     }
 
-    fun getTestDateData(){
-        firebaseDataSource.getTestDateData()
+
+    fun setChatListener(conversationID: String): Query {
+        return firebaseDataSource.setChatListener(conversationID)
+    }
+
+    fun getConfirmedContacts(): LiveData<List<Contact>> {
+        return localDataSource.getConfirmedContacts()
     }
 
 }

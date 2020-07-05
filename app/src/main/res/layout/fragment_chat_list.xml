@@ -6,13 +6,13 @@
     <data>
         <variable
             name="viewModel"
-            type="com.abhishekjagushte.engage.ui.main.fragments.chatlist.ChatListViewModel" />
+            type="com.abhishekjagushte.engage.ui.main.screens.chatlist.ChatListViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.main.fragments.chatlist.ChatListFragment">
+        tools:context=".ui.main.screens.chatlist.ChatListFragment">
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/app_bar"

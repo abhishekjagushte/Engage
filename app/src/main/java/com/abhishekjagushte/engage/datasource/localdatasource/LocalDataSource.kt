@@ -249,4 +249,12 @@ class LocalDataSource @Inject constructor (
         return databaseDao.getConversationList()
     }
 
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Test
+    ///////////////////////////////////////////////////////////////////////////
+    fun getConfirmedContacts(): LiveData<List<Contact>> {
+        return databaseDao.getConfirmedContactsTest()
+    }
+
 }

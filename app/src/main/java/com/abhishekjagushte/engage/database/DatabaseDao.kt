@@ -106,4 +106,12 @@ interface DatabaseDao{
     @Query("SELECT * FROM conversation_view ORDER BY timeStamp DESC")
     fun getConversationList() : LiveData<List<ConversationView>>
 
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Test
+    ///////////////////////////////////////////////////////////////////////////
+
+    @Query("SELECT * FROM contacts WHERE type == 1")
+    fun getConfirmedContactsTest(): LiveData<List<Contact>>
+
 }

@@ -74,20 +74,10 @@ class FirebaseDataSource @Inject constructor(
 
     }
 
-    fun getTestDateData() {
-        firestore.collection("test").orderBy("offsetDateTime").get().addOnSuccessListener {
-            for(doc in it.documents){
 
-                val dateTest = doc.toObject<DateTest>()
-                val date = dateTest!!.offsetDateTime
-                val offsetDateTime: LocalDateTime = date!!.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
+    fun setChatListener(conversationID: String): Query {
+        val query = firestore.collection("conversations121/$conversationID/chats").orderBy("timeStamp", Query.Direction.DESCENDING).limit(1)
 
-                Log.d(TAG, "${dateTest!!.name} + $offsetDateTime + ${dateTest.offsetDateTime.toString()}")
-
-                val d = Date.from(offsetDateTime.toInstant(ZoneOffset.MAX))
-
-                Log.d(TAG, "Converted = ${d.toString()}")
-            }
-        }
+        return query
     }
 }

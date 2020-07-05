@@ -45,6 +45,8 @@ class NotificationHandler : FirebaseMessagingService(){
         Log.d(TAG, "Inside onMessageReceived")
         Log.d(TAG, "Data size ${p0.data.size} + ${p0.data}")
 
+        //TODO don't make change in friend status if already confirmed
+
         //Check if data is available
         if(p0.data.size>0){
             when(p0.data.get("type")){

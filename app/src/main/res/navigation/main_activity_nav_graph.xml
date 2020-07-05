@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/chatListFragment"
-        android:name="com.abhishekjagushte.engage.ui.main.fragments.chatlist.ChatListFragment"
+        android:name="com.abhishekjagushte.engage.ui.main.screens.chatlist.ChatListFragment"
         android:label="chat_list_fragment"
         tools:layout="@layout/fragment_chat_list" >
         <action
@@ -16,12 +16,12 @@
     </fragment>
     <fragment
         android:id="@+id/eventsFragment"
-        android:name="com.abhishekjagushte.engage.ui.main.fragments.events.EventsFragment"
+        android:name="com.abhishekjagushte.engage.ui.main.screens.events.EventsFragment"
         android:label="events_fragment"
         tools:layout="@layout/fragment_events" />
     <fragment
         android:id="@+id/searchFragment"
-        android:name="com.abhishekjagushte.engage.ui.main.fragments.search.SearchFragment"
+        android:name="com.abhishekjagushte.engage.ui.main.screens.search.SearchFragment"
         android:label="search_fragment"
         tools:layout="@layout/fragment_search" >
         <action
@@ -35,7 +35,7 @@
     </fragment>
     <fragment
         android:id="@+id/peopleFragment"
-        android:name="com.abhishekjagushte.engage.ui.main.fragments.people.PeopleFragment"
+        android:name="com.abhishekjagushte.engage.ui.main.screens.people.PeopleFragment"
         android:label="people_fragment"
         tools:layout="@layout/fragment_people" >
         <action
@@ -44,7 +44,7 @@
     </fragment>
     <fragment
         android:id="@+id/profileFragment"
-        android:name="com.abhishekjagushte.engage.ui.main.fragments.profile.ProfileFragment"
+        android:name="com.abhishekjagushte.engage.ui.main.screens.profile.ProfileFragment"
         android:label="activity_profile"
         tools:layout="@layout/fragment_profile" >
         <argument
@@ -61,12 +61,12 @@
     </fragment>
     <fragment
         android:id="@+id/testFragment"
-        android:name="com.abhishekjagushte.engage.ui.main.fragments.test.TestFragment"
+        android:name="com.abhishekjagushte.engage.ui.main.screens.test.TestFragment"
         android:label="fragment_test"
         tools:layout="@layout/fragment_test" />
     <fragment
         android:id="@+id/chatFragment"
-        android:name="com.abhishekjagushte.engage.ui.chat.fragments.chat.ChatFragment"
+        android:name="com.abhishekjagushte.engage.ui.chat.screens.chat.ChatFragment"
         android:label="fragment_chat"
         tools:layout="@layout/fragment_chat" >
         <argument
@@ -99,7 +99,7 @@
 
         <fragment
             android:id="@+id/chooseMethodFragment"
-            android:name="com.abhishekjagushte.engage.ui.setup.fragments.ChooseMethodFragment"
+            android:name="com.abhishekjagushte.engage.ui.setup.screens.ChooseMethodFragment"
             android:label="choose_method_fragment"
             tools:layout="@layout/fragment_choose_method" >
             <action
@@ -115,12 +115,12 @@
         </fragment>
         <fragment
             android:id="@+id/loginFragment"
-            android:name="com.abhishekjagushte.engage.ui.setup.fragments.login.LoginFragment"
+            android:name="com.abhishekjagushte.engage.ui.setup.screens.login.LoginFragment"
             android:label="login_fragment"
             tools:layout="@layout/fragment_login" />
         <fragment
             android:id="@+id/signUpFragment"
-            android:name="com.abhishekjagushte.engage.ui.setup.fragments.signup.SignUpFragment"
+            android:name="com.abhishekjagushte.engage.ui.setup.screens.signup.SignUpFragment"
             android:label="sign_up_fragment"
             tools:layout="@layout/fragment_sign_up" >
             <action
@@ -131,7 +131,7 @@
         </fragment>
         <fragment
             android:id="@+id/setUsernameFragment"
-            android:name="com.abhishekjagushte.engage.ui.setup.fragments.setusername.SetUsernameFragment"
+            android:name="com.abhishekjagushte.engage.ui.setup.screens.setusername.SetUsernameFragment"
             android:label="set_username_fragment"
             tools:layout="@layout/fragment_set_username" >
             <argument
