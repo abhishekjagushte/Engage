@@ -37,9 +37,8 @@ data class DateTest constructor(
 )
 
 
-class MessageNetwork(
+class MessageNetwork121(
     val messageID: String,
-    val conversationID: String,
 
     @ServerTimestamp
     val timeStamp: Date?=null, //this timestamp will be the timestamp while sending the message

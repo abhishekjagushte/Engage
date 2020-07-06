@@ -52,7 +52,7 @@ class ChatFragment : Fragment() {
 
         val args = ChatFragmentArgs.fromBundle(requireArguments())
         Log.d(TAG, "onViewCreated: ${args.conversationID}")
-        viewModel.setConversationID(args.username, args.conversationID)
+        viewModel.setupScreen(args.conversationID)
     }
 
     override fun onAttach(context: Context) {

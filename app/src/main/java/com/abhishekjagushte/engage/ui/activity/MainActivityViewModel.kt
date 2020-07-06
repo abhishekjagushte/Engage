@@ -40,6 +40,7 @@ class MainActivityViewModel(
             }
         }
     }
+}
 
 //    private fun createNewChat121(con: Conversation) {
 //        val myUsername = dataRepository.getMydetails()!!.username
@@ -80,5 +81,3 @@ class MainActivityViewModel(
 //            }
 //        }
 //    }
-
-}

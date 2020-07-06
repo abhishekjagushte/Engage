@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         NavigationUI.setupWithNavController(bottomNavigationView,navController)
         navController.addOnDestinationChangedListener(this)
 
-        test()
+        //test()
 
         setUnsentMessageSender()
         //setUnPushedConversationsPusher()
@@ -101,7 +101,6 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
             else -> bottomNavigationView.visibility = View.VISIBLE
         }
     }
-
 
 
     private fun test(){

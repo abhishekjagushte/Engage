@@ -63,6 +63,8 @@ class NotificationHandler : FirebaseMessagingService(){
                 "3" -> {
                     Log.d(TAG, "onMessageReceived: ${p0.data.toString()}")
                     val msg = mapToMessage121(p0.data)
+                    Log.d(TAG, "onMessageReceived: " +
+                            "${msg.messageID} ${msg.senderID} ${msg.receiverID}")
                     dataRepository.receiveMessage121(msg)
                 }
             }
@@ -129,13 +131,11 @@ class NotificationHandler : FirebaseMessagingService(){
             }
         }
     }
-
     //{server_url=, thumb_nail=, conversationID=KqU3ipvZEs1bSfFZo4tF,
 // messageID=NOJi0osuUGNRYksathbp, latitude=, reply_toID=, mime_type=text/plain,
 // data=hio, type=3, timeStamp=1592412297920, longitude=, receiverID=pandaa25, senderID=pandaa24}
     private fun mapToMessage121(data: Map<String, String>): Message{
         val messageID = data["messageID"]
-        val conversationID = data["conversationID"]
         val serverUrl = data["server_url"]
         val thumbNail = data["thumb_nail"]
         val latitude = if((data["latitude"] ?: error("")).isEmpty()) null else (data["latitude"] ?: error("")).toDouble()
@@ -149,7 +149,7 @@ class NotificationHandler : FirebaseMessagingService(){
 
         return Message(
             messageID = messageID!!,
-            conversationID = conversationID!!,
+            conversationID = senderID!!, //conversationId for 121 is username
             timeStamp = System.currentTimeMillis(),
             serverTimestamp = timeStamp!!.toLong(),
             data = mdata,

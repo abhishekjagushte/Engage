@@ -123,14 +123,13 @@ class LocalDataSource @Inject constructor (
         return databaseDao.getCountContacts()
     }
 
-    fun getConversationIDFromUsername(username: String): String? {
-        return databaseDao.getConversationIDFromUsername(username)
-    }
 
     fun getChats(conversationID: String): LiveData<List<MessageView>> {
         return databaseDao.getChats(conversationID)
     }
 
+
+    //conversationID is username in case of 121
     fun saveTextMessage121Local(
         message: String,
         conversationID: String,
@@ -138,7 +137,7 @@ class LocalDataSource @Inject constructor (
         otherUsername: String
     ) {
         val msg = Message(
-            messageID = firestore.collection("conversations121/$conversationID/chats").document().id,
+            messageID = firestore.collection("messages121").document().id,
             conversationID = conversationID,
             type = Constants.TYPE_MY_MSG,
             status = Constants.STATUS_NOT_SENT,
@@ -164,11 +163,10 @@ class LocalDataSource @Inject constructor (
         }
         }
 
-    fun addConversation121(username: String, conversationID: String){
+    fun addConversation121(username: String){
         val conversation = Conversation(
-            conversationID = conversationID,
+            conversationID = username,
             name = databaseDao.getNameFromUsername(username),
-            username = username,
             type = Constants.CONVERSATION_TYPE_121,
             active = Constants.CONVERSATION_ACTIVE_YES
         )
@@ -183,6 +181,24 @@ class LocalDataSource @Inject constructor (
     fun pushMessage(message: Message) {
         when(message.conType){
             Constants.CONVERSATION_TYPE_121 -> {
+                firestore.collection("messages121")
+                    .document(message.messageID)
+                    .set(message.convertNetworkMessage121())
+                    .addOnSuccessListener {
+                        localDBScope.launch {
+                            withContext(Dispatchers.IO) {
+                                message.status = Constants.STATUS_SENT_BUT_NOT_DELIVERED
+                                databaseDao.updateMessage(message)
+                                Log.d(TAG, "pushMessage: ${message.data} sent")
+                            }
+                        }
+                    }
+            }
+
+            Constants.CONVERSATION_TYPE_M2M -> {
+                TODO("Send message M2M")
+
+                /*
                 firestore.collection("conversations121/${message.conversationID}/chats")
                     .document(message.messageID)
                     .set(message.convertNetworkMessage())
@@ -196,9 +212,7 @@ class LocalDataSource @Inject constructor (
                             }
                         }
                     }
-            }
-
-            Constants.CONVERSATION_TYPE_M2M -> {
+                 */
 
             }
         }
@@ -212,9 +226,6 @@ class LocalDataSource @Inject constructor (
         databaseDao.insertMessage(message)
     }
 
-    fun getUsernameFromConversationID(conversationID: String): String {
-        return databaseDao.getUsernameFromConversationID(conversationID)
-    }
 
     fun getTemporaryConversationID(): String {
         return firestore.collection("conversations121").document().id
@@ -237,9 +248,6 @@ class LocalDataSource @Inject constructor (
         databaseDao.updateConversation(conversation)
     }
 
-    fun getConversationIDFromContacts(username: String): String {
-        return databaseDao.getConversationIDFromContacts(username)
-    }
 
     fun checkConversationExists(conID: String): Int {
         return databaseDao.checkConversationExists(conID)

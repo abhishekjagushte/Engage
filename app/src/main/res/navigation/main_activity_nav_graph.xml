@@ -70,13 +70,8 @@
         android:label="fragment_chat"
         tools:layout="@layout/fragment_chat" >
         <argument
-            android:name="username"
-            app:argType="string"
-            app:nullable="true" />
-        <argument
             android:name="conversationID"
-            app:argType="string"
-            app:nullable="true" />
+            app:argType="string" />
     </fragment>
 
     <fragment

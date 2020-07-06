@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.abhishekjagushte.engage.EngageApplication
 import com.abhishekjagushte.engage.R
 import com.abhishekjagushte.engage.ui.chat.screens.chat.ChatFragment
+import com.abhishekjagushte.engage.ui.chat.screens.chat.ChatType
 import com.abhishekjagushte.engage.ui.chat.screens.chat.ChatViewModel
 import kotlinx.android.synthetic.main.fragment_chat_screen.*
 
@@ -51,8 +52,15 @@ class ChatScreenFragment : Fragment(R.layout.fragment_chat_screen) {
         send_button.setOnClickListener {
             val message = message_input.text.toString().trim()
             if(!message.isEmpty()) {
-                SharedViewModel.sendTextMessage121(message)
-                message_input.text.clear()
+
+                if(SharedViewModel.chatType.value == ChatType.CHAT_TYPE_121){
+                    SharedViewModel.sendTextMessage121(message)
+                    message_input.text.clear()
+                }
+                else{
+                    TODO("Send Message M2M")
+                }
+
             }
         }
 

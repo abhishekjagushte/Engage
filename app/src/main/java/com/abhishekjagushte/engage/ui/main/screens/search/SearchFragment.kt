@@ -84,7 +84,7 @@ class SearchFragment : Fragment() {
             else if(searchData.type == Constants.SEARCHDATA_CONVERSATION){
                 val conID = searchData.extras.get("networkID") as String
                 Log.d(TAG, "onCreateView: $conID")
-                findNavController().navigate(SearchFragmentDirections.actionSearchFragmentToChatFragment(null, conID))
+                findNavController().navigate(SearchFragmentDirections.actionSearchFragmentToChatFragment(conID))
             }
 
 

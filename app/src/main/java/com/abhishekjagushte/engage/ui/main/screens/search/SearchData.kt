@@ -52,7 +52,6 @@ fun SearchData.toSearchResultContact(): SearchResultContact{
 fun SearchData.toSearchResultConversation(): SearchResultConversation{
     return SearchResultConversation(
         name = this.title,
-        username = this.subtitle,
         //status = this.flag,
         conversationID = this.extras.get("networkID") as String,
         type = this.extras.get("conversation_type") as Int

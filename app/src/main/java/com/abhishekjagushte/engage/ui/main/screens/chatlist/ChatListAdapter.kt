@@ -71,7 +71,7 @@ class ChatListItemViewHolder(val binding: ConversationItemBinding): RecyclerView
 
         binding.dataContainer.setOnClickListener {
             navController.navigate(ChatListFragmentDirections
-                .actionChatListFragmentToChatFragment(null, conversationView.conversationID))
+                .actionChatListFragmentToChatFragment(conversationView.conversationID))
         }
     }
 
@@ -103,7 +103,7 @@ class ChatListDiffCallback: DiffUtil.ItemCallback<ChatListDataItem>() {
 
 sealed class ChatListDataItem{
     abstract val id: String
-    abstract val lastMessageID: String
+    abstract val lastMessageID: String?
 
     data class ChatListItem(val conversationView: ConversationView): ChatListDataItem() {
         override val id = conversationView.conversationID

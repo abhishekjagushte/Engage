@@ -2,7 +2,7 @@ package com.abhishekjagushte.engage.database
 
 import android.graphics.Bitmap
 import androidx.room.*
-import com.abhishekjagushte.engage.network.MessageNetwork
+import com.abhishekjagushte.engage.network.MessageNetwork121
 
 ///////////////////////////////////////////////////////////////////////////
 // I changes the networkID to conversationID so there might be errors
@@ -27,8 +27,10 @@ class Contact(
     var type: Int,
 
     @ColumnInfo(name="time_stamp")
-    var timeStamp: String? = null,
-    var conversationID: String?=null
+    var timeStamp: String? = null
+
+    //conversation ID removed from the contacts
+
 )
 
 @Entity(tableName = "suggested_contacts")
@@ -51,11 +53,11 @@ data class UserData(
 class Conversation(
     @PrimaryKey
     var conversationID: String, //the conversationID for the conversation
+    //This conversation ID will contain the conversationID for M2M chats and username for 121 chats
+
     var name: String, //the name will be displayed on the chat_list so this can be name or nickname in case of 121
                         // and group name in case of M2M
 
-    //Username for 121 chats so that we can use the username of the contact to update any required dp or bio
-    var username: String? = null,
     var dp_thmb: Bitmap? = null, //the thumbnail of dp
 
     var type: Int, // determines whether the conversation is 121 or M2M
@@ -80,18 +82,18 @@ class Conversation(
       conversations.conversationID, conversations.type AS conType,  messages.messageID, messages.timeStamp, messages.data, messages.mime_type ,messages.type,
       messages.status, messages.senderID, contacts.nickname FROM conversations
       LEFT JOIN messages ON conversations.lastMessageID == messages.messageID
-      LEFT JOIN contacts ON conversations.username == contacts.username
+      LEFT JOIN contacts ON conversations.conversationID == contacts.username
 """, viewName = "conversation_view")
 data class ConversationView(
     var name: String?,
     var dp_thmb: Bitmap?,
     var dp_url: String?,
     var conversationID: String,
-    var conType: Int,
-    var messageID: String,
+    var conType: Int?,
+    var messageID: String?,
     var timeStamp: Long?,
     var data: String?,
-    var mime_type: String,
+    var mime_type: String?,
     var type: Int?,
     var status: Int?,
     var senderID: String?,
@@ -156,10 +158,9 @@ class Message(
 
     var conType: Int
 ){
-    fun convertNetworkMessage(): MessageNetwork{
-        return MessageNetwork(
+    fun convertNetworkMessage121(): MessageNetwork121{
+        return MessageNetwork121(
             messageID = messageID,
-            conversationID = conversationID,
             data = data,
             senderID = senderID,
             receiverID = receiverID,
@@ -169,10 +170,14 @@ class Message(
 }
 
 
-@DatabaseView(value = "SELECT contacts.nickname, messages.messageID, messages.conversationID ,messages.type, messages.status," +
-        " messages.timeStamp, messages.data, messages.senderID, messages.receiverID, messages.deleted, messages.mime_type, " +
-        "messages.server_url, messages.local_uri, messages.latitude, messages.longitude," +
-        " messages.reply_toID FROM contacts INNER JOIN messages ON messages.receiverID = contacts.username", viewName = "message_view")
+@DatabaseView(value =
+    """
+    SELECT contacts.nickname, messages.messageID, messages.conversationID ,messages.type, messages.status,
+    messages.timeStamp, messages.data, messages.senderID, messages.receiverID, messages.deleted, messages.mime_type, 
+    messages.server_url, messages.local_uri, messages.latitude, messages.longitude,
+    messages.reply_toID FROM contacts INNER JOIN messages ON messages.receiverID = contacts.username
+    """
+    , viewName = "message_view")
 data class MessageView(
     var nickname: String?,
     var messageID: String,
@@ -195,7 +200,6 @@ data class MessageView(
 
 data class SearchResultConversation(
     var name:String,
-    var username: String,
     var type: Int,
     var conversationID: String
 //    var lastMessageData: String? = null,

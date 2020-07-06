@@ -19,7 +19,7 @@ fun TextView.setMessageDataString(conversationView: ConversationView){
 @BindingAdapter("setMessageTime")
 fun TextView.setMessageTime(conversationView: ConversationView){
     val dateTime = conversationView.timeStamp
-    dateTime!!.let {
+    dateTime?.let {
         text = StringFormatting.getTime(it)
     }
 }

@@ -4,10 +4,10 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.abhishekjagushte.engage.database.Conversation
 import com.abhishekjagushte.engage.database.MessageView
 import com.abhishekjagushte.engage.repository.DataRepository
-import com.google.firebase.firestore.DocumentChange
-import com.google.firebase.firestore.ListenerRegistration
+import com.abhishekjagushte.engage.utils.Constants
 import kotlinx.coroutines.*
 import javax.inject.Inject
 
@@ -27,15 +27,17 @@ class ChatViewModel @Inject constructor(
     val conversationID : LiveData<String>
         get() = _conversationID
 
-
-    private var username: String? = null//used to send in message 121
-    private var myUsername: String?=null//used to send in message 121
+    private var myUsername: String?=null//set up in setupScreen
 
     private val TAG = "ChatViewModel"
 
     var _chatState = MutableLiveData<ChatState>()
     val chatState: LiveData<ChatState>
         get() = _chatState//Set initially as existing as this will be in most of the cases
+
+    var _chatType = MutableLiveData<ChatType>()
+    val chatType: LiveData<ChatType>
+        get() = _chatType//Set initially as existing as this will be in most of the cases
 
 
     val viewModelJob = Job()
@@ -45,49 +47,50 @@ class ChatViewModel @Inject constructor(
         _chatState.value = ChatState.NEW
     }
 
-    fun setConversationID(username: String?, conversationID: String?){
-
-        if(conversationID!=null) {
-            _conversationID.value = conversationID
-            //this is to set senderid and receiverid in messages
-            getUsernameFromConversationID(conversationID)
-
-        }
-        else{
-            getConversationIDFromUsername(username)
-            this.username = username
-            Log.d(TAG, "setConversationID: $username")
-        }
-    }
-
-    private fun getUsernameFromConversationID(conversationID: String) {
+    fun setupScreen(conversationID: String){
+        _conversationID.value = conversationID
+        //this is to set senderid and receiverid in messages
         viewModelScope.launch {
-            withContext(Dispatchers.IO){
+            withContext(Dispatchers.IO) {
+                val conversation = dataRepository.getConversation(conversationID)
                 myUsername = dataRepository.getMydetails()!!.username
-                username = dataRepository.getUsernameFromConversationID(conversationID)
-                _chatState.postValue(ChatState.EXISTING)
-            }
-        }
-    }
+                if (conversation != null){
 
-    private fun getConversationIDFromUsername(username: String?) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO){
-                //Sets the myUsername here
-                myUsername = dataRepository.getMydetails()!!.username
-                val conID = dataRepository.getConversationIDFromContacts(username = username!!)
-                Log.d(TAG, "getConversationIDFromUsername: $conID")
-                _conversationID.postValue(conID)
+                    if(conversation.type == Constants.CONVERSATION_TYPE_121) {
+                        _chatType.postValue(ChatType.CHAT_TYPE_121)
+                        //TODO : setUI121(conversation)
+                        Log.d(TAG, "setupScreen: Type 121")
+                    }
+                    else{
+                        _chatType.postValue(ChatType.CHAT_TYPE_M2M)
+                        //TODO : setUIM2M(conversation)
+                        Log.d(TAG, "setupScreen: Type M2M")
+                    }
 
-                if(dataRepository.checkConversationExists(conID)== 0){
-                    _chatState.postValue(ChatState.NEW)
-                    Log.d(TAG, "getConversationIDFromUsername: Worked")
-                }
-                else{
                     _chatState.postValue(ChatState.EXISTING)
                 }
+                else{
+                    //The chat will always be 121 if not present in db
+                    _chatType.postValue(ChatType.CHAT_TYPE_121)
+                    _chatState.postValue(ChatState.NEW)
+                    //TODO : setUINew(conversationID)
+                    Log.d(TAG, "setupScreen: type NOT DEFINED")
+                }
             }
         }
+    }
+
+
+    fun setUI121(conversation: Conversation){
+        TODO("Set the conversation name etc on the page")
+    }
+
+    fun setUIM2M(conversation: Conversation){
+        TODO("Set the conversation name etc on the page")
+    }
+
+    fun setUINew(username: String){
+        TODO("Set the screen for a new chat")
     }
 
     //If a conversationID already exists then it will be fetched while login and will be fetched automatically
@@ -95,9 +98,8 @@ class ChatViewModel @Inject constructor(
     // and then make a converstaion by sending the conversationid from here in firebase
 
     private fun createNewConversation121(username: String){
-        dataRepository.addConversation121(username, conversationID.value!!)
+        dataRepository.addConversation121(username)
     }
-
 
     fun getChatsAll(): LiveData<List<MessageView>> {
         return dataRepository.getChats(conversationID.value!!)
@@ -106,9 +108,12 @@ class ChatViewModel @Inject constructor(
     fun sendTextMessage121(message: String){
         viewModelScope.launch {
             withContext(Dispatchers.IO){
+                //new is only possible when chat type is 121
                 if(chatState.value == ChatState.NEW){
                     //createNewChat121(username!!) //suspend function sets the conversationID
-                    createNewConversation121(username!!)
+
+                    //conversationID is username
+                    createNewConversation121(conversationID.value!!)
 
                     Log.d(TAG, "sendMessage: The conversationID created and it is ${conversationID}")
                     _chatState.postValue(ChatState.EXISTING)
@@ -116,7 +121,7 @@ class ChatViewModel @Inject constructor(
                         message,
                         conversationID.value!!,
                         myUsername!!,
-                        username!!
+                        conversationID.value!! //For 121 username = conversationID
                     )
                 }
                 else {
@@ -126,20 +131,12 @@ class ChatViewModel @Inject constructor(
                         message,
                         conversationID.value!!,
                         myUsername!!,
-                        username!!
+                        conversationID.value!!
                     )
                 }
             }
         }
     }
-
-
-
-
-    override fun onCleared() {
-        super.onCleared()
-    }
-
 }
 
 

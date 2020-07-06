@@ -103,15 +103,13 @@ class ProfileFragmentViewModel @Inject constructor(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val myDetails = dataRepository.getMydetails()
-                val conID = dataRepository.getTemporaryConversationID()
 
                 val request = hashMapOf<String, Any>(
                     "senderID" to myDetails!!.username,
                     "senderName" to myDetails.name,
                     "receiverID" to profileDisplay.value!!.username,
                     "timeStamp" to Date().toString(),
-                    "type" to Constants.ACCEPT_FR_TYPE,
-                    "conversationID" to conID
+                    "type" to Constants.ACCEPT_FR_TYPE
                 )
 
                 dataRepository.addFriend(request).addOnSuccessListener {
@@ -121,8 +119,6 @@ class ProfileFragmentViewModel @Inject constructor(
                     viewModelScope.launch {
                         withContext(Dispatchers.IO) {
                             localContact.type = Constants.CONTACTS_CONFIRMED
-                            localContact.conversationID = conID
-
                             dataRepository.addContact(localContact)
                         }
                         _profileDisplay.value!!.type = Constants.CONTACTS_CONFIRMED

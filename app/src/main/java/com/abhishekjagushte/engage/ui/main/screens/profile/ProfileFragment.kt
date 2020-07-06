@@ -142,7 +142,7 @@ class ProfileFragment : Fragment() {
 
                 Constants.CONTACTS_CONFIRMED -> {
                     navController.navigate(ProfileFragmentDirections
-                        .actionProfileActivityToChatFragment(viewModel.localContact.username, null))
+                        .actionProfileActivityToChatFragment(viewModel.localContact.username))
                 }
             }
         }

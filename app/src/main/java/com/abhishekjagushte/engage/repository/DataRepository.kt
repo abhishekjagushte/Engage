@@ -264,8 +264,7 @@ class DataRepository @Inject constructor(
                 name = name,
                 username = username,
                 type = Constants.CONTACTS_CONFIRMED,
-                networkID = "", //Will be updated when the data is fetched
-                conversationID = conID
+                networkID = "" //Will be updated when the data is fetched
             )
 
             repoScope.launch {
@@ -279,10 +278,6 @@ class DataRepository @Inject constructor(
     ///////////////////////////////////////////////////////////////////////////
     // ChatList Fragment stuff
     ///////////////////////////////////////////////////////////////////////////
-
-    fun getConversationIDFromUsername(username: String): String?{
-        return localDataSource.getConversationIDFromUsername(username)
-    }
 
     // TODO: 6/11/2020 implement this after completing the checking for already available thing
     fun createNewChat121(request: HashMap<String, String>): Task<HttpsCallableResult> {
@@ -302,8 +297,8 @@ class DataRepository @Inject constructor(
         localDataSource.saveTextMessage121Local(message, conversationID, myUsername, otherUsername)
     }
 
-    fun addConversation121(username: String, conversationID: String){
-        localDataSource.addConversation121(username, conversationID)
+    fun addConversation121(username: String){
+        localDataSource.addConversation121(username)
     }
 
     fun getUnsentMessages(): LiveData<List<Message>> {
@@ -317,17 +312,18 @@ class DataRepository @Inject constructor(
     fun receiveMessage121(message: Message){
         repoScope.launch {
             withContext(Dispatchers.IO){
-                if(localDataSource.getConversation(message.conversationID)==null)
-                    localDataSource.addConversation121(message.senderID!!, message.conversationID)
+
+                if(localDataSource.getConversation(message.senderID!!)==null) {
+                    Log.d(TAG, "receiveMessage121: conversation not present")
+                    localDataSource.addConversation121(message.senderID!!)
+                }
 
                 localDataSource.insertMessage(message)
+
             }
         }
     }
 
-    fun getUsernameFromConversationID(conversationID: String): String {
-        return localDataSource.getUsernameFromConversationID(conversationID)
-    }
 
     fun getTemporaryConversationID(): String {
         return localDataSource.getTemporaryConversationID()
@@ -341,13 +337,15 @@ class DataRepository @Inject constructor(
         localDataSource.updateConversation(conversation)
     }
 
-    fun getConversationIDFromContacts(username: String): String {
-        return localDataSource.getConversationIDFromContacts(username)
-    }
 
     fun checkConversationExists(conID: String): Int {
         return localDataSource.checkConversationExists(conID)
     }
+
+    fun getConversation(conversationID: String): Conversation? {
+        return localDataSource.getConversation(conversationID = conversationID)
+    }
+
 
     ///////////////////////////////////////////////////////////////////////////
     // Chat List fragment
