@@ -10,6 +10,7 @@ import com.abhishekjagushte.engage.ui.chat.screens.chat.fragments.eventscreen.di
 import com.abhishekjagushte.engage.ui.activity.MainActivity
 import com.abhishekjagushte.engage.ui.activity.MainComponent
 import com.abhishekjagushte.engage.ui.fragments.ContactListFragment
+import com.abhishekjagushte.engage.ui.main.screens.addparticipants.di.AddParticipantsComponent
 import com.abhishekjagushte.engage.ui.main.screens.chatlist.di.ChatListComponent
 import com.abhishekjagushte.engage.ui.main.screens.profile.di.ProfileComponent
 import com.abhishekjagushte.engage.ui.main.screens.search.di.SearchComponent
@@ -42,6 +43,7 @@ interface AppComponent: AndroidInjector<EngageApplication>{
     fun inject(testFragment: TestFragment)
     fun inject(contactListFragment: ContactListFragment)
 
+    fun addParticipantsComponent(): AddParticipantsComponent.Factory
     fun addMainComponent(): MainComponent.Factory
     fun addEventScreenComponent(): EventComponent.Factory
     fun addChatScreenComponent(): ChatScreenComponent.Factory
@@ -55,9 +57,6 @@ interface AppComponent: AndroidInjector<EngageApplication>{
     fun addSetUsernameComponent(): SetUsernameComponent.Factory
 }
 
-
-
-
 @Module(subcomponents =
     [LoginComponent::class,
     SignUpComponent::class,
@@ -68,5 +67,6 @@ interface AppComponent: AndroidInjector<EngageApplication>{
     ChatComponent::class,
     ChatScreenComponent::class,
     EventComponent::class,
-    MainComponent::class])
+    MainComponent::class,
+    AddParticipantsComponent::class])
 object SubcomponentsModule

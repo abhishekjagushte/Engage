@@ -79,7 +79,7 @@ class SearchFragmentViewModel @Inject constructor(
                 }
 
                 _searchResults.postValue(searchList)
-                Log.d(TAG,"Size = ${_searchResults.value?.size}")
+                Log.d(TAG,"Size = ${_searchResults.value?.size} local")
 
 
                 //TODO possibly store all results in a list while one session of searching or implement recent searches

@@ -13,6 +13,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
+import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -71,6 +72,7 @@ class ChatListFragment : Fragment() {
         recyclerView.adapter = chatListAdapter
 
         observeChatList()
+        floatingActionButtonOnCLick()
     }
 
     private fun observeChatList(){
@@ -80,5 +82,11 @@ class ChatListFragment : Fragment() {
                 chatListAdapter.updateList(it)
             }
         })
+    }
+
+    fun floatingActionButtonOnCLick(){
+        floatingActionButton.setOnClickListener {
+            it.findNavController().navigate(R.id.action_chatListFragment_to_addParticipantsFragment)
+        }
     }
 }

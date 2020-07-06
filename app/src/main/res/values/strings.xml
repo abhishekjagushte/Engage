@@ -32,4 +32,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="chat">Chat</string>
+    <string name="add_participants">Add Participants</string>
+    <string name="add_participants_initial_text">Search, select and add participants for a new group</string>
+    <string name="search_for_friends">Search for friends...</string>
 </resources>

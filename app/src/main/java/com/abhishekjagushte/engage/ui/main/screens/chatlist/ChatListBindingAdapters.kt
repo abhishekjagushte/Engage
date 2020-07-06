@@ -6,6 +6,7 @@ import androidx.databinding.BindingAdapter
 import com.abhishekjagushte.engage.database.ConversationView
 import com.abhishekjagushte.engage.utils.Constants
 import com.abhishekjagushte.engage.utils.StringFormatting
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 @BindingAdapter("setMessageDataString")
 fun TextView.setMessageDataString(conversationView: ConversationView){
