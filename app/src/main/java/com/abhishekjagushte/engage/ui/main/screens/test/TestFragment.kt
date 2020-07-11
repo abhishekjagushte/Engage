@@ -27,12 +27,12 @@ class TestFragment : Fragment(R.layout.fragment_test) {
         super.onViewCreated(view, savedInstanceState)
 
 
-        val contactListFragment = ContactListFragment(ContactItemClickListener {
-            Log.d(TAG, "onViewCreated: $it")
-            Toast.makeText(context, "Clicked $it", Toast.LENGTH_SHORT).show()
-        }, dataRepository.getConfirmedContacts())
-
-        childFragmentManager.beginTransaction().add(R.id.fragment, contactListFragment).commit()
+//        val contactListFragment = ContactListFragment(ContactItemClickListener {
+//            Log.d(TAG, "onViewCreated: $it")
+//            Toast.makeText(context, "Clicked $it", Toast.LENGTH_SHORT).show()
+//        }, dataRepository.getConfirmedContacts())
+//
+//        childFragmentManager.beginTransaction().add(R.id.fragment, contactListFragment).commit()
 
     }
 

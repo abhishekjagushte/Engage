@@ -35,4 +35,6 @@
     <string name="add_participants">Add Participants</string>
     <string name="add_participants_initial_text">Search, select and add participants for a new group</string>
     <string name="search_for_friends">Search for friends...</string>
+    <string name="set_name">Set Name</string>
+    <string name="group_name">Group Name</string>
 </resources>

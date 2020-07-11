@@ -1,5 +1,6 @@
 package com.abhishekjagushte.engage.ui.fragments.adapters
 
+import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -8,8 +9,10 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.abhishekjagushte.engage.R
 import com.abhishekjagushte.engage.database.Contact
 import com.abhishekjagushte.engage.databinding.ItemContactListBinding
+import com.abhishekjagushte.engage.utils.Constants
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,16 +21,21 @@ import kotlinx.coroutines.withContext
 const val CHAT_LIST_ITEM = 1
 const val NOT_DECIDED = 2
 
-class ContactListAdapter(val clickListener: ContactItemClickListener) :
+class ContactListAdapter(val clickListener: ContactItemClickListener,
+                         val longClickListener: ContactLongItemClickListener,
+                         val mode: Int,
+                         val  context: Context
+) :
     ListAdapter<ContactListDataItem, RecyclerView.ViewHolder> (ContactListDiffCallback()){
 
     private val adapterScope = CoroutineScope(Dispatchers.Default)
     private val TAG = "ChatListAdapter"
 
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         Log.d(TAG, "onCreateViewHolder: Called")
         return when(viewType){
-            CHAT_LIST_ITEM -> ContactListItemViewHolder.from(parent)
+            CHAT_LIST_ITEM -> ContactListItemViewHolder.from(parent, mode)
             else -> throw ClassCastException("Unknown viewType $viewType")
         }
     }
@@ -62,22 +70,64 @@ class ContactListAdapter(val clickListener: ContactItemClickListener) :
 
 }
 
-class ContactListItemViewHolder(val binding: ItemContactListBinding): RecyclerView.ViewHolder(binding.root){
+class ContactListItemViewHolder(val binding: ItemContactListBinding, private val mode: Int): RecyclerView.ViewHolder(binding.root){
 
     lateinit var navController: NavController
 
-    fun bind(contact: Contact, clickListener: ContactItemClickListener){
+    private val TAG = "ContactListItemViewHolder"
+    private lateinit var contact: Contact
+
+    fun bind(c: Contact, clickListener: ContactItemClickListener){
+        contact = c
+
+        if(contact.selected==true) {
+            binding.constraintLayout.background =
+                binding.root.context.getDrawable(R.drawable.selected_background)
+                Log.d(TAG, "bind: changed")
+        }
+        else{
+            binding.constraintLayout.background = binding.root.context.getDrawable(android.R.color.transparent)
+            Log.d(TAG, "bind: changed")
+        }
+
         binding.contact = contact
-        binding.clickListener = clickListener
+        setupListeners(clickListener)
         binding.executePendingBindings()
     }
 
+    private fun setupListeners(clickListener: ContactItemClickListener){
+        when(mode){
+            Constants.CONTACT_LIST_MODE_SELECTION -> {
+                binding.constraintLayout.setOnClickListener {
+                    clickListener.onClick(contact)
+                    if(contact.selected==false){
+                        contact.selected = true
+                        binding.constraintLayout.background =
+                            binding.root.context.getDrawable(R.drawable.selected_background)
+                    }
+                    else{
+                        contact.selected = false
+                        binding.constraintLayout.background = binding.root.context.getDrawable(android.R.color.transparent)
+                        Log.d(TAG, "bind: changed")
+                    }
+                }
+            }
+
+            Constants.CONTACT_LIST_MODE_NORMAL -> {
+                binding.constraintLayout.setOnClickListener {
+                    clickListener.onClick(contact)
+                }
+                //TODO set long click listeners if any
+            }
+        }
+    }
+
     companion object{
-        fun from(parent: ViewGroup): ContactListItemViewHolder{
+        fun from(parent: ViewGroup, mode: Int): ContactListItemViewHolder{
             val layoutInflater = LayoutInflater.from(parent.context)
             val binding = ItemContactListBinding.inflate(layoutInflater, parent, false)
 
-            val vh = ContactListItemViewHolder(binding)
+            val vh = ContactListItemViewHolder(binding, mode)
             vh.navController = Navigation.findNavController(parent)
             return vh
         }
@@ -91,7 +141,7 @@ class ContactListDiffCallback: DiffUtil.ItemCallback<ContactListDataItem>() {
     }
 
     override fun areContentsTheSame(oldItem: ContactListDataItem, newItem: ContactListDataItem): Boolean {
-        return oldItem.id == newItem.id
+        return oldItem.selected == newItem.selected
         //TODO consider the case when by chance name or bio changes
     }
 
@@ -99,13 +149,19 @@ class ContactListDiffCallback: DiffUtil.ItemCallback<ContactListDataItem>() {
 
 sealed class ContactListDataItem{
     abstract val id: String
+    abstract val selected: Boolean
 
     data class ContactItem(val contact: Contact): ContactListDataItem() {
         override val id = contact.username
+        override val selected = contact.selected?: false
     }
 }
 
-class ContactItemClickListener(val clickListener: (username: String) -> Unit){
-    fun onClick(contact: Contact) = clickListener(contact.username)
+class ContactItemClickListener(val clickListener: (contact: Contact) -> Unit){
+    fun onClick(contact: Contact) = clickListener(contact)
+}
+
+class ContactLongItemClickListener(val clickListener: (contact: Contact) -> Unit){
+    fun onClick(contact: Contact) = clickListener(contact)
 }
 

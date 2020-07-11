@@ -30,8 +30,10 @@ class Contact(
     var timeStamp: String? = null
 
     //conversation ID removed from the contacts
-
-)
+){
+    @Ignore
+    var selected: Boolean? = false
+}
 
 @Entity(tableName = "suggested_contacts")
 data class SuggestedContacts(

@@ -7,16 +7,13 @@
             name="contact"
             type="com.abhishekjagushte.engage.database.Contact" />
 
-        <variable
-            name="clickListener"
-            type="com.abhishekjagushte.engage.ui.fragments.adapters.ContactItemClickListener" />
-
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="80dp"
-        android:onClick="@{() -> clickListener.onClick(contact)}"
         xmlns:app="http://schemas.android.com/apk/res-auto">
 
         <de.hdodenhof.circleimageview.CircleImageView
@@ -44,11 +41,11 @@
             app:layout_constraintTop_toTopOf="@+id/profile_image" />
 
         <TextView
-            android:id="@+id/bioText"
+            android:id="@+id/subHeadingText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="@={contact.bio}"
+            android:text="@={contact.username}"
             app:layout_constraintStart_toStartOf="@+id/nameText"
             app:layout_constraintTop_toBottomOf="@+id/nameText" />
 

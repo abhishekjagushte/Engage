@@ -10,7 +10,7 @@ import com.abhishekjagushte.engage.ui.chat.screens.chat.fragments.eventscreen.di
 import com.abhishekjagushte.engage.ui.activity.MainActivity
 import com.abhishekjagushte.engage.ui.activity.MainComponent
 import com.abhishekjagushte.engage.ui.fragments.ContactListFragment
-import com.abhishekjagushte.engage.ui.main.screens.addparticipants.di.AddParticipantsComponent
+import com.abhishekjagushte.engage.ui.main.screens.creategroup.addparticipants.di.AddParticipantsComponent
 import com.abhishekjagushte.engage.ui.main.screens.chatlist.di.ChatListComponent
 import com.abhishekjagushte.engage.ui.main.screens.profile.di.ProfileComponent
 import com.abhishekjagushte.engage.ui.main.screens.search.di.SearchComponent

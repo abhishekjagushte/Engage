@@ -15,7 +15,7 @@
             app:destination="@id/chatFragment" />
         <action
             android:id="@+id/action_chatListFragment_to_addParticipantsFragment"
-            app:destination="@id/addParticipantsFragment" />
+            app:destination="@id/addParticipantNavGraph" />
     </fragment>
     <fragment
         android:id="@+id/eventsFragment"
@@ -146,10 +146,26 @@
             app:enterAnim="@anim/slide_in_right" />
 
     </navigation>
-    <fragment
-        android:id="@+id/addParticipantsFragment"
-        android:name="com.abhishekjagushte.engage.ui.main.screens.addparticipants.AddParticipantsFragment"
-        android:label="@string/add_participants"
-        tools:layout="@layout/fragment_add_participants" />
+
+    <navigation android:id="@+id/addParticipantNavGraph"
+        app:startDestination="@id/addParticipantsFragment">
+        <fragment
+            android:id="@+id/setGroupInfoFragment"
+            android:name="com.abhishekjagushte.engage.ui.main.screens.creategroup.setinfo.SetGroupInfoFragment"
+            android:label="fragment_set_group_info"
+            tools:layout="@layout/fragment_set_group_info" />
+        <fragment
+            android:id="@+id/addParticipantsFragment"
+            android:name="com.abhishekjagushte.engage.ui.main.screens.creategroup.addparticipants.AddParticipantsFragment"
+            android:label="@string/add_participants"
+            tools:layout="@layout/fragment_add_participants" >
+            <action
+                android:id="@+id/action_addParticipantsFragment_to_setGroupInfoFragment"
+                app:destination="@id/setGroupInfoFragment" />
+        </fragment>
+        <action
+            android:id="@+id/action_global_chatFragment"
+            app:destination="@id/chatFragment" />
+    </navigation>
 
 </navigation>

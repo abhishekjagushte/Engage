@@ -81,6 +81,10 @@ object Constants {
     const val CONVERSATION_NEEDS_PUSH_YES = 1
     const val CONVERSATION_NEEDS_PUSH_NO = 0
 
+    //ContactList Fragment Modes
+    const val CONTACT_LIST_MODE_SELECTION = 1 //selection for adding participants - on click select
+    const val CONTACT_LIST_MODE_NORMAL = 2 //Normal displaying - only click and on click
+
 }
 
 //Contacts
