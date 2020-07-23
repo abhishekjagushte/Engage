@@ -80,4 +80,8 @@ class FirebaseDataSource @Inject constructor(
 
         return query
     }
+
+    fun getNewConversationIDM2M(): String {
+        return firestore.collection("groups").document().id
+    }
 }

@@ -12,6 +12,7 @@ import com.abhishekjagushte.engage.database.Contact
 import com.abhishekjagushte.engage.repository.DataRepository
 import com.abhishekjagushte.engage.ui.fragments.adapters.ContactItemClickListener
 import com.abhishekjagushte.engage.ui.fragments.adapters.ContactListAdapter
+import com.abhishekjagushte.engage.ui.fragments.adapters.ContactListDataItem
 import com.abhishekjagushte.engage.ui.fragments.adapters.ContactLongItemClickListener
 import kotlinx.android.synthetic.main.fragment_contact_list.*
 import javax.inject.Inject
@@ -46,5 +47,15 @@ class ContactListFragment(
     override fun onAttach(context: Context) {
         super.onAttach(context)
         (requireParentFragment().requireActivity().application as EngageApplication).appComponent.inject(this)
+    }
+
+    fun removeUsername(username: String){
+        for(c in adapter.currentList){
+            if((c as ContactListDataItem.ContactItem).contact.username.equals(username)) {
+                c.selected = false
+                c.contact.selected = false
+            }
+        }
+        adapter.notifyDataSetChanged()
     }
 }

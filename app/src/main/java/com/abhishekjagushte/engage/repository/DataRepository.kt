@@ -9,6 +9,7 @@ import com.abhishekjagushte.engage.datasource.localdatasource.LocalDataSource
 import com.abhishekjagushte.engage.datasource.remotedatasource.FirebaseAuthDataSource
 import com.abhishekjagushte.engage.datasource.remotedatasource.FirebaseDataSource
 import com.abhishekjagushte.engage.datasource.remotedatasource.FunctionsSource
+import com.abhishekjagushte.engage.network.CreateGroupRequest
 import com.abhishekjagushte.engage.network.Profile
 import com.abhishekjagushte.engage.network.convertDomainObject
 import com.abhishekjagushte.engage.ui.main.screens.search.SearchData
@@ -24,6 +25,7 @@ import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.functions.HttpsCallableResult
 import com.google.firebase.iid.InstanceIdResult
 import kotlinx.coroutines.*
+import org.json.JSONObject
 import javax.inject.Inject
 
 class DataRepository @Inject constructor(
@@ -293,8 +295,16 @@ class DataRepository @Inject constructor(
         conversationID: String,
         myUsername: String,
         otherUsername: String
-    ) {
+    ){
         localDataSource.saveTextMessage121Local(message, conversationID, myUsername, otherUsername)
+    }
+
+    fun saveTextMessageM2M(
+        message: String,
+        conversationID: String,
+        replyToId: String?
+    ){
+        localDataSource.saveTextMessageM2MLocal(message, conversationID, replyToId)
     }
 
     fun addConversation121(username: String){
@@ -316,6 +326,21 @@ class DataRepository @Inject constructor(
                 if(localDataSource.getConversation(message.senderID!!)==null) {
                     Log.d(TAG, "receiveMessage121: conversation not present")
                     localDataSource.addConversation121(message.senderID!!)
+                }
+
+                localDataSource.insertMessage(message)
+
+            }
+        }
+    }
+
+    fun receiveMessageM2M(message: Message){
+        repoScope.launch {
+            withContext(Dispatchers.IO){
+
+                if(localDataSource.getConversation(message.conversationID)==null) {
+                    Log.d(TAG, "receiveMessage121: conversation not present")
+                    //localDataSource.addGroupMessaageReceivedFirst(message.conversationID)
                 }
 
                 localDataSource.insertMessage(message)
@@ -364,6 +389,37 @@ class DataRepository @Inject constructor(
         return localDataSource.searchForFriends(query)
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // Set Group Info while creating
+    ///////////////////////////////////////////////////////////////////////////
+
+    suspend fun createGroupLocal(request: CreateGroupRequest, pushed: Boolean) {
+        localDataSource.createGroupLocal(request, pushed)
+    }
+
+    fun createGroup(request: JSONObject?): Task<HttpsCallableResult> {
+        return functionsSource.createGroup(request)
+    }
+
+    fun getNewConversationIDM2M(): String{
+        return firebaseDataSource.getNewConversationIDM2M()
+    }
+
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Notifications
+    ///////////////////////////////////////////////////////////////////////////
+
+    fun addNewGroup(name: String?, conversationID: String?) {
+        repoScope.launch {
+            withContext(Dispatchers.IO){
+                if(localDataSource.checkConversationExists(conversationID!!)==0)
+                    localDataSource.addConversationM2M(name!!, conversationID)
+
+            }
+        }
+    }
+
 
     ///////////////////////////////////////////////////////////////////////////
     // Test
@@ -380,6 +436,8 @@ class DataRepository @Inject constructor(
     fun getConfirmedContacts(): LiveData<List<Contact>> {
         return localDataSource.getConfirmedContacts()
     }
+
+
 
 }
 

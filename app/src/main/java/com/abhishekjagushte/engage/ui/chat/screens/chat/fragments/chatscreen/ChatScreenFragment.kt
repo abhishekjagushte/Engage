@@ -58,7 +58,8 @@ class ChatScreenFragment : Fragment(R.layout.fragment_chat_screen) {
                     message_input.text.clear()
                 }
                 else{
-                    TODO("Send Message M2M")
+                    SharedViewModel.sendTextMessageM2M(message, null)
+                    message_input.text.clear()
                 }
 
             }

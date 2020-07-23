@@ -137,6 +137,15 @@ class ChatViewModel @Inject constructor(
             }
         }
     }
+
+    fun sendTextMessageM2M(message: String, replyToId: String?) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO){
+                Log.d(TAG, "sendTextMessageM2M: ${conversationID.value}")
+                dataRepository.saveTextMessageM2M(message, conversationID.value!!, replyToId)
+            }
+        }
+    }
 }
 
 

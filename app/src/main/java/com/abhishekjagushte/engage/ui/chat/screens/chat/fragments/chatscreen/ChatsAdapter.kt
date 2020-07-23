@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.abhishekjagushte.engage.database.MessageView
 import com.abhishekjagushte.engage.databinding.TextMessage121ContainerLeftBinding
+import com.abhishekjagushte.engage.databinding.TextMessageContainerLeftBinding
 import com.abhishekjagushte.engage.databinding.TextMessageContainerRightBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -102,7 +103,7 @@ class MyTextMessageViewHolder private constructor(val binding: TextMessageContai
     }
 }
 
-class OtherTextMessageViewHolder private constructor(val binding: TextMessage121ContainerLeftBinding): RecyclerView.ViewHolder(binding.root){
+class OtherTextMessageViewHolder private constructor(val binding: TextMessageContainerLeftBinding): RecyclerView.ViewHolder(binding.root){
 
     fun bind(message: MessageView){
         binding.message = message
@@ -112,7 +113,7 @@ class OtherTextMessageViewHolder private constructor(val binding: TextMessage121
     companion object{
         fun from(parent: ViewGroup): OtherTextMessageViewHolder {
             val layoutInflater = LayoutInflater.from(parent.context)
-            val binding = TextMessage121ContainerLeftBinding.inflate(layoutInflater, parent, false)
+            val binding = TextMessageContainerLeftBinding.inflate(layoutInflater, parent, false)
 
             return OtherTextMessageViewHolder(binding)
         }

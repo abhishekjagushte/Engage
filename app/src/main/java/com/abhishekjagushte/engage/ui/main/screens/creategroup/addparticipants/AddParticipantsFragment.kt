@@ -53,6 +53,7 @@ class AddParticipantsFragment : Fragment(R.layout.fragment_add_participants) {
         participantsRecyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         adapter = AddedParticipantsAdapter(ParticipantRemoveListener{
             sharedViewModel.removeParticipant(it)
+            contactListFragment.removeUsername(it.username)
         })
         participantsRecyclerView.adapter = adapter
 
@@ -67,7 +68,10 @@ class AddParticipantsFragment : Fragment(R.layout.fragment_add_participants) {
         listenQuery()
 
         doneFAB.setOnClickListener {
-            it.findNavController().navigate(R.id.action_addParticipantsFragment_to_setGroupInfoFragment)
+            if(sharedViewModel.participants.value!!.size >= 2)
+                it.findNavController().navigate(R.id.action_addParticipantsFragment_to_setGroupInfoFragment)
+            else
+                Toast.makeText(context, "Add atleast 2 members", Toast.LENGTH_SHORT).show()
         }
     }
 

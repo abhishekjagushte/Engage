@@ -21,16 +21,15 @@ import kotlinx.coroutines.withContext
 const val CHAT_LIST_ITEM = 1
 const val NOT_DECIDED = 2
 
-class ContactListAdapter(val clickListener: ContactItemClickListener,
-                         val longClickListener: ContactLongItemClickListener,
-                         val mode: Int,
+class ContactListAdapter(private val clickListener: ContactItemClickListener,
+                         private val longClickListener: ContactLongItemClickListener,
+                         private val mode: Int,
                          val  context: Context
 ) :
     ListAdapter<ContactListDataItem, RecyclerView.ViewHolder> (ContactListDiffCallback()){
 
     private val adapterScope = CoroutineScope(Dispatchers.Default)
     private val TAG = "ChatListAdapter"
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         Log.d(TAG, "onCreateViewHolder: Called")
@@ -56,7 +55,7 @@ class ContactListAdapter(val clickListener: ContactItemClickListener,
         when(holder){
             is ContactListItemViewHolder -> {
                 val item = getItem(position) as ContactListDataItem.ContactItem
-                holder.bind(item.contact, clickListener)
+                holder.bind(item, clickListener)
             }
         }
     }
@@ -75,22 +74,22 @@ class ContactListItemViewHolder(val binding: ItemContactListBinding, private val
     lateinit var navController: NavController
 
     private val TAG = "ContactListItemViewHolder"
-    private lateinit var contact: Contact
+    private lateinit var contactDataItem: ContactListDataItem.ContactItem
 
-    fun bind(c: Contact, clickListener: ContactItemClickListener){
-        contact = c
-
-        if(contact.selected==true) {
+    fun bind(
+        contactDataItem: ContactListDataItem.ContactItem,
+        clickListener: ContactItemClickListener
+    ){
+        this.contactDataItem = contactDataItem
+        if(contactDataItem.selected) {
             binding.constraintLayout.background =
                 binding.root.context.getDrawable(R.drawable.selected_background)
-                Log.d(TAG, "bind: changed")
         }
         else{
             binding.constraintLayout.background = binding.root.context.getDrawable(android.R.color.transparent)
-            Log.d(TAG, "bind: changed")
         }
 
-        binding.contact = contact
+        binding.contact = contactDataItem.contact
         setupListeners(clickListener)
         binding.executePendingBindings()
     }
@@ -99,23 +98,20 @@ class ContactListItemViewHolder(val binding: ItemContactListBinding, private val
         when(mode){
             Constants.CONTACT_LIST_MODE_SELECTION -> {
                 binding.constraintLayout.setOnClickListener {
-                    clickListener.onClick(contact)
-                    if(contact.selected==false){
-                        contact.selected = true
+                    clickListener.onClick(contactDataItem.contact)
+                    if(!contactDataItem.selected){
                         binding.constraintLayout.background =
                             binding.root.context.getDrawable(R.drawable.selected_background)
                     }
                     else{
-                        contact.selected = false
                         binding.constraintLayout.background = binding.root.context.getDrawable(android.R.color.transparent)
-                        Log.d(TAG, "bind: changed")
                     }
                 }
             }
 
             Constants.CONTACT_LIST_MODE_NORMAL -> {
                 binding.constraintLayout.setOnClickListener {
-                    clickListener.onClick(contact)
+                    clickListener.onClick(contactDataItem.contact)
                 }
                 //TODO set long click listeners if any
             }
@@ -141,6 +137,7 @@ class ContactListDiffCallback: DiffUtil.ItemCallback<ContactListDataItem>() {
     }
 
     override fun areContentsTheSame(oldItem: ContactListDataItem, newItem: ContactListDataItem): Boolean {
+        //Log.d("ContactListDiffCallback", "areContentsTheSame: ${oldItem.selected} ${newItem.selected}")
         return oldItem.selected == newItem.selected
         //TODO consider the case when by chance name or bio changes
     }
@@ -149,11 +146,11 @@ class ContactListDiffCallback: DiffUtil.ItemCallback<ContactListDataItem>() {
 
 sealed class ContactListDataItem{
     abstract val id: String
-    abstract val selected: Boolean
+    abstract var selected: Boolean
 
     data class ContactItem(val contact: Contact): ContactListDataItem() {
         override val id = contact.username
-        override val selected = contact.selected?: false
+        override var selected = contact.selected?: true
     }
 }
 
@@ -164,4 +161,3 @@ class ContactItemClickListener(val clickListener: (contact: Contact) -> Unit){
 class ContactLongItemClickListener(val clickListener: (contact: Contact) -> Unit){
     fun onClick(contact: Contact) = clickListener(contact)
 }
-

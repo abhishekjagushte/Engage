@@ -67,8 +67,25 @@ class NotificationHandler : FirebaseMessagingService(){
                             "${msg.messageID} ${msg.senderID} ${msg.receiverID}")
                     dataRepository.receiveMessage121(msg)
                 }
+
+                "4" -> {
+                    Log.d(TAG, "onMessageReceived: Added in group")
+                    addNewGroup(p0.data)
+                }
+
+                "5" -> {
+                    Log.d(TAG, "onMessageReceived: M2M chat message = ${p0.data}")
+                    val msg = mapToMessageM2M(p0.data)
+                    dataRepository.receiveMessageM2M(msg)
+                }
             }
         }
+    }
+
+    private fun addNewGroup(data: Map<String, String>) {
+        val name: String? = data["name"]
+        val conversationID: String? = data["conversationID"]
+        dataRepository.addNewGroup(name, conversationID)
     }
 
     private fun buildNotification(data: Map<String, String>, type: Int){
@@ -168,6 +185,44 @@ class NotificationHandler : FirebaseMessagingService(){
             needs_push = Constants.NEEDS_PUSH_NO,
             deleted = Constants.DELETED_NO,
             conType = Constants.CONVERSATION_TYPE_121
+        )
+    }
+
+    private fun mapToMessageM2M(data: Map<String, String>): Message {
+        val messageID = data["messageID"]
+        val conversationID = data["conversationID"]
+        val serverUrl = data["server_url"]
+        val thumbNail = data["thumb_nail"]
+        val latitude = if((data["latitude"] ?: error("")).isEmpty()) null else (data["latitude"] ?: error("")).toDouble()
+        val longitude = if((data["longitude"] ?: error("")).isEmpty()) null else (data["longitude"] ?: error("")).toDouble()
+        val replyToid = data["reply_toID"]
+        val receiverID = data["receiverID"]
+        val senderID = data["senderID"]
+        val timeStamp = data["timeStamp"]
+        val mdata = data["data"]
+        val mime_type = data["mime_type"]
+
+        return Message(
+            messageID = messageID!!,
+            conversationID = conversationID!!, //conversationId for M2M
+            timeStamp = System.currentTimeMillis(),
+            serverTimestamp = timeStamp!!.toLong(),
+            data = mdata,
+            senderID = senderID,
+            receiverID = receiverID,
+            mime_type = mime_type,
+            server_url = serverUrl,
+            latitude = latitude,
+            longitude = longitude,
+            thumb_nail = null,
+            reply_toID = replyToid,
+
+            type = Constants.TYPE_OTHER_MSG,
+            status = Constants.STATUS_RECEIVED_BUT_NOT_READ,
+            local_uri = null,
+            needs_push = Constants.NEEDS_PUSH_NO,
+            deleted = Constants.DELETED_NO,
+            conType = Constants.CONVERSATION_TYPE_M2M
         )
     }
 }

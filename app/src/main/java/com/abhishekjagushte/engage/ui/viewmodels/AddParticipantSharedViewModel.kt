@@ -7,11 +7,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.abhishekjagushte.engage.database.Contact
 import com.abhishekjagushte.engage.database.ContactNameUsername
+import com.abhishekjagushte.engage.network.CreateGroupRequest
 import com.abhishekjagushte.engage.repository.DataRepository
+import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.text.FieldPosition
+import org.json.JSONException
+import org.json.JSONObject
+
+
+enum class LoadingState{
+    NOT_LOADING, LOADING, COMPLETED
+}
 
 class AddParticipantSharedViewModel /*@Inject constructor*/(
     private val dataRepository: DataRepository
@@ -29,10 +37,16 @@ class AddParticipantSharedViewModel /*@Inject constructor*/(
     val queryList: LiveData<List<Contact>>
         get() = _queryList
 
+    private val _completeState = MutableLiveData<LoadingState>()
+    val completeState: LiveData<LoadingState>
+        get() = _completeState
+
+
     init {
         _participants.value = mutableListOf()
         Log.d(TAG, "Add Participant shared viewmodel init")
         setInitialQuery()
+        _completeState.value = LoadingState.NOT_LOADING
     }
 
     override fun onCleared() {
@@ -53,7 +67,8 @@ class AddParticipantSharedViewModel /*@Inject constructor*/(
                     val contact =
                         Contact(name = it.name, username = it.username, networkID = "", type = 1)
                     //Sets selected
-                    contact.selected = participantsHash[contact.name] == true
+                    contact.selected = participantsHash[contact.username] == true
+                    Log.d(TAG, "query: ${contact.selected}")
                     return@map contact
                 })
             }
@@ -83,8 +98,76 @@ class AddParticipantSharedViewModel /*@Inject constructor*/(
         Log.d(TAG, "removeParticipant: ${participants.value}")
     }
 
-    fun createGroup() {
+    fun createGroup(name: String) {
+        viewModelScope.launch {
 
+            _completeState.postValue(LoadingState.LOADING)
+
+            withContext(Dispatchers.IO){
+                val myUsername = dataRepository.getMydetails()!!.username
+
+                var participantsList = participants.value!!.map {
+                    it.username
+                }
+
+                participantsList = participantsList.plus(myUsername)
+
+                //TODO use the prior uproach add first in local db, get the conversationID and
+                // let the mainactivity push the unpushed conversations
+
+
+                val conversationID: String = dataRepository.getNewConversationIDM2M()
+
+                val request: CreateGroupRequest =  CreateGroupRequest(
+                    name = name,
+                    conversationID = conversationID,
+                    creator = myUsername,
+                    participants = participantsList
+                )
+
+
+                val gson = Gson()
+                val jsonString = gson.toJson(request)
+                var jsonObj: JSONObject? = null
+                try {
+                    jsonObj = JSONObject(jsonString)
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                }
+
+                dataRepository.createGroup(jsonObj).addOnSuccessListener {
+                    viewModelScope.launch {
+                        it.data?.let {
+                            if((it as HashMap<String, String>)["status"].equals("success")) {
+                                Log.d(TAG, "createGroup: success")
+                                withContext(Dispatchers.IO) {
+                                    dataRepository.createGroupLocal(request, true)
+                                    _completeState.postValue(LoadingState.COMPLETED)
+                                    //TODO complete the observer for completestate
+                                }
+                            }
+                            else if(it["status"].equals("failure")){
+
+                                Log.d(TAG, "createGroup: Failure")
+
+                                viewModelScope.launch {
+                                    withContext(Dispatchers.IO){
+                                        dataRepository.createGroupLocal(request, false)
+                                        _completeState.postValue(LoadingState.COMPLETED)
+                                    }
+                                }
+                            }
+                        }
+
+
+                    }
+
+                }.addOnFailureListener {
+                    it.printStackTrace()
+                }
+
+            }
+        }
     }
 
 }

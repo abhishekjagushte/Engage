@@ -2,7 +2,7 @@ package com.abhishekjagushte.engage.database
 
 import android.graphics.Bitmap
 import androidx.room.*
-import com.abhishekjagushte.engage.network.MessageNetwork121
+import com.abhishekjagushte.engage.network.MessageNetwork
 
 ///////////////////////////////////////////////////////////////////////////
 // I changes the networkID to conversationID so there might be errors
@@ -70,6 +70,7 @@ class Conversation(
     var active: Int //this if 1 says that this conversation should be displayed in chat_list and this being 0
                     //is significant to store conversationID of inactive chats that are synced while first time insatll
                     // of login or reinstall (during login, if backup not restored all 121 chats are active=0
+                    // and also if type = M2M and active = 0 that means conversation is not pushed yet
 
 //    var needs_push: Int? //Only needed in 121 conversations. To reduce the delay in send the first message in 121
 //                        //conversations with current mechanism that is fetching the conversationID first
@@ -160,8 +161,8 @@ class Message(
 
     var conType: Int
 ){
-    fun convertNetworkMessage121(): MessageNetwork121{
-        return MessageNetwork121(
+    fun convertNetworkMessage(): MessageNetwork{
+        return MessageNetwork(
             messageID = messageID,
             data = data,
             senderID = senderID,
@@ -174,10 +175,10 @@ class Message(
 
 @DatabaseView(value =
     """
-    SELECT contacts.nickname, messages.messageID, messages.conversationID ,messages.type, messages.status,
+    SELECT contacts.nickname, messages.messageID, messages.conversationID ,messages.type, messages.conType, messages.status,
     messages.timeStamp, messages.data, messages.senderID, messages.receiverID, messages.deleted, messages.mime_type, 
     messages.server_url, messages.local_uri, messages.latitude, messages.longitude,
-    messages.reply_toID FROM contacts INNER JOIN messages ON messages.receiverID = contacts.username
+    messages.reply_toID FROM messages LEFT JOIN contacts ON messages.senderID = contacts.username
     """
     , viewName = "message_view")
 data class MessageView(
@@ -185,6 +186,7 @@ data class MessageView(
     var messageID: String,
     var conversationID: String,
     var type: Int?,
+    var conType: Int?,
     var status: Int?,
     var timeStamp: Long?,
     var data: String?,
@@ -198,7 +200,6 @@ data class MessageView(
     var longitude: Double?,
     var reply_toID: String?
 )
-
 
 data class SearchResultConversation(
     var name:String,

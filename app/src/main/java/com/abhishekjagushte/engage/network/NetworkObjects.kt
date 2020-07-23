@@ -37,7 +37,7 @@ data class DateTest constructor(
 )
 
 
-class MessageNetwork121(
+class MessageNetwork(
     val messageID: String,
 
     @ServerTimestamp
@@ -56,4 +56,11 @@ class MessageNetwork121(
     val thumb_nail: ByteArray?=null, //thumbnail for the media
 
     val reply_toID: String?=null
+)
+
+data class CreateGroupRequest(
+    val name: String,
+    val conversationID: String,
+    val creator: String,
+    var participants: List<String>
 )

@@ -110,4 +110,7 @@ interface DatabaseDao{
     @Query("SELECT * FROM contacts WHERE type == 1")
     fun getConfirmedContactsTest(): LiveData<List<Contact>>
 
+    @Insert
+    fun insertConversationCrossRef(contactsConversationsCrossRef: ContactsConversationsCrossRef)
+
 }

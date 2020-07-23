@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.abhishekjagushte.engage.database.*
+import com.abhishekjagushte.engage.network.CreateGroupRequest
 import com.abhishekjagushte.engage.utils.Constants
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.*
@@ -153,14 +154,14 @@ class LocalDataSource @Inject constructor (
         )
 
         databaseDao.insertMessage(msg)
-        try {
-            Log.d(
-                TAG,
-                "saveTextMessage121Local: ${databaseDao.getChatsCount(conversationID).size}"
-            )
-        }catch (e: Exception){
-            e.printStackTrace()
-        }
+//        try {
+//            Log.d(
+//                TAG,
+//                "saveTextMessage121Local: ${databaseDao.getChatsCount(conversationID).size}"
+//            )
+//        }catch (e: Exception){
+//            e.printStackTrace()
+//        }
         }
 
     fun addConversation121(username: String){
@@ -183,7 +184,7 @@ class LocalDataSource @Inject constructor (
             Constants.CONVERSATION_TYPE_121 -> {
                 firestore.collection("messages121")
                     .document(message.messageID)
-                    .set(message.convertNetworkMessage121())
+                    .set(message.convertNetworkMessage())
                     .addOnSuccessListener {
                         localDBScope.launch {
                             withContext(Dispatchers.IO) {
@@ -196,10 +197,8 @@ class LocalDataSource @Inject constructor (
             }
 
             Constants.CONVERSATION_TYPE_M2M -> {
-                TODO("Send message M2M")
 
-                /*
-                firestore.collection("conversations121/${message.conversationID}/chats")
+                firestore.collection("groups/${message.conversationID}/chats")
                     .document(message.messageID)
                     .set(message.convertNetworkMessage())
                     .addOnSuccessListener {
@@ -212,7 +211,7 @@ class LocalDataSource @Inject constructor (
                             }
                         }
                     }
-                 */
+
 
             }
         }
@@ -274,5 +273,94 @@ class LocalDataSource @Inject constructor (
         return databaseDao.getConfirmedContactsTest()
     }
 
+    fun createGroupLocal(request: CreateGroupRequest, pushed: Boolean) {
+        //The initial Message will be set when the group will be pushed
+        val conversation: Conversation?
+        val initialMessage: Message?
+
+        if(pushed) {
+            val lmid = firestore.collection("groups/${request.conversationID}/chats").document().id
+
+            conversation = Conversation(
+                name = request.name,
+                conversationID = request.conversationID,
+                type = Constants.CONVERSATION_TYPE_M2M,
+                active = Constants.CONVERSATION_ACTIVE_YES,
+                lastMessageID = lmid
+            )
+
+            val initialMessage = getInitialMessage(request.conversationID, lmid)
+            insertMessage(initialMessage)
+        }
+        else{
+            conversation = Conversation(
+                name = request.name,
+                conversationID = request.conversationID,
+                type = Constants.CONVERSATION_TYPE_M2M,
+                active = Constants.CONVERSATION_ACTIVE_NO_NEEDS_PUSH
+            )
+        }
+
+        databaseDao.insertConversation(conversation)
+
+        for(username in request.participants){
+            databaseDao.insertConversationCrossRef(ContactsConversationsCrossRef(username, request.conversationID))
+        }
+
+    }
+
+    private fun getInitialMessage(conversationID: String, lastMessageID: String): Message{
+        return Message(
+            messageID = lastMessageID,
+            conversationID = conversationID,
+            type = Constants.TYPE_NOTICE,
+            status = Constants.STATUS_NOT_SENT,
+            needs_push = Constants.NEEDS_PUSH_YES,
+            timeStamp = System.currentTimeMillis(),
+            serverTimestamp = System.currentTimeMillis(),
+            data = Constants.I_CREATED_GROUP,
+            senderID = getMyDetails()!!.username,
+            receiverID = null,
+            deleted = Constants.DELETED_NO,
+            mime_type = Constants.MIME_TYPE_TEXT,
+            conType = Constants.CONVERSATION_TYPE_M2M
+        )
+    }
+
+    fun saveTextMessageM2MLocal(
+        message: String,
+        conversationID: String,
+        replyToId: String?
+    ){
+        val msg = Message(
+            messageID = firestore.collection("groups/${conversationID}/chats").document().id,
+            conversationID = conversationID,
+            type = Constants.TYPE_MY_MSG,
+            status = Constants.STATUS_NOT_SENT,
+            needs_push = Constants.NEEDS_PUSH_YES,
+            timeStamp = System.currentTimeMillis(),
+            serverTimestamp = System.currentTimeMillis(),
+            data = message,
+            senderID = getMyDetails()!!.username,
+            receiverID = null,
+            deleted = Constants.DELETED_NO,
+            mime_type = Constants.MIME_TYPE_TEXT,
+            conType = Constants.CONVERSATION_TYPE_M2M,
+            reply_toID = replyToId
+        )
+
+        databaseDao.insertMessage(msg)
+    }
+
+    fun addConversationM2M(name: String, conversationID: String) {
+        val conversation = Conversation(
+            name = name,
+            conversationID = conversationID,
+            type = Constants.CHATLIST_TYPE_M2M,
+            active = Constants.CONVERSATION_ACTIVE_YES
+        )
+
+        databaseDao.insertConversation(conversation)
+    }
 
 }

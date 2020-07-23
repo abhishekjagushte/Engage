@@ -1,6 +1,7 @@
 package com.abhishekjagushte.engage.utils
 
 object Constants {
+
     const val SEARCH_TIME_DELAY: Long = 500L
     const val FIREBASE_USERS_COLLECTION: String = "users"
     const val FIREBASE_CONNECTION_REQUEST_COLLECTION = "connection-requests"
@@ -52,6 +53,7 @@ object Constants {
     ///////////////////////////////////////////////////////////////////////////
     const val TYPE_MY_MSG = 0
     const val TYPE_OTHER_MSG = 1
+    const val TYPE_NOTICE: Int = 2
 
 
     const val STATUS_NOT_SENT = 0
@@ -75,6 +77,7 @@ object Constants {
 
     const val CONVERSATION_ACTIVE_YES = 1
     const val CONVERSATION_ACTIVE_NO = 2
+    const val CONVERSATION_ACTIVE_NO_NEEDS_PUSH = 3
 
     const val CONVERSATION_ID_INITIAL = "NONE"
 
@@ -84,6 +87,9 @@ object Constants {
     //ContactList Fragment Modes
     const val CONTACT_LIST_MODE_SELECTION = 1 //selection for adding participants - on click select
     const val CONTACT_LIST_MODE_NORMAL = 2 //Normal displaying - only click and on click
+
+
+    const val I_CREATED_GROUP = "You created this group"
 
 }
 
