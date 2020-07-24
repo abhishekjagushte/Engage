@@ -168,6 +168,10 @@ class DataRepository @Inject constructor(
         return localDataSource.getContactFromUsername(username)
     }
 
+    fun getContact(username: String): Contact? {
+        return localDataSource.getContact(username)
+    }
+
     fun getContactFirestoreFromUsername(username: String): Task<DocumentSnapshot> {
         return firebaseDataSource.getContactFirestoreFromUsername(username)
     }

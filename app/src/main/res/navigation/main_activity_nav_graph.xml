@@ -8,8 +8,8 @@
     <fragment
         android:id="@+id/chatListFragment"
         android:name="com.abhishekjagushte.engage.ui.main.screens.chatlist.ChatListFragment"
-        android:label="chat_list_fragment"
-        tools:layout="@layout/fragment_chat_list" >
+        android:label="@string/chats"
+        tools:layout="@layout/fragment_chat_list">
         <action
             android:id="@+id/action_chatListFragment_to_chatFragment"
             app:destination="@id/chatFragment" />
@@ -20,13 +20,13 @@
     <fragment
         android:id="@+id/eventsFragment"
         android:name="com.abhishekjagushte.engage.ui.main.screens.events.EventsFragment"
-        android:label="events_fragment"
+        android:label="@string/events"
         tools:layout="@layout/fragment_events" />
     <fragment
         android:id="@+id/searchFragment"
         android:name="com.abhishekjagushte.engage.ui.main.screens.search.SearchFragment"
-        android:label="search_fragment"
-        tools:layout="@layout/fragment_search" >
+        android:label="@string/search"
+        tools:layout="@layout/fragment_search">
         <action
             android:id="@+id/action_searchFragment_to_profileActivity"
             app:destination="@id/profileFragment"
@@ -70,8 +70,7 @@
     <fragment
         android:id="@+id/chatFragment"
         android:name="com.abhishekjagushte.engage.ui.chat.screens.chat.ChatFragment"
-        android:label="fragment_chat"
-        tools:layout="@layout/fragment_chat" >
+        tools:layout="@layout/fragment_chat">
         <argument
             android:name="conversationID"
             app:argType="string" />

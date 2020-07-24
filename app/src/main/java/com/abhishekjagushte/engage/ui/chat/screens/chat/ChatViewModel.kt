@@ -27,6 +27,11 @@ class ChatViewModel @Inject constructor(
     val conversationID : LiveData<String>
         get() = _conversationID
 
+    private var _conversation = MutableLiveData<Conversation>()
+    val conversation : LiveData<Conversation>
+        get() = _conversation
+
+
     private var myUsername: String?=null//set up in setupScreen
 
     private val TAG = "ChatViewModel"
@@ -67,12 +72,31 @@ class ChatViewModel @Inject constructor(
                         Log.d(TAG, "setupScreen: Type M2M")
                     }
 
+                    //sets the conversation
+                    _conversation.postValue(conversation)
+
                     _chatState.postValue(ChatState.EXISTING)
                 }
                 else{
                     //The chat will always be 121 if not present in db
                     _chatType.postValue(ChatType.CHAT_TYPE_121)
                     _chatState.postValue(ChatState.NEW)
+
+                    val contact = dataRepository.getContact(conversationID)
+
+                    val con = Conversation(
+                        conversationID = conversationID,
+                        name = contact?.nickname?: conversationID,
+                        type = Constants.CONVERSATION_TYPE_121,
+                        active = Constants.CONVERSATION_ACTIVE_NO)
+
+                    if(contact!=null){
+                        _conversation.postValue(con)
+                    }
+                    else{
+                        TODO("Handle if contact not found")
+                    }
+
                     //TODO : setUINew(conversationID)
                     Log.d(TAG, "setupScreen: type NOT DEFINED")
                 }

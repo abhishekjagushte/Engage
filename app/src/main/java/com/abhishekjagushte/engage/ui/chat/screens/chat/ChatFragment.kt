@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.navigation.ui.AppBarConfiguration
@@ -53,11 +54,22 @@ class ChatFragment : Fragment() {
         val args = ChatFragmentArgs.fromBundle(requireArguments())
         Log.d(TAG, "onViewCreated: ${args.conversationID}")
         viewModel.setupScreen(args.conversationID)
+
+        setupUI()
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         (requireActivity().application as EngageApplication).appComponent.addChatComponent().create().inject(this)
     }
+
+    fun setupUI(){
+        viewModel.conversation.observe(viewLifecycleOwner, Observer {
+            it?.let {
+                toolbar.title = it.name
+            }
+        })
+    }
+
 
 }

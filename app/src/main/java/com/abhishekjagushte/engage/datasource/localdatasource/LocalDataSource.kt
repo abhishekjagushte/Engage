@@ -25,6 +25,10 @@ class LocalDataSource @Inject constructor (
         return databaseDao.getContactFromUsername(username)
     }
 
+    fun getContact(username: String): Contact? {
+        return databaseDao.getContact(username)
+    }
+
     fun updateContact(contact: Contact){
         databaseDao.updateContact(contact)
     }

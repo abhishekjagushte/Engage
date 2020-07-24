@@ -27,6 +27,10 @@ interface DatabaseDao{
     @Query("SELECT * FROM contacts WHERE username = :username")
     fun getContactFromUsername(username: String): LiveData<Contact>
 
+    @Query("SELECT * FROM contacts WHERE username = :username")
+    fun getContact(username: String): Contact?
+
+
     @Update
     fun updateContact(contact: Contact)
 
