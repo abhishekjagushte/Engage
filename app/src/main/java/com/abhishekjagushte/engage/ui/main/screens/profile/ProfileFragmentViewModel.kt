@@ -43,8 +43,6 @@ class ProfileFragmentViewModel @Inject constructor(
         return dataRepository.getContactFromUsername(username)
     }
 
-
-
     fun setProfileDisplay(contact: Contact?, username: String) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {

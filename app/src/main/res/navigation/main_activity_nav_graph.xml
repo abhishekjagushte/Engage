@@ -164,7 +164,8 @@
         </fragment>
         <action
             android:id="@+id/action_global_chatFragment"
-            app:destination="@id/chatFragment" />
+            app:destination="@id/chatFragment"
+            app:popUpTo="@id/chatListFragment" />
     </navigation>
 
 </navigation>

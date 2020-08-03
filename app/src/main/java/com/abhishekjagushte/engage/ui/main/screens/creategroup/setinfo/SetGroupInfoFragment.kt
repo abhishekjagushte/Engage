@@ -1,9 +1,11 @@
 package com.abhishekjagushte.engage.ui.main.screens.creategroup.setinfo
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
 import com.abhishekjagushte.engage.R
 import com.abhishekjagushte.engage.ui.viewmodels.AddParticipantSharedViewModel
@@ -31,7 +33,10 @@ class SetGroupInfoFragment : Fragment(R.layout.fragment_set_group_info) {
     private fun observeCompleteState() {
         sharedViewModel.completeState.observe(viewLifecycleOwner, Observer {
             it?.let {
-                when(it){
+
+                Log.d(TAG, "observeCompleteState: in observeee ${it.complete}")
+
+                when(it.loadingState){
                     LoadingState.COMPLETED -> {
                         //TODO
                     }
@@ -40,6 +45,12 @@ class SetGroupInfoFragment : Fragment(R.layout.fragment_set_group_info) {
                         //TODO
                     }
                 }
+
+                if(it.complete){
+                    Log.d(TAG, "observeCompleteState: should navigate")
+                    findNavController().navigate(SetGroupInfoFragmentDirections.actionGlobalChatFragment(it.conversationID!!))
+                }
+
             }
         })
     }

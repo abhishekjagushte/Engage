@@ -16,10 +16,19 @@ import kotlinx.coroutines.withContext
 import org.json.JSONException
 import org.json.JSONObject
 
+const val INCOMPLETE_NETWORK_ERROR = 1
 
 enum class LoadingState{
     NOT_LOADING, LOADING, COMPLETED
 }
+
+class CompleteStatus(
+    val conversationID: String? = null,
+    val message: String? = null,
+    val messageCode: Int? = null,
+    val loadingState: LoadingState,
+    val complete: Boolean = false
+)
 
 class AddParticipantSharedViewModel /*@Inject constructor*/(
     private val dataRepository: DataRepository
@@ -37,8 +46,8 @@ class AddParticipantSharedViewModel /*@Inject constructor*/(
     val queryList: LiveData<List<Contact>>
         get() = _queryList
 
-    private val _completeState = MutableLiveData<LoadingState>()
-    val completeState: LiveData<LoadingState>
+    private val _completeState = MutableLiveData<CompleteStatus>()
+    val completeState: LiveData<CompleteStatus>
         get() = _completeState
 
 
@@ -46,7 +55,7 @@ class AddParticipantSharedViewModel /*@Inject constructor*/(
         _participants.value = mutableListOf()
         Log.d(TAG, "Add Participant shared viewmodel init")
         setInitialQuery()
-        _completeState.value = LoadingState.NOT_LOADING
+        _completeState.value = CompleteStatus(loadingState = LoadingState.NOT_LOADING)
     }
 
     override fun onCleared() {
@@ -75,7 +84,6 @@ class AddParticipantSharedViewModel /*@Inject constructor*/(
         }
     }
 
-
     fun addParticipant(contact: ContactNameUsername){
         participantsHash[contact.username] = true
         _participants.value?.add(contact)
@@ -101,7 +109,7 @@ class AddParticipantSharedViewModel /*@Inject constructor*/(
     fun createGroup(name: String) {
         viewModelScope.launch {
 
-            _completeState.postValue(LoadingState.LOADING)
+            _completeState.postValue(CompleteStatus(loadingState = LoadingState.LOADING))
 
             withContext(Dispatchers.IO){
                 val myUsername = dataRepository.getMydetails()!!.username
@@ -115,16 +123,14 @@ class AddParticipantSharedViewModel /*@Inject constructor*/(
                 //TODO use the prior uproach add first in local db, get the conversationID and
                 // let the mainactivity push the unpushed conversations
 
-
                 val conversationID: String = dataRepository.getNewConversationIDM2M()
 
-                val request: CreateGroupRequest =  CreateGroupRequest(
+                val request =  CreateGroupRequest(
                     name = name,
                     conversationID = conversationID,
                     creator = myUsername,
                     participants = participantsList
                 )
-
 
                 val gson = Gson()
                 val jsonString = gson.toJson(request)
@@ -142,7 +148,11 @@ class AddParticipantSharedViewModel /*@Inject constructor*/(
                                 Log.d(TAG, "createGroup: success")
                                 withContext(Dispatchers.IO) {
                                     dataRepository.createGroupLocal(request, true)
-                                    _completeState.postValue(LoadingState.COMPLETED)
+                                    _completeState.postValue(
+                                        CompleteStatus(
+                                            conversationID = conversationID,
+                                            loadingState = LoadingState.NOT_LOADING,
+                                            complete = true))
                                     //TODO complete the observer for completestate
                                 }
                             }
@@ -153,15 +163,16 @@ class AddParticipantSharedViewModel /*@Inject constructor*/(
                                 viewModelScope.launch {
                                     withContext(Dispatchers.IO){
                                         dataRepository.createGroupLocal(request, false)
-                                        _completeState.postValue(LoadingState.COMPLETED)
+                                        _completeState.postValue(
+                                            CompleteStatus(
+                                                message = "Failure",
+                                                messageCode = INCOMPLETE_NETWORK_ERROR,
+                                                loadingState = LoadingState.NOT_LOADING))
                                     }
                                 }
                             }
                         }
-
-
                     }
-
                 }.addOnFailureListener {
                     it.printStackTrace()
                 }
