@@ -61,6 +61,7 @@ object Constants {
     const val STATUS_SENT_BUT_NOT_READ = 2
     const val STATUS_SENT_AND_READ = 3
     const val STATUS_RECEIVED_BUT_NOT_READ = 4
+    const val STATUS_RECEIVED_AND_READ_BY_ME = 5
 
     const val NEEDS_PUSH_YES = 1
     const val NEEDS_PUSH_NO = 2

@@ -3,6 +3,7 @@ package com.abhishekjagushte.engage.repository
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.paging.DataSource
 import com.abhishekjagushte.engage.database.*
 import com.abhishekjagushte.engage.datasource.localdatasource.FirebaseInstanceSource
 import com.abhishekjagushte.engage.datasource.localdatasource.LocalDataSource
@@ -285,12 +286,13 @@ class DataRepository @Inject constructor(
     // ChatList Fragment stuff
     ///////////////////////////////////////////////////////////////////////////
 
+
     // TODO: 6/11/2020 implement this after completing the checking for already available thing
     fun createNewChat121(request: HashMap<String, String>): Task<HttpsCallableResult> {
         return functionsSource.createNewChat121(request)
     }
 
-    fun getChats(conversationID: String): LiveData<List<MessageView>> {
+    fun getChats(conversationID: String): DataSource.Factory<Int, MessageView> {
         return localDataSource.getChats(conversationID)
     }
 
@@ -339,18 +341,17 @@ class DataRepository @Inject constructor(
     }
 
     fun receiveMessageM2M(message: Message){
-        repoScope.launch {
-            withContext(Dispatchers.IO){
 
-                if(localDataSource.getConversation(message.conversationID)==null) {
-                    Log.d(TAG, "receiveMessage121: conversation not present")
-                    //localDataSource.addGroupMessaageReceivedFirst(message.conversationID)
-                }
-
-                localDataSource.insertMessage(message)
-
-            }
+        if(localDataSource.getConversation(message.conversationID)==null) {
+            Log.d(TAG, "receiveMessage121: conversation not present")
+            //localDataSource.addGroupMessaageReceivedFirst(message.conversationID)
         }
+
+        localDataSource.insertMessage(message)
+    }
+
+    fun markMessagesRead(conversationID: String) {
+        localDataSource.markMessagesRead(conversationID)
     }
 
 
@@ -424,6 +425,9 @@ class DataRepository @Inject constructor(
         }
     }
 
+    fun getUnreadMessages(): List<MessageView> {
+        return localDataSource.getUnreadMessages()
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     // Test
@@ -440,6 +444,7 @@ class DataRepository @Inject constructor(
     fun getConfirmedContacts(): LiveData<List<Contact>> {
         return localDataSource.getConfirmedContacts()
     }
+
 
 
 

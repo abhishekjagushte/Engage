@@ -3,6 +3,7 @@ package com.abhishekjagushte.engage.datasource.localdatasource
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.paging.DataSource
 import com.abhishekjagushte.engage.database.*
 import com.abhishekjagushte.engage.network.CreateGroupRequest
 import com.abhishekjagushte.engage.utils.Constants
@@ -129,7 +130,7 @@ class LocalDataSource @Inject constructor (
     }
 
 
-    fun getChats(conversationID: String): LiveData<List<MessageView>> {
+    fun getChats(conversationID: String): DataSource.Factory<Int, MessageView> {
         return databaseDao.getChats(conversationID)
     }
 
@@ -365,6 +366,14 @@ class LocalDataSource @Inject constructor (
         )
 
         databaseDao.insertConversation(conversation)
+    }
+
+    fun markMessagesRead(conversationID: String) {
+        databaseDao.markMessagesRead(conversationID)
+    }
+
+    fun getUnreadMessages(): List<MessageView> {
+        return databaseDao.getUnreadMessages()
     }
 
 }

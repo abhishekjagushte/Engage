@@ -3,6 +3,8 @@ package com.abhishekjagushte.engage.ui.chat.screens.chat.fragments.chatscreen
 import android.os.Looper
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.paging.PagedList
+import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -14,14 +16,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.lang.IllegalStateException
 
 const val MY_TEXT_MESSAGE = 1
 const val OTHER_TEXT_MESSAGE = 2
 
-class ChatsAdapter(
-    private val recyclerView: RecyclerView,
-    private val handler: android.os.Handler = android.os.Handler(Looper.getMainLooper())
-): ListAdapter<ChatDataItem, RecyclerView.ViewHolder>(ChatDiffCallBack()){
+class ChatsAdapter(): PagedListAdapter<ChatDataItem, RecyclerView.ViewHolder>(ChatDiffCallBack()){
 
     private val adapterScope = CoroutineScope(Dispatchers.Default)
 
@@ -53,36 +53,23 @@ class ChatsAdapter(
         return when(getItem(position)){
             is ChatDataItem.MyTextMessage -> MY_TEXT_MESSAGE
             is ChatDataItem.OtherTextMessage -> OTHER_TEXT_MESSAGE
+            else -> throw IllegalStateException("Chat Adapter unknown adapter item type")
         }
     }
 
-    fun updateList(list: List<MessageView>?) {
+    fun updateList(list: PagedList<ChatDataItem>?) {
         adapterScope.launch {
-            if(list!=null)
+            list?.let {
                 withContext(Dispatchers.Main) {
-                    submitList(list.map{
-                        if(it.type == 0)
-                            ChatDataItem.MyTextMessage(it)
-                        else
-                            ChatDataItem.OtherTextMessage(it)
-                    })
+                    submitList(list)
+
+                }
 
             }
-
         }
     }
 
-    override fun onCurrentListChanged(
-        previousList: MutableList<ChatDataItem>,
-        currentList: MutableList<ChatDataItem>
-    ) {
-        super.onCurrentListChanged(previousList, currentList)
-        handler.post  {
-            recyclerView.scrollToPosition(0)
 
-        }
-
-    }
 
 }
 

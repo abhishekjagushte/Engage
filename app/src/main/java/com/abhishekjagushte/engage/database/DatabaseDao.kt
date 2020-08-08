@@ -2,6 +2,7 @@ package com.abhishekjagushte.engage.database
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import javax.sql.DataSource
 
 @Dao
 interface DatabaseDao{
@@ -61,7 +62,8 @@ interface DatabaseDao{
 
 
     @Query("SELECT * FROM message_view WHERE conversationID == :conversationID ORDER BY timeStamp DESC")
-    fun getChats(conversationID: String): LiveData<List<MessageView>>
+    fun getChats(conversationID: String): androidx.paging.DataSource.Factory<Int, MessageView>
+            //LiveData<List<MessageView>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertConversation(conversation: Conversation)
@@ -116,5 +118,13 @@ interface DatabaseDao{
 
     @Insert
     fun insertConversationCrossRef(contactsConversationsCrossRef: ContactsConversationsCrossRef)
+
+    //5 means read_by_me and 4 means not read ...see constants file
+    @Query("UPDATE messages SET status = 5 WHERE status = 4 AND conversationID = :conversationID ")
+    fun markMessagesRead(conversationID: String)
+
+    //gets all the messages unread by me
+    @Query("SELECT * FROM message_view where status = 4")
+    fun getUnreadMessages(): List<MessageView>
 
 }

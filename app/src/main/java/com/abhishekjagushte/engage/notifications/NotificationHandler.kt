@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.app.Person
 import androidx.navigation.NavDeepLinkBuilder
 import com.abhishekjagushte.engage.EngageApplication
 import com.abhishekjagushte.engage.R
@@ -16,7 +17,9 @@ import com.abhishekjagushte.engage.repository.DataRepository
 import com.abhishekjagushte.engage.utils.Constants
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import kotlinx.coroutines.*
 import javax.inject.Inject
+import kotlin.random.Random
 
 
 const val TYPE_FR_ACCEPTED = 1
@@ -29,6 +32,9 @@ class NotificationHandler : FirebaseMessagingService(){
     lateinit var dataRepository: DataRepository
 
     private val TAG = "NotificationHandler"
+
+    private val job = Job()
+    private val coroutinScope = CoroutineScope(Dispatchers.Main + job)
 
     override fun onNewToken(p0: String) {
         super.onNewToken(p0)
@@ -66,6 +72,7 @@ class NotificationHandler : FirebaseMessagingService(){
                     Log.d(TAG, "onMessageReceived: " +
                             "${msg.messageID} ${msg.senderID} ${msg.receiverID}")
                     dataRepository.receiveMessage121(msg)
+                    makeMessageNotification(msg)
                 }
 
                 "4" -> {
@@ -76,9 +83,74 @@ class NotificationHandler : FirebaseMessagingService(){
                 "5" -> {
                     Log.d(TAG, "onMessageReceived: M2M chat message = ${p0.data}")
                     val msg = mapToMessageM2M(p0.data)
-                    dataRepository.receiveMessageM2M(msg)
+                    coroutinScope.launch {
+                        withContext(Dispatchers.IO){
+                            dataRepository.receiveMessageM2M(msg)
+                            makeMessageNotification(msg)
+                        }
+                    }
+
                 }
             }
+        }
+    }
+
+
+//TODO make a new view to get only what is needed here to show notififation
+    //TODO See how to combine multiple notifications which belong to one chat/conversation
+    private fun makeMessageNotification(message: Message) {
+        dataRepository.getNotificationChannelID().addOnSuccessListener {
+
+            Log.d(TAG, "makeMessageNotification: ${message.data}")
+
+            val args = Bundle()
+            args.putString("conversationID", message.conversationID)
+
+            val pendingIntent = NavDeepLinkBuilder(this@NotificationHandler)
+                .setGraph(R.navigation.main_activity_nav_graph)
+                .setDestination(R.id.chatFragment)
+                .setArguments(args)
+                .createPendingIntent()
+
+
+            val person = Person.Builder()
+                .setName(message.senderID)
+                .setKey(message.senderID)
+                .build()
+
+            val msg = NotificationCompat.MessagingStyle.Message(
+                message.data,
+                message.timeStamp!!,
+                person
+            )
+
+            val msgStyle = NotificationCompat.MessagingStyle(person)
+                .addMessage(msg)
+
+            if (message.conType == Constants.CONVERSATION_TYPE_M2M)
+                msgStyle.conversationTitle = message.conversationID
+
+            val notification = NotificationCompat.Builder(this@NotificationHandler, it.token)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setStyle(msgStyle)
+                .setContentIntent(pendingIntent)
+
+            val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val channel = NotificationChannel(
+                    it.token,
+                    "Messages",
+                    NotificationManager.IMPORTANCE_DEFAULT
+                )
+                manager.createNotificationChannel(channel)
+            }
+
+            manager.notify(
+                message.messageID,
+                Random(System.currentTimeMillis()).nextInt(1000),
+                notification.build()
+            )
         }
     }
 
@@ -124,8 +196,8 @@ class NotificationHandler : FirebaseMessagingService(){
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
 
         dataRepository.getNotificationChannelID().addOnSuccessListener {
-            if(it!=null)
-            {
+            it?.let{
+
                 val notification = NotificationCompat.Builder(this, it.token)
                     .setSmallIcon(R.mipmap.ic_launcher_round)
                     .setContentTitle(title)
@@ -148,6 +220,70 @@ class NotificationHandler : FirebaseMessagingService(){
             }
         }
     }
+
+
+    private fun makeAllMessagesNotification() {
+        dataRepository.getNotificationChannelID().addOnSuccessListener {
+            it?.let {
+
+                coroutinScope.launch {
+                    withContext(Dispatchers.IO){
+                        val messages = dataRepository.getUnreadMessages()
+
+                        for(message in messages){
+                            Log.d(TAG, "makeMessageNotification: ${message.data}")
+
+                            val args = Bundle()
+                            args.putString("conversationID", message.conversationID)
+
+                            val pendingIntent = NavDeepLinkBuilder(this@NotificationHandler)
+                                .setGraph(R.navigation.main_activity_nav_graph)
+                                .setDestination(R.id.chatFragment)
+                                .setArguments(args)
+                                .createPendingIntent()
+
+
+                            val person = Person.Builder()
+                                .setName(message.nickname?:message.senderID)
+                                .setKey(message.senderID)
+                                .build()
+
+                            val msg = NotificationCompat.MessagingStyle.Message(
+                                message.data,
+                                message.timeStamp!!,
+                                person
+                            )
+
+                            val msgStyle = NotificationCompat.MessagingStyle(person)
+                                .addMessage(msg)
+
+                            if(message.conType == Constants.CONVERSATION_TYPE_M2M)
+                                msgStyle.conversationTitle = message.conversationID
+
+                            val notification = NotificationCompat.Builder(this@NotificationHandler, it.token)
+                                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                                .setStyle(msgStyle)
+                                .setContentIntent(pendingIntent)
+
+                            val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                val channel = NotificationChannel(it.token,
+                                    "Messages",
+                                    NotificationManager.IMPORTANCE_DEFAULT
+                                )
+                                manager.createNotificationChannel(channel)
+                            }
+
+                            manager.notify(message.messageID, Random(System.currentTimeMillis()).nextInt(1000), notification.build())
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
     //{server_url=, thumb_nail=, conversationID=KqU3ipvZEs1bSfFZo4tF,
 // messageID=NOJi0osuUGNRYksathbp, latitude=, reply_toID=, mime_type=text/plain,
 // data=hio, type=3, timeStamp=1592412297920, longitude=, receiverID=pandaa25, senderID=pandaa24}

@@ -4,9 +4,13 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.paging.DataSource
+import androidx.paging.LivePagedListBuilder
+import androidx.paging.PagedList
 import com.abhishekjagushte.engage.database.Conversation
 import com.abhishekjagushte.engage.database.MessageView
 import com.abhishekjagushte.engage.repository.DataRepository
+import com.abhishekjagushte.engage.ui.chat.screens.chat.fragments.chatscreen.ChatDataItem
 import com.abhishekjagushte.engage.utils.Constants
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -125,8 +129,20 @@ class ChatViewModel @Inject constructor(
         dataRepository.addConversation121(username)
     }
 
-    fun getChatsAll(): LiveData<List<MessageView>> {
-        return dataRepository.getChats(conversationID.value!!)
+    fun getChatsAll(): LiveData<PagedList<ChatDataItem>> {
+        val factory: DataSource.Factory<Int, MessageView> = dataRepository.getChats(conversationID.value!!)
+
+        val convertedFactory = factory.map{
+            return@map when(it.type){
+                0 -> ChatDataItem.MyTextMessage(it)
+                else -> ChatDataItem.OtherTextMessage(it)
+            }
+        }
+
+        val pagedListBuilder: LivePagedListBuilder<Int, ChatDataItem>
+            = LivePagedListBuilder<Int, ChatDataItem>(convertedFactory, 50)
+
+        return pagedListBuilder.build()
     }
 
     fun sendTextMessage121(message: String){
@@ -167,6 +183,14 @@ class ChatViewModel @Inject constructor(
             withContext(Dispatchers.IO){
                 Log.d(TAG, "sendTextMessageM2M: ${conversationID.value}")
                 dataRepository.saveTextMessageM2M(message, conversationID.value!!, replyToId)
+            }
+        }
+    }
+
+    fun markMessagesRead() {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO){
+                dataRepository.markMessagesRead(conversationID.value!!)
             }
         }
     }
