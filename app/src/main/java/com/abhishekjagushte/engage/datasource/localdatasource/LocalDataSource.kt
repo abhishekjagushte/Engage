@@ -372,8 +372,12 @@ class LocalDataSource @Inject constructor (
         databaseDao.markMessagesRead(conversationID)
     }
 
-    fun getUnreadMessages(): List<MessageView> {
+    fun getUnreadMessages(): List<MessageNotificationView> {
         return databaseDao.getUnreadMessages()
+    }
+
+    fun getMessageNotification(messageID: String): MessageNotificationView {
+        return databaseDao.getMessageNotification(messageID)
     }
 
 }

@@ -124,7 +124,10 @@ interface DatabaseDao{
     fun markMessagesRead(conversationID: String)
 
     //gets all the messages unread by me
-    @Query("SELECT * FROM message_view where status = 4")
-    fun getUnreadMessages(): List<MessageView>
+    @Query("SELECT * FROM message_notification_view where status = 4")
+    fun getUnreadMessages(): List<MessageNotificationView>
+
+    @Query("SELECT * FROM message_notification_view WHERE messageID = :messageID")
+    fun getMessageNotification(messageID: String): MessageNotificationView
 
 }

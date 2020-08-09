@@ -425,8 +425,12 @@ class DataRepository @Inject constructor(
         }
     }
 
-    fun getUnreadMessages(): List<MessageView> {
+    fun getUnreadMessages(): List<MessageNotificationView> {
         return localDataSource.getUnreadMessages()
+    }
+
+    fun getMessageNotification(messageID: String): MessageNotificationView {
+        return localDataSource.getMessageNotification(messageID)
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -444,8 +448,6 @@ class DataRepository @Inject constructor(
     fun getConfirmedContacts(): LiveData<List<Contact>> {
         return localDataSource.getConfirmedContacts()
     }
-
-
 
 
 }

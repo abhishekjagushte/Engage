@@ -15,7 +15,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         SuggestedContacts::class,
         Message::class],
     version = 1,
-    views = [MessageView::class, ConversationView::class],
+    views = [MessageView::class, ConversationView::class, MessageNotificationView::class],
     exportSchema = false)
 @TypeConverters(Converters::class)
 

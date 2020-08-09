@@ -13,11 +13,13 @@ import androidx.navigation.NavDeepLinkBuilder
 import com.abhishekjagushte.engage.EngageApplication
 import com.abhishekjagushte.engage.R
 import com.abhishekjagushte.engage.database.Message
+import com.abhishekjagushte.engage.database.MessageNotificationView
 import com.abhishekjagushte.engage.repository.DataRepository
 import com.abhishekjagushte.engage.utils.Constants
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.*
+import java.lang.IllegalStateException
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -96,61 +98,76 @@ class NotificationHandler : FirebaseMessagingService(){
     }
 
 
-//TODO make a new view to get only what is needed here to show notififation
+//TODO make a new view to get only what is needed here to show notification
     //TODO See how to combine multiple notifications which belong to one chat/conversation
+    //TODO add logic to remove notifications when clicked on them
     private fun makeMessageNotification(message: Message) {
+
         dataRepository.getNotificationChannelID().addOnSuccessListener {
+            coroutinScope.launch {
+                withContext(Dispatchers.IO){
+                    Log.d(TAG, "makeMessageNotification: ${message.data}")
 
-            Log.d(TAG, "makeMessageNotification: ${message.data}")
+                    val msgNotification = dataRepository.getMessageNotification(message.messageID)
 
-            val args = Bundle()
-            args.putString("conversationID", message.conversationID)
+                    val args = Bundle()
+                    args.putString("conversationID", message.conversationID)
 
-            val pendingIntent = NavDeepLinkBuilder(this@NotificationHandler)
-                .setGraph(R.navigation.main_activity_nav_graph)
-                .setDestination(R.id.chatFragment)
-                .setArguments(args)
-                .createPendingIntent()
+                    val pendingIntent = NavDeepLinkBuilder(this@NotificationHandler)
+                        .setGraph(R.navigation.main_activity_nav_graph)
+                        .setDestination(R.id.chatFragment)
+                        .setArguments(args)
+                        .createPendingIntent()
 
 
-            val person = Person.Builder()
-                .setName(message.senderID)
-                .setKey(message.senderID)
-                .build()
+                    val person = Person.Builder()
+                        .setName(msgNotification.nickname?:msgNotification.senderID)
+                        .setKey(message.senderID)
+                        .build()
 
-            val msg = NotificationCompat.MessagingStyle.Message(
-                message.data,
-                message.timeStamp!!,
-                person
-            )
+                    val msg = NotificationCompat.MessagingStyle.Message(
+                        getNotificationText(msgNotification),
+                        msgNotification.timeStamp!!,
+                        person
+                    )
 
-            val msgStyle = NotificationCompat.MessagingStyle(person)
-                .addMessage(msg)
+                    val msgStyle = NotificationCompat.MessagingStyle(person)
+                        .addMessage(msg)
 
-            if (message.conType == Constants.CONVERSATION_TYPE_M2M)
-                msgStyle.conversationTitle = message.conversationID
+                    if (message.conType == Constants.CONVERSATION_TYPE_M2M)
+                        msgStyle.conversationTitle = msgNotification.name
 
-            val notification = NotificationCompat.Builder(this@NotificationHandler, it.token)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setStyle(msgStyle)
-                .setContentIntent(pendingIntent)
+                    val notification = NotificationCompat.Builder(this@NotificationHandler, it.token)
+                        .setSmallIcon(R.drawable.ic_launcher_foreground)
+                        .setStyle(msgStyle)
+                        .setContentIntent(pendingIntent)
 
-            val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                    val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val channel = NotificationChannel(
-                    it.token,
-                    "Messages",
-                    NotificationManager.IMPORTANCE_DEFAULT
-                )
-                manager.createNotificationChannel(channel)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        val channel = NotificationChannel(
+                            it.token,
+                            "Messages",
+                            NotificationManager.IMPORTANCE_DEFAULT
+                        )
+                        manager.createNotificationChannel(channel)
+                    }
+
+                    manager.notify(
+                        message.messageID,
+                        Random(System.currentTimeMillis()).nextInt(1000),
+                        notification.build()
+                    )
+                }
             }
+        }
+    }
 
-            manager.notify(
-                message.messageID,
-                Random(System.currentTimeMillis()).nextInt(1000),
-                notification.build()
-            )
+    //This will provide different text if mime type is different
+    private fun getNotificationText(msgNotification: MessageNotificationView): String {
+        return when(msgNotification.mime_type){
+            Constants.MIME_TYPE_TEXT -> msgNotification.data!!
+            else -> throw IllegalStateException("Message mime type is wrong")
         }
     }
 
@@ -180,8 +197,6 @@ class NotificationHandler : FirebaseMessagingService(){
                 args.putString(Constants.ARGUMENT_NAME, data.get(Constants.ARGUMENT_NAME))
                 makeNotification(title, content, args, R.id.profileFragment)
             }
-
-
         }
     }
 
@@ -244,7 +259,7 @@ class NotificationHandler : FirebaseMessagingService(){
 
 
                             val person = Person.Builder()
-                                .setName(message.nickname?:message.senderID)
+                                .setName(message.name)
                                 .setKey(message.senderID)
                                 .build()
 
