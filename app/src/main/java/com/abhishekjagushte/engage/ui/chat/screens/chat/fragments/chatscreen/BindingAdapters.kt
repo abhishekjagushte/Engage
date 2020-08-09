@@ -3,7 +3,7 @@ package com.abhishekjagushte.engage.ui.chat.screens.chat.fragments.chatscreen
 import android.view.View
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
-import com.abhishekjagushte.engage.database.MessageView
+import com.abhishekjagushte.engage.database.views.MessageView
 import com.abhishekjagushte.engage.utils.Constants
 import com.abhishekjagushte.engage.utils.StringFormatting
 

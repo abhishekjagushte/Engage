@@ -7,8 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.paging.DataSource
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
-import com.abhishekjagushte.engage.database.Conversation
-import com.abhishekjagushte.engage.database.MessageView
+import com.abhishekjagushte.engage.database.views.MessageView
+import com.abhishekjagushte.engage.database.entities.Conversation
 import com.abhishekjagushte.engage.repository.DataRepository
 import com.abhishekjagushte.engage.ui.chat.screens.chat.fragments.chatscreen.ChatDataItem
 import com.abhishekjagushte.engage.utils.Constants

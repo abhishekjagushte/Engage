@@ -8,7 +8,7 @@
     <data>
         <variable
             name="message"
-            type="com.abhishekjagushte.engage.database.MessageView" />
+            type="com.abhishekjagushte.engage.database.views.MessageView" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

@@ -7,7 +7,7 @@
     <data>
         <variable
             name="conversationView"
-            type="com.abhishekjagushte.engage.database.ConversationView" />
+            type="com.abhishekjagushte.engage.database.views.ConversationView" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

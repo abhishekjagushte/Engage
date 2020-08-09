@@ -8,7 +8,7 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.abhishekjagushte.engage.database.MessageView
+import com.abhishekjagushte.engage.database.views.MessageView
 import com.abhishekjagushte.engage.databinding.TextMessage121ContainerLeftBinding
 import com.abhishekjagushte.engage.databinding.TextMessageContainerLeftBinding
 import com.abhishekjagushte.engage.databinding.TextMessageContainerRightBinding

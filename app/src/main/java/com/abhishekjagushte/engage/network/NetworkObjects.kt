@@ -1,6 +1,6 @@
 package com.abhishekjagushte.engage.network
 
-import com.abhishekjagushte.engage.database.Contact
+import com.abhishekjagushte.engage.database.entities.Contact
 import com.google.firebase.firestore.ServerTimestamp
 import java.util.*
 
@@ -21,7 +21,7 @@ data class Profile constructor(
     val conversationsM2M: List<HashMap<String, String>> = listOf()
 )
 
-fun Profile.convertDomainObject(type: Int): Contact{
+fun Profile.convertDomainObject(type: Int): Contact {
     return Contact(
         networkID = this.id,
         name = this.name,

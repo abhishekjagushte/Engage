@@ -9,10 +9,6 @@ import javax.inject.Inject
 class FunctionsSource @Inject constructor(
     private val functions: FirebaseFunctions
 ){
-    fun createNewChat121(request: HashMap<String, String>): Task<HttpsCallableResult> {
-        return functions.getHttpsCallable("createNewChat121")
-            .call(request)
-    }
 
     fun createGroup(request: JSONObject?): Task<HttpsCallableResult> {
         return functions.getHttpsCallable("createGroup")

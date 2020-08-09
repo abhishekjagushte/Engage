@@ -3,7 +3,7 @@ package com.abhishekjagushte.engage.ui.main.screens.chatlist
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.abhishekjagushte.engage.database.ConversationView
+import com.abhishekjagushte.engage.database.views.ConversationView
 import com.abhishekjagushte.engage.repository.DataRepository
 import kotlinx.coroutines.*
 import javax.inject.Inject

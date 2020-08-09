@@ -3,7 +3,7 @@ package com.abhishekjagushte.engage.ui.main.screens.chatlist
 import android.util.Log
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
-import com.abhishekjagushte.engage.database.ConversationView
+import com.abhishekjagushte.engage.database.views.ConversationView
 import com.abhishekjagushte.engage.utils.Constants
 import com.abhishekjagushte.engage.utils.StringFormatting
 import com.google.android.material.floatingactionbutton.FloatingActionButton

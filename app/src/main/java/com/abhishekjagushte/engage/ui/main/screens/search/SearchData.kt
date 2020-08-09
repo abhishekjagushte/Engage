@@ -1,7 +1,7 @@
 package com.abhishekjagushte.engage.ui.main.screens.search
 
-import com.abhishekjagushte.engage.database.SearchResultContact
-import com.abhishekjagushte.engage.database.SearchResultConversation
+import com.abhishekjagushte.engage.database.entities.SearchResultContact
+import com.abhishekjagushte.engage.database.entities.SearchResultConversation
 import com.abhishekjagushte.engage.utils.Constants
 
 data class SearchData constructor(

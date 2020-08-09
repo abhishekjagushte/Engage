@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.abhishekjagushte.engage.EngageApplication
 import com.abhishekjagushte.engage.R
-import com.abhishekjagushte.engage.database.Contact
+import com.abhishekjagushte.engage.database.entities.Contact
 import com.abhishekjagushte.engage.repository.DataRepository
 import com.abhishekjagushte.engage.ui.fragments.adapters.ContactItemClickListener
 import com.abhishekjagushte.engage.ui.fragments.adapters.ContactListAdapter

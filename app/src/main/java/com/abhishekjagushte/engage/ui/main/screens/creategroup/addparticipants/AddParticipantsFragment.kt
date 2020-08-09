@@ -15,7 +15,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.abhishekjagushte.engage.R
-import com.abhishekjagushte.engage.database.ContactNameUsername
+import com.abhishekjagushte.engage.database.entities.ContactNameUsername
 import com.abhishekjagushte.engage.ui.activity.MainActivity
 import com.abhishekjagushte.engage.ui.fragments.ContactListFragment
 import com.abhishekjagushte.engage.ui.fragments.adapters.ContactItemClickListener

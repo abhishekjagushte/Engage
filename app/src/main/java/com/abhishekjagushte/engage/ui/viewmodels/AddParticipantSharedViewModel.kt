@@ -5,8 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.abhishekjagushte.engage.database.Contact
-import com.abhishekjagushte.engage.database.ContactNameUsername
+import com.abhishekjagushte.engage.database.entities.Contact
+import com.abhishekjagushte.engage.database.entities.ContactNameUsername
 import com.abhishekjagushte.engage.network.CreateGroupRequest
 import com.abhishekjagushte.engage.repository.DataRepository
 import com.google.gson.Gson

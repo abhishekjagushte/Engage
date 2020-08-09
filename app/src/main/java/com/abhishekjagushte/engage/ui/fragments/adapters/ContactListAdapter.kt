@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.abhishekjagushte.engage.R
-import com.abhishekjagushte.engage.database.Contact
+import com.abhishekjagushte.engage.database.entities.Contact
 import com.abhishekjagushte.engage.databinding.ItemContactListBinding
 import com.abhishekjagushte.engage.utils.Constants
 import kotlinx.coroutines.CoroutineScope

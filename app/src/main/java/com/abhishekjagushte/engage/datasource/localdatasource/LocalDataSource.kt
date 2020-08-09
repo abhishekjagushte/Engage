@@ -2,9 +2,12 @@ package com.abhishekjagushte.engage.datasource.localdatasource
 
 import android.util.Log
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.paging.DataSource
 import com.abhishekjagushte.engage.database.*
+import com.abhishekjagushte.engage.database.entities.*
+import com.abhishekjagushte.engage.database.views.ConversationView
+import com.abhishekjagushte.engage.database.views.MessageNotificationView
+import com.abhishekjagushte.engage.database.views.MessageView
 import com.abhishekjagushte.engage.network.CreateGroupRequest
 import com.abhishekjagushte.engage.utils.Constants
 import com.google.firebase.firestore.FirebaseFirestore
@@ -42,23 +45,6 @@ class LocalDataSource @Inject constructor (
         return databaseDao.getMyDetails()
     }
 
-    fun getCurrentLoggedInUserCredentials(userData: MutableLiveData<UserData?>){
-        val users = databaseDao.getCurrentLoggedInUser()
-        getCountUserData()
-        if(users.isEmpty()){
-           userData.postValue(null)
-        }
-        else{
-            userData.postValue(users[0])
-        }
-    }
-
-    fun getCountUserData(): Int{
-        val i = databaseDao.getCredentialsCount()
-        Log.d(TAG, "Number of entries = $i")
-        return i
-    }
-
     fun signUpAddCredentialsLocal(email: String, password: String){
         //databaseDao.truncateCredentials()
         databaseDao.insertCredentials(UserData(email, password))
@@ -78,51 +64,6 @@ class LocalDataSource @Inject constructor (
 
     fun searchForSuggestedContacts(query: String): List<SearchResultContact> {
         return databaseDao.searchForSuggestedContacts(query)
-    }
-
-
-    fun addContactsTest(){
-        databaseDao.insertNewContact(Contact(
-            name = "Abhishek Jagushte",
-            username = "abhijagushte",
-            networkID = "dgvsgavsgdjvajaj",
-            type = 1
-        ))
-
-        databaseDao.insertNewContact(Contact(
-            name = "Taylor Swift",
-            username = "taylorswift13",
-            networkID = "sdbjewgvfjbnsdffff",
-            type = 1
-        ))
-
-        databaseDao.insertNewContact(Contact(
-            name = "Sam Smith",
-            username = "samsmith",
-            networkID = "bekhgflgewhkfweljvkhev",
-            type = 2
-        ))
-
-        databaseDao.insertNewContact(Contact(
-            name = "Panda",
-            username = "panda",
-            networkID = "sbfjhgfyksvhjafua",
-            type = 1
-        ))
-
-        databaseDao.insertNewContact(Contact(
-            name = "Prachi Pathare",
-            username = "prachi",
-            networkID = "dgvsgdsddsgdjvajaj",
-            type = 3
-        ))
-
-        databaseDao.insertNewContact(Contact(
-            name = "Kylie Jenner",
-            username = "fvdsfvdshfvdshfv",
-            networkID = "dgvsgadfeknfke ",
-            type = 4
-        ))
     }
 
     fun getCountContacts(): Int {
@@ -159,15 +100,7 @@ class LocalDataSource @Inject constructor (
         )
 
         databaseDao.insertMessage(msg)
-//        try {
-//            Log.d(
-//                TAG,
-//                "saveTextMessage121Local: ${databaseDao.getChatsCount(conversationID).size}"
-//            )
-//        }catch (e: Exception){
-//            e.printStackTrace()
-//        }
-        }
+    }
 
     fun addConversation121(username: String){
         val conversation = Conversation(
@@ -230,31 +163,12 @@ class LocalDataSource @Inject constructor (
         databaseDao.insertMessage(message)
     }
 
-
-    fun getTemporaryConversationID(): String {
-        return firestore.collection("conversations121").document().id
-    }
-
-    fun getUnPushedConversations(): LiveData<List<Conversation>> {
-        return databaseDao.getUnPushedConversations()
-    }
-
-//    fun isConversationPushed(conversationID: String): Boolean {
-//        val conversation = databaseDao.getConversation(conversationID)
-//        conversation?.let {
-//            if(conversation.needs_push ==0)
-//                return true
-//        }
-//        return false
-//    }
-
     fun updateConversation(conversation: Conversation) {
         databaseDao.updateConversation(conversation)
     }
 
-
-    fun checkConversationExists(conID: String): Int {
-        return databaseDao.checkConversationExists(conID)
+    fun checkConversationExists(conID: String): Boolean {
+        return databaseDao.checkConversationExists(conID) == 1
     }
 
     fun getConversationList(): LiveData<List<ConversationView>> {

@@ -12,8 +12,8 @@ import androidx.core.app.Person
 import androidx.navigation.NavDeepLinkBuilder
 import com.abhishekjagushte.engage.EngageApplication
 import com.abhishekjagushte.engage.R
-import com.abhishekjagushte.engage.database.Message
-import com.abhishekjagushte.engage.database.MessageNotificationView
+import com.abhishekjagushte.engage.database.entities.Message
+import com.abhishekjagushte.engage.database.views.MessageNotificationView
 import com.abhishekjagushte.engage.repository.DataRepository
 import com.abhishekjagushte.engage.utils.Constants
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -23,7 +23,6 @@ import java.lang.IllegalStateException
 import javax.inject.Inject
 import kotlin.random.Random
 
-
 const val TYPE_FR_ACCEPTED = 1
 const val TYPE_FR_RECEIVED = 2
 const val TYPE_MSG_RECEIVED_121 =  3
@@ -32,7 +31,6 @@ class NotificationHandler : FirebaseMessagingService(){
 
     @Inject
     lateinit var dataRepository: DataRepository
-
     private val TAG = "NotificationHandler"
 
     private val job = Job()
@@ -54,13 +52,12 @@ class NotificationHandler : FirebaseMessagingService(){
         Log.d(TAG, "Data size ${p0.data.size} + ${p0.data}")
 
         //TODO don't make change in friend status if already confirmed
-
         //Check if data is available
         if(p0.data.size>0){
             when(p0.data.get("type")){
                 "1" -> {
                     buildNotification(p0.data, TYPE_FR_RECEIVED)
-                    dataRepository.friendRequestRecieved(p0.data)
+                    dataRepository.friendRequestReceived(p0.data)
                 }
 
                 "2" -> {
@@ -70,11 +67,15 @@ class NotificationHandler : FirebaseMessagingService(){
 
                 "3" -> {
                     Log.d(TAG, "onMessageReceived: ${p0.data.toString()}")
-                    val msg = mapToMessage121(p0.data)
+                    val msg = Message.mapToMessage121(p0.data)
                     Log.d(TAG, "onMessageReceived: " +
                             "${msg.messageID} ${msg.senderID} ${msg.receiverID}")
-                    dataRepository.receiveMessage121(msg)
-                    makeMessageNotification(msg)
+                    coroutinScope.launch {
+                        withContext(Dispatchers.IO) {
+                            dataRepository.receiveMessage121(msg)
+                            makeMessageNotification(msg)
+                        }
+                    }
                 }
 
                 "4" -> {
@@ -84,25 +85,22 @@ class NotificationHandler : FirebaseMessagingService(){
 
                 "5" -> {
                     Log.d(TAG, "onMessageReceived: M2M chat message = ${p0.data}")
-                    val msg = mapToMessageM2M(p0.data)
+                    val msg = Message.mapToMessageM2M(p0.data)
                     coroutinScope.launch {
                         withContext(Dispatchers.IO){
                             dataRepository.receiveMessageM2M(msg)
                             makeMessageNotification(msg)
                         }
                     }
-
                 }
             }
         }
     }
 
-
-//TODO make a new view to get only what is needed here to show notification
+    //TODO make a new view to get only what is needed here to show notification
     //TODO See how to combine multiple notifications which belong to one chat/conversation
     //TODO add logic to remove notifications when clicked on them
     private fun makeMessageNotification(message: Message) {
-
         dataRepository.getNotificationChannelID().addOnSuccessListener {
             coroutinScope.launch {
                 withContext(Dispatchers.IO){
@@ -236,7 +234,6 @@ class NotificationHandler : FirebaseMessagingService(){
         }
     }
 
-
     private fun makeAllMessagesNotification() {
         dataRepository.getNotificationChannelID().addOnSuccessListener {
             it?.let {
@@ -297,86 +294,20 @@ class NotificationHandler : FirebaseMessagingService(){
             }
         }
     }
-
-
-    //{server_url=, thumb_nail=, conversationID=KqU3ipvZEs1bSfFZo4tF,
-// messageID=NOJi0osuUGNRYksathbp, latitude=, reply_toID=, mime_type=text/plain,
-// data=hio, type=3, timeStamp=1592412297920, longitude=, receiverID=pandaa25, senderID=pandaa24}
-    private fun mapToMessage121(data: Map<String, String>): Message{
-        val messageID = data["messageID"]
-        val serverUrl = data["server_url"]
-        val thumbNail = data["thumb_nail"]
-        val latitude = if((data["latitude"] ?: error("")).isEmpty()) null else (data["latitude"] ?: error("")).toDouble()
-        val longitude = if((data["longitude"] ?: error("")).isEmpty()) null else (data["longitude"] ?: error("")).toDouble()
-        val replyToid = data["reply_toID"]
-        val receiverID = data["receiverID"]
-        val senderID = data["senderID"]
-        val timeStamp = data["timeStamp"]
-        val mdata = data["data"]
-        val mime_type = data["mime_type"]
-
-        return Message(
-            messageID = messageID!!,
-            conversationID = senderID!!, //conversationId for 121 is username
-            timeStamp = System.currentTimeMillis(),
-            serverTimestamp = timeStamp!!.toLong(),
-            data = mdata,
-            senderID = senderID,
-            receiverID = receiverID,
-            mime_type = mime_type,
-            server_url = serverUrl,
-            latitude = latitude,
-            longitude = longitude,
-            thumb_nail = null,
-            reply_toID = replyToid,
-
-            type = Constants.TYPE_OTHER_MSG,
-            status = Constants.STATUS_RECEIVED_BUT_NOT_READ,
-            local_uri = null,
-            needs_push = Constants.NEEDS_PUSH_NO,
-            deleted = Constants.DELETED_NO,
-            conType = Constants.CONVERSATION_TYPE_121
-        )
-    }
-
-    private fun mapToMessageM2M(data: Map<String, String>): Message {
-        val messageID = data["messageID"]
-        val conversationID = data["conversationID"]
-        val serverUrl = data["server_url"]
-        val thumbNail = data["thumb_nail"]
-        val latitude = if((data["latitude"] ?: error("")).isEmpty()) null else (data["latitude"] ?: error("")).toDouble()
-        val longitude = if((data["longitude"] ?: error("")).isEmpty()) null else (data["longitude"] ?: error("")).toDouble()
-        val replyToid = data["reply_toID"]
-        val receiverID = data["receiverID"]
-        val senderID = data["senderID"]
-        val timeStamp = data["timeStamp"]
-        val mdata = data["data"]
-        val mime_type = data["mime_type"]
-
-        return Message(
-            messageID = messageID!!,
-            conversationID = conversationID!!, //conversationId for M2M
-            timeStamp = System.currentTimeMillis(),
-            serverTimestamp = timeStamp!!.toLong(),
-            data = mdata,
-            senderID = senderID,
-            receiverID = receiverID,
-            mime_type = mime_type,
-            server_url = serverUrl,
-            latitude = latitude,
-            longitude = longitude,
-            thumb_nail = null,
-            reply_toID = replyToid,
-
-            type = Constants.TYPE_OTHER_MSG,
-            status = Constants.STATUS_RECEIVED_BUT_NOT_READ,
-            local_uri = null,
-            needs_push = Constants.NEEDS_PUSH_NO,
-            deleted = Constants.DELETED_NO,
-            conType = Constants.CONVERSATION_TYPE_M2M
-        )
-    }
 }
+
+/*
+E/AndroidRuntime: FATAL EXCEPTION: main
+Process: com.abhishekjagushte.engage, PID: 12689
+java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.String com.abhishekjagushte.engage.database.views.MessageNotificationView.getNickname()' on a null object reference
+at com.abhishekjagushte.engage.notifications.NotificationHandler$makeMessageNotification$1$1$1.invokeSuspend(NotificationHandler.kt:120)
+at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:56)
+at kotlinx.coroutines.scheduling.CoroutineScheduler.runSafely(CoroutineScheduler.kt:571)
+at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.executeTask(CoroutineScheduler.kt:738)
+at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.runWorker(CoroutineScheduler.kt:678)
+at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.run(CoroutineScheduler.kt:665)
+*/
 
 
 //private fun friendRequestAccepted(data: Map<String, String>) {

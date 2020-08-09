@@ -10,7 +10,7 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.abhishekjagushte.engage.database.ContactNameUsername
+import com.abhishekjagushte.engage.database.entities.ContactNameUsername
 import com.abhishekjagushte.engage.databinding.ItemParticipantBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

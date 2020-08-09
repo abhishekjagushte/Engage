@@ -2,6 +2,10 @@ package com.abhishekjagushte.engage.database
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.abhishekjagushte.engage.database.entities.*
+import com.abhishekjagushte.engage.database.views.ConversationView
+import com.abhishekjagushte.engage.database.views.MessageNotificationView
+import com.abhishekjagushte.engage.database.views.MessageView
 import javax.sql.DataSource
 
 @Dao
@@ -22,22 +26,17 @@ interface DatabaseDao{
     @Query("SELECT * FROM user_data")
     fun getCurrentLoggedInUser(): List<UserData>
 
-    @Query("SELECT COUNT(*) FROM user_data")
-    fun getCredentialsCount(): Int
-
     @Query("SELECT * FROM contacts WHERE username = :username")
     fun getContactFromUsername(username: String): LiveData<Contact>
 
     @Query("SELECT * FROM contacts WHERE username = :username")
     fun getContact(username: String): Contact?
 
-
     @Update
     fun updateContact(contact: Contact)
 
     @Query("SELECT name, username FROM contacts WHERE type == 0")
     fun getMyDetails(): ContactNameUsername?
-
 
     // Search Queries
     //Pass username when type is 121 and pass networkID when M2M
@@ -59,7 +58,6 @@ interface DatabaseDao{
     ///////////////////////////////////////////////////////////////////////////
     // ChatScreen Fragment
     ///////////////////////////////////////////////////////////////////////////
-
 
     @Query("SELECT * FROM message_view WHERE conversationID == :conversationID ORDER BY timeStamp DESC")
     fun getChats(conversationID: String): androidx.paging.DataSource.Factory<Int, MessageView>

@@ -3,8 +3,8 @@ package com.abhishekjagushte.engage.ui.activity
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import com.abhishekjagushte.engage.database.Conversation
-import com.abhishekjagushte.engage.database.Message
+import com.abhishekjagushte.engage.database.entities.Conversation
+import com.abhishekjagushte.engage.database.entities.Message
 import com.abhishekjagushte.engage.repository.DataRepository
 import com.abhishekjagushte.engage.utils.Constants
 import kotlinx.coroutines.*

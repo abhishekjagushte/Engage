@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.abhishekjagushte.engage.database.Contact
+import com.abhishekjagushte.engage.database.entities.Contact
 import com.abhishekjagushte.engage.network.Profile
 import com.abhishekjagushte.engage.network.convertDomainObject
 import com.abhishekjagushte.engage.repository.DataRepository
