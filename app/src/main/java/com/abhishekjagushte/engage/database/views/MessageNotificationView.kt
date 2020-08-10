@@ -6,7 +6,7 @@ import androidx.room.DatabaseView
 @DatabaseView(value =
 """
     SELECT messages.messageID, messages.timeStamp, messages.data, messages.mime_type ,
-        messages.senderID AS senderID, messages.conversationID, messages.status, conversations.conversationID AS conID, conversations.name,
+            messages.senderID AS senderID, messages.conversationID, messages.status, conversations.conversationID AS conID, conversations.name,
          conversations.priority, conversations.dp_thmb, conversations.type AS conType, contacts.nickname 
     FROM 
     messages INNER JOIN conversations ON messages.conversationID = conversations.conversationID

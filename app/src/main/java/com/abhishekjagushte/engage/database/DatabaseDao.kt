@@ -6,7 +6,7 @@ import com.abhishekjagushte.engage.database.entities.*
 import com.abhishekjagushte.engage.database.views.ConversationView
 import com.abhishekjagushte.engage.database.views.MessageNotificationView
 import com.abhishekjagushte.engage.database.views.MessageView
-import javax.sql.DataSource
+import androidx.paging.DataSource
 
 @Dao
 interface DatabaseDao{
@@ -60,7 +60,7 @@ interface DatabaseDao{
     ///////////////////////////////////////////////////////////////////////////
 
     @Query("SELECT * FROM message_view WHERE conversationID == :conversationID ORDER BY timeStamp DESC")
-    fun getChats(conversationID: String): androidx.paging.DataSource.Factory<Int, MessageView>
+    fun getChats(conversationID: String): DataSource.Factory<Int, MessageView>
             //LiveData<List<MessageView>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -69,7 +69,7 @@ interface DatabaseDao{
     @Query("SELECT * FROM messages WHERE conversationID == :conversationID ORDER BY timeStamp")
     fun getChatsCount(conversationID: String): List<Message>
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertMessage(message: Message)
 
     @Query("SELECT COUNT(*) FROM message_view")

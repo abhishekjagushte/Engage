@@ -78,7 +78,7 @@ class ChatListFragment : Fragment() {
     private fun observeChatList(){
         viewModel.getConversationList().observe(viewLifecycleOwner, Observer {
             it?.let{
-                Log.d(TAG, "observeChatList: ${it.size} + $it")
+                //Log.d(TAG, "observeChatList: ${it.size} + $it")
                 chatListAdapter.updateList(it)
             }
         })

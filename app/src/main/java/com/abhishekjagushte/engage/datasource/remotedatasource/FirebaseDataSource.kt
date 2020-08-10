@@ -6,6 +6,7 @@ import com.abhishekjagushte.engage.utils.Constants
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.*
 import com.google.firebase.firestore.ktx.toObject
+import com.google.firebase.ktx.Firebase
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import java.time.ZoneId
@@ -75,8 +76,12 @@ class FirebaseDataSource @Inject constructor(
     }
 
 
-    fun setChatListener(conversationID: String): Query {
-        val query = firestore.collection("conversations121/$conversationID/chats").orderBy("timeStamp", Query.Direction.DESCENDING).limit(1)
+    fun setChatListener(username: String): Query {
+        val query = firestore
+            .collection("messages121")
+            .whereEqualTo("receiverID", username)
+            .whereGreaterThanOrEqualTo("timeStamp", Date())
+            .limit(50)
 
         return query
     }

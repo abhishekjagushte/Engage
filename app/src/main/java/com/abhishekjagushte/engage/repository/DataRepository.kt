@@ -408,8 +408,8 @@ class DataRepository @Inject constructor(
     }
 
 
-    fun setChatListener(conversationID: String): Query {
-        return firebaseDataSource.setChatListener(conversationID)
+    fun setChatListener(username: String): Query {
+        return firebaseDataSource.setChatListener(username)
     }
 
     fun getConfirmedContacts(): LiveData<List<Contact>> {

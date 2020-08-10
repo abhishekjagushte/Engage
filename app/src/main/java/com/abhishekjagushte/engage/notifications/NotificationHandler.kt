@@ -48,8 +48,8 @@ class NotificationHandler : FirebaseMessagingService(){
         super.onMessageReceived(p0)
 
         (application as EngageApplication).appComponent.inject(this)
-        Log.d(TAG, "Inside onMessageReceived")
-        Log.d(TAG, "Data size ${p0.data.size} + ${p0.data}")
+        //Log.d(TAG, "Inside onMessageReceived")
+        //Log.d(TAG, "Data size ${p0.data.size} + ${p0.data}")
 
         //TODO don't make change in friend status if already confirmed
         //Check if data is available
@@ -66,30 +66,32 @@ class NotificationHandler : FirebaseMessagingService(){
                 }
 
                 "3" -> {
-                    Log.d(TAG, "onMessageReceived: ${p0.data.toString()}")
+                    //Log.d(TAG, "onMessageReceived: ${p0.data.toString()}")
                     val msg = Message.mapToMessage121(p0.data)
-                    Log.d(TAG, "onMessageReceived: " +
-                            "${msg.messageID} ${msg.senderID} ${msg.receiverID}")
+                    //Log.d(TAG, "onMessageReceived: " +
+                      //      "${msg.messageID} ${msg.senderID} ${msg.receiverID}")
                     coroutinScope.launch {
                         withContext(Dispatchers.IO) {
-                            dataRepository.receiveMessage121(msg)
-                            makeMessageNotification(msg)
+                            //TODO this is testing
+                            //dataRepository.receiveMessage121(msg)
+                            //makeMessageNotification(msg)
                         }
                     }
                 }
 
                 "4" -> {
-                    Log.d(TAG, "onMessageReceived: Added in group")
+                    //Log.d(TAG, "onMessageReceived: Added in group")
                     addNewGroup(p0.data)
                 }
 
                 "5" -> {
-                    Log.d(TAG, "onMessageReceived: M2M chat message = ${p0.data}")
+                    //Log.d(TAG, "onMessageReceived: M2M chat message = ${p0.data}")
                     val msg = Message.mapToMessageM2M(p0.data)
                     coroutinScope.launch {
                         withContext(Dispatchers.IO){
-                            dataRepository.receiveMessageM2M(msg)
-                            makeMessageNotification(msg)
+                            //TODO this is testing
+                            //dataRepository.receiveMessageM2M(msg)
+                            //makeMessageNotification(msg)
                         }
                     }
                 }
@@ -104,7 +106,7 @@ class NotificationHandler : FirebaseMessagingService(){
         dataRepository.getNotificationChannelID().addOnSuccessListener {
             coroutinScope.launch {
                 withContext(Dispatchers.IO){
-                    Log.d(TAG, "makeMessageNotification: ${message.data}")
+                    //Log.d(TAG, "makeMessageNotification: ${message.data}")
 
                     val msgNotification = dataRepository.getMessageNotification(message.messageID)
 
@@ -243,7 +245,7 @@ class NotificationHandler : FirebaseMessagingService(){
                         val messages = dataRepository.getUnreadMessages()
 
                         for(message in messages){
-                            Log.d(TAG, "makeMessageNotification: ${message.data}")
+                            //Log.d(TAG, "makeMessageNotification: ${message.data}")
 
                             val args = Bundle()
                             args.putString("conversationID", message.conversationID)

@@ -83,7 +83,9 @@
         tools:layout="@layout/fragment_splash_screen">
         <action
             android:id="@+id/action_splashScreen_to_chatListFragment"
-            app:destination="@id/chatListFragment" />
+            app:destination="@id/chatListFragment"
+            app:popUpTo="@id/splashScreen"
+            app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_splashScreen_to_setup_activity_nav_graph"
             app:destination="@id/setup_activity_nav_graph" />
@@ -142,7 +144,9 @@
         <action
             android:id="@+id/action_global_chatListFragment"
             app:destination="@id/chatListFragment"
-            app:enterAnim="@anim/slide_in_right" />
+            app:enterAnim="@anim/slide_in_right"
+            app:popUpTo="@id/splashScreen"
+            app:popUpToInclusive="true" />
 
     </navigation>
 

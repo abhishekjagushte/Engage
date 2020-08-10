@@ -236,6 +236,7 @@ private fun createNewChat121(username: String) {
         }
     }
 
+
      //TODO tested with jio and wifi the delay is not that high enough to switch to listener
     fun setChatListener(conversationID: String){
         listener = dataRepository.setChatListener(conversationID).addSnapshotListener{ snapshot, exception ->

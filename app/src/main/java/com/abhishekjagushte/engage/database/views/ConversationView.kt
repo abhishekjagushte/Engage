@@ -5,10 +5,11 @@ import androidx.room.DatabaseView
 
 @DatabaseView("""
     SELECT conversations.name, conversations.dp_thmb, conversations.dp_url,
-      conversations.conversationID, conversations.type AS conType,  messages.messageID, messages.timeStamp, messages.data, messages.mime_type ,messages.type,
-      messages.status, messages.senderID, contacts.nickname FROM conversations
-      LEFT JOIN messages ON conversations.lastMessageID == messages.messageID
-      LEFT JOIN contacts ON conversations.conversationID == contacts.username
+        conversations.conversationID, conversations.type AS conType,  messages.messageID, 
+        messages.timeStamp, messages.data, messages.mime_type ,messages.type,
+        messages.status, messages.senderID, contacts.nickname FROM conversations
+        LEFT JOIN messages ON conversations.lastMessageID == messages.messageID
+        LEFT JOIN contacts ON conversations.conversationID == contacts.username
 """, viewName = "conversation_view")
 data class ConversationView(
     var name: String?,

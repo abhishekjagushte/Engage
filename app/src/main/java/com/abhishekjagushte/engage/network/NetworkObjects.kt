@@ -1,6 +1,9 @@
 package com.abhishekjagushte.engage.network
 
+import android.provider.SyncStateContract
 import com.abhishekjagushte.engage.database.entities.Contact
+import com.abhishekjagushte.engage.database.entities.Message
+import com.abhishekjagushte.engage.utils.Constants
 import com.google.firebase.firestore.ServerTimestamp
 import java.util.*
 
@@ -38,17 +41,17 @@ data class DateTest constructor(
 
 
 class MessageNetwork(
-    val messageID: String,
+    val messageID: String?=null,
 
     @ServerTimestamp
     val timeStamp: Date?=null, //this timestamp will be the timestamp while sending the message
 
-    val data: String?, //the data of message
-    val senderID: String?, //the senderID of the message
-    val receiverID: String?, //the receiverID for the message
+    val data: String?=null, //the data of message
+    val senderID: String?=null, //the senderID of the message
+    val receiverID: String?=null, //the receiverID for the message
 
     //Media
-    val mime_type: String?, //the mime type
+    val mime_type: String?=null, //the mime type
     val server_url: String?=null, // the cloud url for the media
     val latitude: Double?=null, //latitude for location sharing
     val longitude: Double?=null, //logitude for location sharing
@@ -56,7 +59,28 @@ class MessageNetwork(
     val thumb_nail: ByteArray?=null, //thumbnail for the media
 
     val reply_toID: String?=null
-)
+){
+    //TODO this is test function
+    fun convertDomainMessage(type: Int): Message{
+        return Message(
+            messageID = messageID!!,
+            timeStamp = System.currentTimeMillis(),
+            conversationID =  senderID!!,
+            data = data,
+            mime_type = mime_type,
+            server_url = server_url,
+            latitude = latitude,
+            longitude = longitude,
+            conType = type,
+            type = Constants.TYPE_OTHER_MSG,
+            needs_push = Constants.NEEDS_PUSH_NO,
+            receiverID = receiverID,
+            senderID = senderID,
+            serverTimestamp = timeStamp!!.time,
+            status = Constants.STATUS_RECEIVED_BUT_NOT_READ
+        )
+    }
+}
 
 data class CreateGroupRequest(
     val name: String,

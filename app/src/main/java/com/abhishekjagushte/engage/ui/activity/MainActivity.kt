@@ -58,6 +58,8 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
 
         setUnsentMessageSender()
         //setUnPushedConversationsPusher()
+
+        viewModel.testSetMessageListener()
     }
 
 //    private fun setUnPushedConversationsPusher(){
@@ -71,7 +73,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
     private fun setUnsentMessageSender(){
         viewModel.getUnsentMessages().observe(this, Observer {
             it?.let {
-                Log.d(TAG, "setUnsentMessageSender: Triggered")
+                //Log.d(TAG, "setUnsentMessageSender: Triggered")
                viewModel.sendMessages(it)
             }
         })
