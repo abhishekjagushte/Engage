@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.paging.DataSource
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
+import androidx.work.WorkManager
 import com.abhishekjagushte.engage.database.views.MessageView
 import com.abhishekjagushte.engage.database.entities.Conversation
 import com.abhishekjagushte.engage.repository.DataRepository
@@ -24,7 +25,8 @@ enum class ChatType{
 }
 
 class ChatViewModel @Inject constructor(
-    private val dataRepository: DataRepository
+    private val dataRepository: DataRepository,
+    private val workManager: WorkManager
 ) : ViewModel(){
 
     private var _conversationID = MutableLiveData<String>()
@@ -157,17 +159,20 @@ class ChatViewModel @Inject constructor(
 
                     Log.d(TAG, "sendMessage: The conversationID created and it is ${conversationID}")
                     _chatState.postValue(ChatState.EXISTING)
-                    dataRepository.saveTextMessage121Local(
+
+                    val messageID = dataRepository.saveTextMessage121Local(
                         message,
                         conversationID.value!!,
                         myUsername!!,
                         conversationID.value!! //For 121 username = conversationID
                     )
+
+
                 }
                 else {
                     Log.d(TAG, "sendTextMessage121: sent")
                     //sets the livedata for chats once the conversationID is initialized
-                    dataRepository.saveTextMessage121Local(
+                    val messageID  = dataRepository.saveTextMessage121Local(
                         message,
                         conversationID.value!!,
                         myUsername!!,
@@ -248,6 +253,42 @@ private fun createNewChat121(username: String) {
             snapshot?.let {
                 for(doc in snapshot.documents) {
                     Log.d(TAG, "setChatListener: ${doc.data}")
+                }
+            }
+        }
+    }
+
+
+
+    fun sendTextMessage121(message: String){
+        viewModelScope.launch {
+            withContext(Dispatchers.IO){
+                //new is only possible when chat type is 121
+                if(chatState.value == ChatState.NEW){
+                    //createNewChat121(username!!) //suspend function sets the conversationID
+
+                    //conversationID is username
+                    createNewConversation121(conversationID.value!!)
+
+                    Log.d(TAG, "sendMessage: The conversationID created and it is ${conversationID}")
+                    _chatState.postValue(ChatState.EXISTING)
+
+                    dataRepository.saveTextMessage121Local(
+                        message,
+                        conversationID.value!!,
+                        myUsername!!,
+                        conversationID.value!! //For 121 username = conversationID
+                    )
+                }
+                else {
+                    Log.d(TAG, "sendTextMessage121: sent")
+                    //sets the livedata for chats once the conversationID is initialized
+                    dataRepository.saveTextMessage121Local(
+                        message,
+                        conversationID.value!!,
+                        myUsername!!,
+                        conversationID.value!!
+                    )
                 }
             }
         }

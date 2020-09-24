@@ -2,6 +2,7 @@ package com.abhishekjagushte.engage.utils
 
 object Constants {
 
+    const val MESSAGE_ID: String = "MESSAGE_ID"
     const val SEARCH_TIME_DELAY: Long = 500L
     const val FIREBASE_USERS_COLLECTION: String = "users"
     const val FIREBASE_CONNECTION_REQUEST_COLLECTION = "connection-requests"

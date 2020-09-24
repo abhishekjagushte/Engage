@@ -30,7 +30,8 @@ import javax.inject.Singleton
         [LocalStorageModule::class,
             NetworkModule::class,
             ViewModelBuilderModule::class,
-            SubcomponentsModule::class])
+            SubcomponentsModule::class,
+            WorkManagerModule::class])
 interface AppComponent: AndroidInjector<EngageApplication>{
 
     @Component.Factory

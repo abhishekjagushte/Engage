@@ -287,8 +287,8 @@ class DataRepository @Inject constructor(
         conversationID: String,
         myUsername: String,
         otherUsername: String
-    ){
-        localDataSource.saveTextMessage121Local(message, conversationID, myUsername, otherUsername)
+    ): String {
+        return localDataSource.saveTextMessage121Local(message, conversationID, myUsername, otherUsername)
     }
 
     fun saveTextMessageM2M(
@@ -306,6 +306,17 @@ class DataRepository @Inject constructor(
     fun getUnsentMessages(): LiveData<List<Message>> {
         return localDataSource.getUnsentMessages()
     }
+
+
+    fun setMessageSent(messageID: String) {
+        localDataSource.setMessageSent(messageID)
+    }
+
+
+    fun pushMessage(messageID: String): Task<Void> {
+        return localDataSource.pushMessage(messageID)//Since pushing messaage is more of a job for local databse updation, it is done in local db source
+    }
+
 
     fun pushMessage(message: Message) {
         localDataSource.pushMessage(message)//Since pushing messaage is more of a job for local databse updation, it is done in local db source

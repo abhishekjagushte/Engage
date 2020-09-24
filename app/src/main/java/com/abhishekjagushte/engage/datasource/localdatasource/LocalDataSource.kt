@@ -10,8 +10,10 @@ import com.abhishekjagushte.engage.database.views.MessageNotificationView
 import com.abhishekjagushte.engage.database.views.MessageView
 import com.abhishekjagushte.engage.network.CreateGroupRequest
 import com.abhishekjagushte.engage.utils.Constants
+import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.*
+import java.lang.IllegalStateException
 import javax.inject.Inject
 
 class LocalDataSource @Inject constructor (
@@ -82,9 +84,11 @@ class LocalDataSource @Inject constructor (
         conversationID: String,
         myUsername: String,
         otherUsername: String
-    ) {
+    ): String {
+
+        val messageID = firestore.collection("messages121").document().id
         val msg = Message(
-            messageID = firestore.collection("messages121").document().id,
+            messageID = messageID,
             conversationID = conversationID,
             type = Constants.TYPE_MY_MSG,
             status = Constants.STATUS_NOT_SENT,
@@ -100,6 +104,8 @@ class LocalDataSource @Inject constructor (
         )
 
         databaseDao.insertMessage(msg)
+
+        return messageID
     }
 
     fun addConversation121(username: String){
@@ -115,6 +121,33 @@ class LocalDataSource @Inject constructor (
 
     fun getUnsentMessages(): LiveData<List<Message>> {
         return databaseDao.getUnsentMessages()
+    }
+
+
+    fun setMessageSent(messageID: String) {
+        databaseDao.setMessageSent(messageID)
+    }
+
+
+    fun pushMessage(messageID: String): Task<Void> {
+
+        val message = databaseDao.getMessage(messageID)
+
+        return when (message.conType) {
+            Constants.CONVERSATION_TYPE_121 -> {
+                firestore.collection("messages121")
+                    .document(message.messageID)
+                    .set(message.convertNetworkMessage())
+            }
+
+            Constants.CONVERSATION_TYPE_M2M -> {
+
+                firestore.collection("groups/${message.conversationID}/chats")
+                    .document(message.messageID)
+                    .set(message.convertNetworkMessage())
+            }
+            else -> throw IllegalStateException("Message category is other than 121 or M2M")
+        }
     }
 
     fun pushMessage(message: Message) {
@@ -293,5 +326,6 @@ class LocalDataSource @Inject constructor (
     fun getMessageNotification(messageID: String): MessageNotificationView {
         return databaseDao.getMessageNotification(messageID)
     }
+
 
 }

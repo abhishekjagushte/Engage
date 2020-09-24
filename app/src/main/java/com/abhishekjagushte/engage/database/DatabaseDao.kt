@@ -128,4 +128,10 @@ interface DatabaseDao{
     @Query("SELECT * FROM message_notification_view WHERE messageID = :messageID")
     fun getMessageNotification(messageID: String): MessageNotificationView
 
+    @Query("SELECT * FROM messages WHERE messageID = :messageID")
+    fun getMessage(messageID: String): Message
+
+    @Query("UPDATE messages SET status = 1 WHERE messageID = :messageID")
+    fun setMessageSent(messageID: String)
+
 }
