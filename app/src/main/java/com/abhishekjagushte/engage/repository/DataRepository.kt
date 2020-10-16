@@ -17,6 +17,7 @@ import com.abhishekjagushte.engage.datasource.localdatasource.LocalDataSource
 import com.abhishekjagushte.engage.datasource.remotedatasource.FirebaseAuthDataSource
 import com.abhishekjagushte.engage.datasource.remotedatasource.FirebaseDataSource
 import com.abhishekjagushte.engage.datasource.remotedatasource.FunctionsSource
+import com.abhishekjagushte.engage.listeners.M2MListener
 import com.abhishekjagushte.engage.network.CreateGroupRequest
 import com.abhishekjagushte.engage.network.convertDomainObject
 import com.abhishekjagushte.engage.ui.main.screens.search.SearchData
@@ -27,15 +28,15 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.*
 import com.google.firebase.functions.HttpsCallableResult
 import com.google.firebase.iid.InstanceIdResult
 import kotlinx.coroutines.*
+import kotlinx.coroutines.tasks.await
 import org.json.JSONObject
+import java.util.*
 import javax.inject.Inject
+import kotlin.collections.HashMap
 
 class DataRepository @Inject constructor(
     private val authDataSource: FirebaseAuthDataSource,
@@ -295,8 +296,8 @@ class DataRepository @Inject constructor(
         message: String,
         conversationID: String,
         replyToId: String?
-    ){
-        localDataSource.saveTextMessageM2MLocal(message, conversationID, replyToId)
+    ): String {
+        return localDataSource.saveTextMessageM2MLocal(message, conversationID, replyToId)
     }
 
     fun addConversation121(username: String){
@@ -332,7 +333,7 @@ class DataRepository @Inject constructor(
 
     fun receiveMessageM2M(message: Message){
         if(localDataSource.getConversation(message.conversationID)==null) {
-            Log.d(TAG, "receiveMessage121: conversation not present")
+            Log.d(TAG, "receiveMessageM2M: conversation not present")
             //localDataSource.addGroupMessaageReceivedFirst(message.conversationID)
         }
         localDataSource.insertMessage(message)
@@ -423,10 +424,39 @@ class DataRepository @Inject constructor(
         return firebaseDataSource.setChatListener(username)
     }
 
+    fun set121ChatListener(username: String): Query {
+        val timestamp = localDataSource.getLast121MessageTimestamp()
+        val last121MessageTimeStamp = Date(timestamp)
+
+        Log.d(TAG, "set121ChatListener: $last121MessageTimeStamp")
+        
+        return firebaseDataSource.set121ChatListener(last121MessageTimeStamp, username)
+    }
+
+
+
+    fun setM2MChatListener(conversationID: String): ListenerRegistration {
+        val myUsername = localDataSource.getMyDetails()!!.username
+        val timestamp = localDataSource.getLastM2MMessageTimestampForConversation(conversationID)
+        val lastMessageTimeStamp = Date(timestamp)
+
+        Log.d(TAG, "setM2MChatListener: $lastMessageTimeStamp")
+        
+        val query = firebaseDataSource.setM2MChatListener(conversationID, lastMessageTimeStamp)
+        val listener = M2MListener(this, repoScope, conversationID, myUsername)
+        return query.addSnapshotListener { value, error ->
+            listener.m2mListener(value, error)
+        }
+    }
+
+
     fun getConfirmedContacts(): LiveData<List<Contact>> {
         return localDataSource.getConfirmedContacts()
     }
 
+    fun testSync(): Task<HttpsCallableResult> {
+        return functionsSource.testSync()
+    }
 
 }
 

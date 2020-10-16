@@ -11,5 +11,6 @@ class EngageWorkerFactory @Inject constructor(
 ): DelegatingWorkerFactory(){
     init {
         addFactory(PushWorkerFactory(dataRepository))
+        addFactory(SyncWorkerFactory(dataRepository))
     }
 }

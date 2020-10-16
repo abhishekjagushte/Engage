@@ -19,6 +19,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
 
@@ -56,10 +57,17 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
 
         //test()
 
-        setUnsentMessageSender()
+
+        //TODO this is disabled
+        //setUnsentMessageSender()
         //setUnPushedConversationsPusher()
 
         viewModel.testSetMessageListener()
+
+
+        //Test sync
+        viewModel.testSyncFunction()
+
     }
 
 //    private fun setUnPushedConversationsPusher(){

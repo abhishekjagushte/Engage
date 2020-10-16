@@ -73,8 +73,8 @@ class NotificationHandler : FirebaseMessagingService(){
                     coroutinScope.launch {
                         withContext(Dispatchers.IO) {
                             //TODO this is testing
-                            //dataRepository.receiveMessage121(msg)
-                            //makeMessageNotification(msg)
+                            dataRepository.receiveMessage121(msg)
+                            makeMessageNotification(msg)
                         }
                     }
                 }

@@ -3,13 +3,12 @@ package com.abhishekjagushte.engage.ui.activity
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import com.abhishekjagushte.engage.database.entities.Conversation
 import com.abhishekjagushte.engage.database.entities.Message
 import com.abhishekjagushte.engage.network.MessageNetwork
 import com.abhishekjagushte.engage.repository.DataRepository
 import com.abhishekjagushte.engage.utils.Constants
 import com.google.firebase.firestore.DocumentChange
-import com.google.firebase.firestore.EventListener
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.*
 
@@ -18,6 +17,8 @@ class MainActivityViewModel(
 ): ViewModel(){
 
     private val TAG = "MainActivityViewModel"
+    private lateinit var listener121: ListenerRegistration
+
 
     val job: Job = Job()
     val viewModelScope: CoroutineScope = CoroutineScope(Dispatchers.Main + job)
@@ -32,6 +33,9 @@ class MainActivityViewModel(
 
     override fun onCleared() {
         super.onCleared()
+
+        //Removes 121 listener
+        listener121.remove()
         Log.d(TAG, "onCleared: MainActivity ViewModel onCleared")
     }
 
@@ -58,7 +62,7 @@ class MainActivityViewModel(
 
     private fun test(username: String){
 
-        dataRepository.setChatListener(username)
+        listener121 = dataRepository.set121ChatListener(username)
             .addSnapshotListener { snapshot, exception ->
                 if (exception != null) {
                     Log.d(TAG, "setChatListener: Error")
@@ -75,7 +79,7 @@ class MainActivityViewModel(
                                 DocumentChange.Type.ADDED -> {
                                     //Log.w(TAG, "Added ${dc.document.data}")
                                     dataRepository.receiveMessage121(dc.document.toObject<MessageNetwork>()
-                                        .convertDomainMessage(Constants.CONVERSATION_TYPE_121))
+                                        .convertDomainMessage121(Constants.CONVERSATION_TYPE_121))
                                 }
                                 //DocumentChange.Type.MODIFIED -> Log.d(TAG, "Modified${dc.document.data}")
                                 //DocumentChange.Type.REMOVED -> Log.d(TAG, "Removed ${dc.document.data}")
@@ -90,6 +94,17 @@ class MainActivityViewModel(
                 }
             }
     }
+
+    fun testSyncFunction() {
+        dataRepository.testSync().addOnSuccessListener {
+            it?.let {
+                Log.d(TAG, "testSyncFunction: ${it.data.toString()}")
+            }
+        }
+    }
+
+
+
 }
 
 //    private fun createNewChat121(con: Conversation) {

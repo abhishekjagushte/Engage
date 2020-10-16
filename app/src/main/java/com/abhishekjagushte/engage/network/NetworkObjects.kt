@@ -46,6 +46,8 @@ class MessageNetwork(
     @ServerTimestamp
     val timeStamp: Date?=null, //this timestamp will be the timestamp while sending the message
 
+    val conversationID: String? = null, //used only for m2m messages
+
     val data: String?=null, //the data of message
     val senderID: String?=null, //the senderID of the message
     val receiverID: String?=null, //the receiverID for the message
@@ -61,7 +63,7 @@ class MessageNetwork(
     val reply_toID: String?=null
 ){
     //TODO this is test function
-    fun convertDomainMessage(type: Int): Message{
+    fun convertDomainMessage121(type: Int): Message{
         return Message(
             messageID = messageID!!,
             timeStamp = System.currentTimeMillis(),
@@ -80,6 +82,27 @@ class MessageNetwork(
             status = Constants.STATUS_RECEIVED_BUT_NOT_READ
         )
     }
+
+    fun convertDomainMessageM2M(conversationID: String): Message{
+        return Message(
+            messageID = messageID!!,
+            timeStamp = System.currentTimeMillis(),
+            conversationID =  conversationID,
+            data = data,
+            mime_type = mime_type,
+            server_url = server_url,
+            latitude = latitude,
+            longitude = longitude,
+            conType = Constants.CONVERSATION_TYPE_M2M,
+            type = Constants.TYPE_OTHER_MSG,
+            needs_push = Constants.NEEDS_PUSH_NO,
+            receiverID = null,
+            senderID = senderID,
+            serverTimestamp = timeStamp!!.time,
+            status = Constants.STATUS_RECEIVED_BUT_NOT_READ
+        )
+    }
+
 }
 
 data class CreateGroupRequest(

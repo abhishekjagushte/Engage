@@ -1,6 +1,7 @@
 package com.abhishekjagushte.engage.workmanager.workers
 
 import android.content.Context
+import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.Worker
 import androidx.work.WorkerParameters
@@ -20,11 +21,15 @@ class PushWorker (
         val task = dataRepository.pushMessage(messageID!!)
         task.await()
 
+        //TODO sending messages to M2M users is implemented but not tested
+
         return if (task.isSuccessful){
             dataRepository.setMessageSent(messageID)
+            Log.i("PushWorker", "success")
             Result.success()
         }
         else{
+            Log.i("PushWorker", "failure")
             Result.failure()
         }
     }

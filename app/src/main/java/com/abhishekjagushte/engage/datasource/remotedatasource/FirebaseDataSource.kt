@@ -86,7 +86,24 @@ class FirebaseDataSource @Inject constructor(
         return query
     }
 
+    fun set121ChatListener(last121MessageTimeStamp: Date, username: String): Query {
+        val query = firestore
+            .collection("messages121")
+            .whereEqualTo("receiverID", username)
+            .whereGreaterThanOrEqualTo("timeStamp", last121MessageTimeStamp)
+
+        return query
+    }
+
     fun getNewConversationIDM2M(): String {
         return firestore.collection("groups").document().id
+    }
+
+    fun setM2MChatListener(conversationID: String, lastMessageTimeStamp: Date): Query {
+        val query = firestore
+            .collection("groups/$conversationID/chats")
+            .whereGreaterThanOrEqualTo("timeStamp", lastMessageTimeStamp)
+
+        return query
     }
 }

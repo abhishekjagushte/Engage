@@ -15,4 +15,10 @@ class FunctionsSource @Inject constructor(
             .call(request)
     }
 
+    fun testSync(): Task<HttpsCallableResult> {
+        return functions.getHttpsCallable(
+            "sync"
+        ).call()
+    }
+
 }

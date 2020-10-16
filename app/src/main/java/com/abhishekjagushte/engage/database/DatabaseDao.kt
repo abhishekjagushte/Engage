@@ -134,4 +134,12 @@ interface DatabaseDao{
     @Query("UPDATE messages SET status = 1 WHERE messageID = :messageID")
     fun setMessageSent(messageID: String)
 
+    @Query("SELECT MAX(timeStamp) FROM messages WHERE conType = 1")//contype 1 = 121
+    fun getLast121MessageTimestamp(): Long
+
+
+    //gets timestamp of last message for a specific m2m con
+    @Query("SELECT MAX(timeStamp) FROM messages WHERE conversationID = :conversationID")
+    fun getLastM2MMessageTimestampForConversation(conversationID: String): Long
+
 }

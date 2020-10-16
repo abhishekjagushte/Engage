@@ -283,9 +283,10 @@ class LocalDataSource @Inject constructor (
         message: String,
         conversationID: String,
         replyToId: String?
-    ){
+    ): String {
+        val messageID = firestore.collection("groups/${conversationID}/chats").document().id
         val msg = Message(
-            messageID = firestore.collection("groups/${conversationID}/chats").document().id,
+            messageID = messageID,
             conversationID = conversationID,
             type = Constants.TYPE_MY_MSG,
             status = Constants.STATUS_NOT_SENT,
@@ -302,6 +303,8 @@ class LocalDataSource @Inject constructor (
         )
 
         databaseDao.insertMessage(msg)
+
+        return messageID
     }
 
     fun addConversationM2M(name: String, conversationID: String) {
@@ -325,6 +328,14 @@ class LocalDataSource @Inject constructor (
 
     fun getMessageNotification(messageID: String): MessageNotificationView {
         return databaseDao.getMessageNotification(messageID)
+    }
+
+    fun getLast121MessageTimestamp(): Long {
+        return databaseDao.getLast121MessageTimestamp()
+    }
+
+    fun getLastM2MMessageTimestampForConversation(conversationID: String): Long {
+        return databaseDao.getLastM2MMessageTimestampForConversation(conversationID)
     }
 
 

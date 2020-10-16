@@ -7,12 +7,14 @@ import androidx.lifecycle.ViewModel
 import androidx.paging.DataSource
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
-import androidx.work.WorkManager
+import androidx.work.*
 import com.abhishekjagushte.engage.database.views.MessageView
 import com.abhishekjagushte.engage.database.entities.Conversation
 import com.abhishekjagushte.engage.repository.DataRepository
 import com.abhishekjagushte.engage.ui.chat.screens.chat.fragments.chatscreen.ChatDataItem
 import com.abhishekjagushte.engage.utils.Constants
+import com.abhishekjagushte.engage.workmanager.workers.PushWorker
+import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.*
 import javax.inject.Inject
 
@@ -28,6 +30,15 @@ class ChatViewModel @Inject constructor(
     private val dataRepository: DataRepository,
     private val workManager: WorkManager
 ) : ViewModel(){
+
+    var listenerRegistration: ListenerRegistration? = null
+
+    override fun onCleared() {
+        super.onCleared()
+
+        Log.d(TAG, "onCleared: Chat viewmodel cleared")
+        listenerRegistration?.remove()
+    }
 
     private var _conversationID = MutableLiveData<String>()
     val conversationID : LiveData<String>
@@ -75,6 +86,11 @@ class ChatViewModel @Inject constructor(
                     else{
                         _chatType.postValue(ChatType.CHAT_TYPE_M2M)
                         //TODO : setUIM2M(conversation)
+
+                        //Sets the listener
+                        Log.d(TAG, "setupScreen: $conversationID")
+                        setM2MChatListener(conversationID)
+
                         Log.d(TAG, "setupScreen: Type M2M")
                     }
 
@@ -167,7 +183,7 @@ class ChatViewModel @Inject constructor(
                         conversationID.value!! //For 121 username = conversationID
                     )
 
-
+                    setUpPushWorker(messageID)
                 }
                 else {
                     Log.d(TAG, "sendTextMessage121: sent")
@@ -178,6 +194,8 @@ class ChatViewModel @Inject constructor(
                         myUsername!!,
                         conversationID.value!!
                     )
+
+                    setUpPushWorker(messageID)
                 }
             }
         }
@@ -187,7 +205,8 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             withContext(Dispatchers.IO){
                 Log.d(TAG, "sendTextMessageM2M: ${conversationID.value}")
-                dataRepository.saveTextMessageM2M(message, conversationID.value!!, replyToId)
+                val messageID = dataRepository.saveTextMessageM2M(message, conversationID.value!!, replyToId)
+                setUpPushWorker(messageID)
             }
         }
     }
@@ -199,6 +218,31 @@ class ChatViewModel @Inject constructor(
             }
         }
     }
+
+
+    private fun setUpPushWorker(messageID: String)
+    {
+        val data = Data.Builder().putString(Constants.MESSAGE_ID, messageID).build()
+
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .setRequiresCharging(false)
+            .build()
+
+        val pushWorker = OneTimeWorkRequestBuilder<PushWorker>()
+            .setInputData(data)
+            .setConstraints(constraints)
+            .build()
+
+        workManager.enqueue(pushWorker)
+    }
+
+
+    private fun setM2MChatListener(conversationID: String){
+        listenerRegistration = dataRepository.setM2MChatListener(conversationID)
+    }
+
+
 }
 
 
