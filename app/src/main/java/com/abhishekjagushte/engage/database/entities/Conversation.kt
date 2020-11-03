@@ -67,3 +67,8 @@ data class CommonGroups(
     )
     var groups: List<Conversation>
 )
+
+data class M2MSyncRequirement(
+    var conversationID: String,
+    var lastMessageTimeStamp: Long
+)

@@ -76,7 +76,7 @@ class ProfileFragmentViewModel @Inject constructor(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val myDetails = dataRepository.getMydetails()
-                val request = hashMapOf(
+                val request = hashMapOf<String, Any>(
                     "senderID" to myDetails!!.username,
                     "senderName" to myDetails.name,
                     "receiverID" to profileDisplay.value!!.username,

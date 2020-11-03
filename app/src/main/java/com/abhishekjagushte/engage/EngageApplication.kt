@@ -1,21 +1,22 @@
 package com.abhishekjagushte.engage
 
 import android.app.Application
-import androidx.work.Configuration
+import androidx.work.*
 import com.abhishekjagushte.engage.di.AppComponent
 import com.abhishekjagushte.engage.di.DaggerAppComponent
 import com.abhishekjagushte.engage.workmanager.factories.EngageWorkerFactory
+import com.abhishekjagushte.engage.workmanager.workers.SyncWorker
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class EngageApplication : Application(), Configuration.Provider {
 
     @Inject lateinit var engageWorkerFactory: EngageWorkerFactory
+    @Inject lateinit var workManager: WorkManager
 
-    val appComponent: AppComponent by lazy {
-        initializeComponent()
-    }
+    lateinit var appComponent: AppComponent
 
-    fun initializeComponent(): AppComponent {
+    private fun initializeComponent(): AppComponent {
         // Creates an instance of AppComponent using its Factory constructor
         // We pass the applicationContext that will be used as Context in the graph
         val component =  DaggerAppComponent.factory().create(this)
@@ -28,6 +29,19 @@ class EngageApplication : Application(), Configuration.Provider {
             .setMinimumLoggingLevel(android.util.Log.INFO)
             .setWorkerFactory(engageWorkerFactory)
             .build()
+
+
+    override fun onCreate() {
+        super.onCreate()
+        appComponent = initializeComponent()
+        setUpSyncWorker()
+    }
+
+    private fun setUpSyncWorker(){
+        val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+        val syncWorker = PeriodicWorkRequestBuilder<SyncWorker>(15, TimeUnit.MINUTES).setConstraints(constraints).build()
+        workManager.enqueueUniquePeriodicWork("EngageSync", ExistingPeriodicWorkPolicy.KEEP, syncWorker)
+    }
 
 }
 

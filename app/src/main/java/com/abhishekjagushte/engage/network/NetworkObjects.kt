@@ -63,7 +63,7 @@ class MessageNetwork(
     val reply_toID: String?=null
 ){
     //TODO this is test function
-    fun convertDomainMessage121(type: Int): Message{
+    fun convertDomainMessage121(): Message{
         return Message(
             messageID = messageID!!,
             timeStamp = System.currentTimeMillis(),
@@ -73,7 +73,7 @@ class MessageNetwork(
             server_url = server_url,
             latitude = latitude,
             longitude = longitude,
-            conType = type,
+            conType = Constants.CONVERSATION_TYPE_121,
             type = Constants.TYPE_OTHER_MSG,
             needs_push = Constants.NEEDS_PUSH_NO,
             receiverID = receiverID,

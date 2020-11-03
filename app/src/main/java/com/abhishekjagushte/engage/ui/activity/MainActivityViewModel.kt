@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import com.abhishekjagushte.engage.database.entities.Message
 import com.abhishekjagushte.engage.network.MessageNetwork
 import com.abhishekjagushte.engage.repository.DataRepository
-import com.abhishekjagushte.engage.utils.Constants
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.ktx.toObject
@@ -17,7 +16,7 @@ class MainActivityViewModel(
 ): ViewModel(){
 
     private val TAG = "MainActivityViewModel"
-    private lateinit var listener121: ListenerRegistration
+    private var listener121: ListenerRegistration?=null
 
 
     val job: Job = Job()
@@ -35,7 +34,7 @@ class MainActivityViewModel(
         super.onCleared()
 
         //Removes 121 listener
-        listener121.remove()
+        listener121?.remove()
         Log.d(TAG, "onCleared: MainActivity ViewModel onCleared")
     }
 
@@ -62,10 +61,10 @@ class MainActivityViewModel(
 
     private fun test(username: String){
 
-        listener121 = dataRepository.set121ChatListener(username)
+        listener121 = dataRepository.getLatestChats121Query(username)
             .addSnapshotListener { snapshot, exception ->
                 if (exception != null) {
-                    Log.d(TAG, "setChatListener: Error")
+                    Log.d(TAG, "setChatListener: Error ${exception.stackTrace}")
                     return@addSnapshotListener
                 }
                 snapshot?.let {
@@ -79,7 +78,7 @@ class MainActivityViewModel(
                                 DocumentChange.Type.ADDED -> {
                                     //Log.w(TAG, "Added ${dc.document.data}")
                                     dataRepository.receiveMessage121(dc.document.toObject<MessageNetwork>()
-                                        .convertDomainMessage121(Constants.CONVERSATION_TYPE_121))
+                                        .convertDomainMessage121())
                                 }
                                 //DocumentChange.Type.MODIFIED -> Log.d(TAG, "Modified${dc.document.data}")
                                 //DocumentChange.Type.REMOVED -> Log.d(TAG, "Removed ${dc.document.data}")

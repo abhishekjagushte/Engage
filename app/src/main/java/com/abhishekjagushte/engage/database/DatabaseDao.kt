@@ -142,4 +142,6 @@ interface DatabaseDao{
     @Query("SELECT MAX(timeStamp) FROM messages WHERE conversationID = :conversationID")
     fun getLastM2MMessageTimestampForConversation(conversationID: String): Long
 
+    @Query("SELECT conversations.conversationID, timeStamp FROM conversations INNER JOIN messages ON conversations.lastMessageID == messages.messageID AND conversations.type =2 ")
+    fun getM2MSyncRequirement(): List<M2MSyncRequirement>
 }

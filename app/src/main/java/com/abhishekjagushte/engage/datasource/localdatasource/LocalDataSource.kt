@@ -338,5 +338,9 @@ class LocalDataSource @Inject constructor (
         return databaseDao.getLastM2MMessageTimestampForConversation(conversationID)
     }
 
+    fun getM2MSyncMap(): List<M2MSyncRequirement> {
+        return databaseDao.getM2MSyncRequirement()
+    }
+
 
 }

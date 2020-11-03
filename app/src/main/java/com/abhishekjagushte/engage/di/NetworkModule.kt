@@ -20,9 +20,8 @@ class NetworkModule (){
 
         val firestore = FirebaseFirestore.getInstance()
         val settings = FirebaseFirestoreSettings.Builder()
-            .setTimestampsInSnapshotsEnabled(true)
             .build()
-        firestore.setFirestoreSettings(settings)
+        firestore.firestoreSettings = settings
         return firestore
     }
 

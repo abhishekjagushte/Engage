@@ -4,6 +4,9 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.abhishekjagushte.engage.repository.DataRepository
+import com.abhishekjagushte.engage.sync.M2MChatsSynchronizer
+import com.abhishekjagushte.engage.sync.One21Synchronizer
+import java.lang.Exception
 
 class SyncWorker(
     context: Context,
@@ -12,6 +15,17 @@ class SyncWorker(
 ): CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
-        TODO("Not yet implemented")
+        try {
+            val m2MChatsSynchronizer = M2MChatsSynchronizer(dataRepository)
+            m2MChatsSynchronizer.synchronize()
+            val one21Synchronizer = One21Synchronizer(dataRepository)
+            one21Synchronizer.synchronize()
+
+            return Result.success()
+
+        }catch (e: Exception){
+            e.printStackTrace()
+            return Result.retry()
+        }
     }
 }

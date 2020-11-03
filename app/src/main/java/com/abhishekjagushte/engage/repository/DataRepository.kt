@@ -4,11 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.DataSource
-import com.abhishekjagushte.engage.database.*
-import com.abhishekjagushte.engage.database.entities.Contact
-import com.abhishekjagushte.engage.database.entities.ContactNameUsername
-import com.abhishekjagushte.engage.database.entities.Conversation
-import com.abhishekjagushte.engage.database.entities.Message
+import com.abhishekjagushte.engage.database.entities.*
 import com.abhishekjagushte.engage.database.views.ConversationView
 import com.abhishekjagushte.engage.database.views.MessageNotificationView
 import com.abhishekjagushte.engage.database.views.MessageView
@@ -32,11 +28,9 @@ import com.google.firebase.firestore.*
 import com.google.firebase.functions.HttpsCallableResult
 import com.google.firebase.iid.InstanceIdResult
 import kotlinx.coroutines.*
-import kotlinx.coroutines.tasks.await
 import org.json.JSONObject
 import java.util.*
 import javax.inject.Inject
-import kotlin.collections.HashMap
 
 class DataRepository @Inject constructor(
     private val authDataSource: FirebaseAuthDataSource,
@@ -391,6 +385,20 @@ class DataRepository @Inject constructor(
 
 
     ///////////////////////////////////////////////////////////////////////////
+    // Sync
+    ///////////////////////////////////////////////////////////////////////////
+
+
+    fun getM2MSyncMap(): List<M2MSyncRequirement> {
+        return localDataSource.getM2MSyncMap()
+    }
+
+    fun syncM2MChat(syncMap: M2MSyncRequirement): Task<QuerySnapshot> {
+        return  firebaseDataSource.syncM2MChat(syncMap)
+    }
+
+
+    ///////////////////////////////////////////////////////////////////////////
     // Notifications
     ///////////////////////////////////////////////////////////////////////////
 
@@ -424,7 +432,7 @@ class DataRepository @Inject constructor(
         return firebaseDataSource.setChatListener(username)
     }
 
-    fun set121ChatListener(username: String): Query {
+    fun getLatestChats121Query(username: String): Query {
         val timestamp = localDataSource.getLast121MessageTimestamp()
         val last121MessageTimeStamp = Date(timestamp)
 
@@ -459,18 +467,3 @@ class DataRepository @Inject constructor(
     }
 
 }
-
-
-//        firestore.collection("users").document().set(profile)
-//            .addOnCompleteListener(OnCompleteListener { task ->
-//                if (task.isSuccessful) {
-//
-//                    uiScope.launch {
-//                        addDataLocal(profile.convertDomainObject(0))
-//                        Log.d(TAG, "Completed")
-//                    }
-//
-//                } else {
-//                    Log.d(TAG, "Failed")
-//                }
-//            })

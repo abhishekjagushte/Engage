@@ -1,6 +1,7 @@
 package com.abhishekjagushte.engage.datasource.remotedatasource
 
 import android.util.Log
+import com.abhishekjagushte.engage.database.entities.M2MSyncRequirement
 import com.abhishekjagushte.engage.network.DateTest
 import com.abhishekjagushte.engage.utils.Constants
 import com.google.android.gms.tasks.Task
@@ -105,5 +106,13 @@ class FirebaseDataSource @Inject constructor(
             .whereGreaterThanOrEqualTo("timeStamp", lastMessageTimeStamp)
 
         return query
+    }
+
+    fun syncM2MChat(syncMap: M2MSyncRequirement): Task<QuerySnapshot> {
+        val query = firestore
+            .collection("groups/${syncMap.conversationID}/chats")
+            .whereGreaterThanOrEqualTo("timeStamp", Date(syncMap.lastMessageTimeStamp))
+
+        return query.get()
     }
 }
