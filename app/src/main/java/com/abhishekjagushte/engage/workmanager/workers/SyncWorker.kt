@@ -9,16 +9,16 @@ import com.abhishekjagushte.engage.sync.One21Synchronizer
 import java.lang.Exception
 
 class SyncWorker(
-    context: Context,
+    private val context: Context,
     workerParams: WorkerParameters,
     private val dataRepository: DataRepository
 ): CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
         try {
-            val m2MChatsSynchronizer = M2MChatsSynchronizer(dataRepository)
+            val m2MChatsSynchronizer = M2MChatsSynchronizer(dataRepository, context)
             m2MChatsSynchronizer.synchronize()
-            val one21Synchronizer = One21Synchronizer(dataRepository)
+            val one21Synchronizer = One21Synchronizer(dataRepository, context)
             one21Synchronizer.synchronize()
 
             return Result.success()

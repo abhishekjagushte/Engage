@@ -8,7 +8,6 @@ import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.abhishekjagushte.engage.database.entities.*
 import com.abhishekjagushte.engage.database.views.ConversationView
-import com.abhishekjagushte.engage.database.views.M2MSyncRequirementView
 import com.abhishekjagushte.engage.database.views.MessageNotificationView
 import com.abhishekjagushte.engage.database.views.MessageView
 

@@ -74,7 +74,8 @@ class NotificationHandler : FirebaseMessagingService(){
                         withContext(Dispatchers.IO) {
                             //TODO this is testing
                             dataRepository.receiveMessage121(msg)
-                            makeMessageNotification(msg)
+                            //makeMessageNotification(msg)
+                            EngageMessageNotification(dataRepository,applicationContext).makeMessageNotification(msg)
                         }
                     }
                 }
@@ -92,6 +93,7 @@ class NotificationHandler : FirebaseMessagingService(){
                             //TODO this is testing
                             //dataRepository.receiveMessageM2M(msg)
                             //makeMessageNotification(msg)
+                            EngageMessageNotification(dataRepository,applicationContext).makeMessageNotification(msg)
                         }
                     }
                 }
