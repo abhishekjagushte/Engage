@@ -93,6 +93,12 @@ object Constants {
 
     const val I_CREATED_GROUP = "You created this group"
 
+
+
+    //Data transfer constatnts
+    const val IMAGE_KEY: String = "image"
+    const val CONVERSATION_INFO_KEY = "conversationInfo"
+
 }
 
 //Contacts

@@ -38,7 +38,7 @@ class PushWorker (
             }
         }
 
-        Log.d(TAG, "doWork: Returning failure: messageID null")
-        return Result.failure()
+        Log.d(TAG, "doWork: Returning success: no new message to be sent")
+        return Result.success()
     }
 }

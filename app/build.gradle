@@ -113,5 +113,8 @@ dependencies {
     //Workmanager
     implementation "androidx.work:work-runtime-ktx:$work_version"
 
+    //PhotoView
+    implementation 'com.github.chrisbanes:PhotoView:2.3.0'
+
 
 }

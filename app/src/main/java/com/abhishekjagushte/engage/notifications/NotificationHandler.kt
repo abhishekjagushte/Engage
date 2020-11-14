@@ -1,5 +1,6 @@
 package com.abhishekjagushte.engage.notifications
 
+import android.app.ActivityManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -15,13 +16,14 @@ import com.abhishekjagushte.engage.R
 import com.abhishekjagushte.engage.database.entities.Message
 import com.abhishekjagushte.engage.database.views.MessageNotificationView
 import com.abhishekjagushte.engage.repository.DataRepository
+import com.abhishekjagushte.engage.sync.EngageSyncRequest
 import com.abhishekjagushte.engage.utils.Constants
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.*
-import java.lang.IllegalStateException
 import javax.inject.Inject
 import kotlin.random.Random
+
 
 const val TYPE_FR_ACCEPTED = 1
 const val TYPE_FR_RECEIVED = 2
@@ -34,7 +36,7 @@ class NotificationHandler : FirebaseMessagingService(){
     private val TAG = "NotificationHandler"
 
     private val job = Job()
-    private val coroutinScope = CoroutineScope(Dispatchers.Main + job)
+    private val coroutineScope = CoroutineScope(Dispatchers.Main + job)
 
     override fun onNewToken(p0: String) {
         super.onNewToken(p0)
@@ -69,10 +71,11 @@ class NotificationHandler : FirebaseMessagingService(){
                     //Log.d(TAG, "onMessageReceived: ${p0.data.toString()}")
                     val msg = Message.mapToMessage121(p0.data)
                     //Log.d(TAG, "onMessageReceived: " +
-                      //      "${msg.messageID} ${msg.senderID} ${msg.receiverID}")
-                    coroutinScope.launch {
+                    //      "${msg.messageID} ${msg.senderID} ${msg.receiverID}")
+                    coroutineScope.launch {
                         withContext(Dispatchers.IO) {
                             //TODO this is testing
+                            //EngageSyncRequest(dataRepository, applicationContext).one21synchronize()
                             dataRepository.receiveMessage121(msg)
                             //makeMessageNotification(msg)
                             EngageMessageNotification(dataRepository,applicationContext).makeMessageNotification(msg)
@@ -88,12 +91,17 @@ class NotificationHandler : FirebaseMessagingService(){
                 "5" -> {
                     //Log.d(TAG, "onMessageReceived: M2M chat message = ${p0.data}")
                     val msg = Message.mapToMessageM2M(p0.data)
-                    coroutinScope.launch {
-                        withContext(Dispatchers.IO){
+                    coroutineScope.launch {
+                        withContext(Dispatchers.IO) {
                             //TODO this is testing
-                            //dataRepository.receiveMessageM2M(msg)
+                            dataRepository.receiveMessageM2M(msg)
                             //makeMessageNotification(msg)
-                            EngageMessageNotification(dataRepository,applicationContext).makeMessageNotification(msg)
+                            EngageMessageNotification(
+                                dataRepository,
+                                applicationContext
+                            ).makeMessageNotification(
+                                msg
+                            )
                         }
                     }
                 }
@@ -106,7 +114,7 @@ class NotificationHandler : FirebaseMessagingService(){
     //TODO add logic to remove notifications when clicked on them
     private fun makeMessageNotification(message: Message) {
         dataRepository.getNotificationChannelID().addOnSuccessListener {
-            coroutinScope.launch {
+            coroutineScope.launch {
                 withContext(Dispatchers.IO){
                     //Log.d(TAG, "makeMessageNotification: ${message.data}")
 
@@ -123,7 +131,7 @@ class NotificationHandler : FirebaseMessagingService(){
 
 
                     val person = Person.Builder()
-                        .setName(msgNotification.nickname?:msgNotification.senderID)
+                        .setName(msgNotification.nickname ?: msgNotification.senderID)
                         .setKey(message.senderID)
                         .build()
 
@@ -139,7 +147,10 @@ class NotificationHandler : FirebaseMessagingService(){
                     if (message.conType == Constants.CONVERSATION_TYPE_M2M)
                         msgStyle.conversationTitle = msgNotification.name
 
-                    val notification = NotificationCompat.Builder(this@NotificationHandler, it.token)
+                    val notification = NotificationCompat.Builder(
+                        this@NotificationHandler,
+                        it.token
+                    )
                         .setSmallIcon(R.drawable.ic_launcher_foreground)
                         .setStyle(msgStyle)
                         .setContentIntent(pendingIntent)
@@ -184,7 +195,11 @@ class NotificationHandler : FirebaseMessagingService(){
 
             TYPE_FR_RECEIVED -> {
                 val title: String = application.resources.getString(R.string.app_name)
-                val content = application.resources.getString(R.string.FR_received_msg, data.get("name"), data.get("username"))
+                val content = application.resources.getString(
+                    R.string.FR_received_msg, data.get("name"), data.get(
+                        "username"
+                    )
+                )
                 val args = Bundle()
                 args.putString(Constants.ARGUMENT_USERNAME, data.get(Constants.ARGUMENT_USERNAME))
                 args.putString(Constants.ARGUMENT_NAME, data.get(Constants.ARGUMENT_NAME))
@@ -193,7 +208,11 @@ class NotificationHandler : FirebaseMessagingService(){
 
             TYPE_FR_ACCEPTED -> {
                 val title: String = application.resources.getString(R.string.app_name)
-                val content = application.resources.getString(R.string.FR_accepted_msg, data.get("name"), data.get("username"))
+                val content = application.resources.getString(
+                    R.string.FR_accepted_msg, data.get("name"), data.get(
+                        "username"
+                    )
+                )
                 val args = Bundle()
                 args.putString(Constants.ARGUMENT_USERNAME, data.get(Constants.ARGUMENT_USERNAME))
                 args.putString(Constants.ARGUMENT_NAME, data.get(Constants.ARGUMENT_NAME))
@@ -226,7 +245,8 @@ class NotificationHandler : FirebaseMessagingService(){
                 val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    val channel = NotificationChannel(it.token,
+                    val channel = NotificationChannel(
+                        it.token,
                         "Friend Requests",
                         NotificationManager.IMPORTANCE_DEFAULT
                     )
@@ -242,7 +262,7 @@ class NotificationHandler : FirebaseMessagingService(){
         dataRepository.getNotificationChannelID().addOnSuccessListener {
             it?.let {
 
-                coroutinScope.launch {
+                coroutineScope.launch {
                     withContext(Dispatchers.IO){
                         val messages = dataRepository.getUnreadMessages()
 
@@ -276,7 +296,10 @@ class NotificationHandler : FirebaseMessagingService(){
                             if(message.conType == Constants.CONVERSATION_TYPE_M2M)
                                 msgStyle.conversationTitle = message.conversationID
 
-                            val notification = NotificationCompat.Builder(this@NotificationHandler, it.token)
+                            val notification = NotificationCompat.Builder(
+                                this@NotificationHandler,
+                                it.token
+                            )
                                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                                 .setStyle(msgStyle)
                                 .setContentIntent(pendingIntent)
@@ -284,14 +307,19 @@ class NotificationHandler : FirebaseMessagingService(){
                             val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                val channel = NotificationChannel(it.token,
+                                val channel = NotificationChannel(
+                                    it.token,
                                     "Messages",
                                     NotificationManager.IMPORTANCE_DEFAULT
                                 )
                                 manager.createNotificationChannel(channel)
                             }
 
-                            manager.notify(message.messageID, Random(System.currentTimeMillis()).nextInt(1000), notification.build())
+                            manager.notify(
+                                message.messageID, Random(System.currentTimeMillis()).nextInt(
+                                    1000
+                                ), notification.build()
+                            )
                         }
                     }
                 }

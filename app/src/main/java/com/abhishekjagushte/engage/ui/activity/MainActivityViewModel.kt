@@ -1,11 +1,15 @@
 package com.abhishekjagushte.engage.ui.activity
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.abhishekjagushte.engage.database.entities.Message
+import com.abhishekjagushte.engage.listeners.One21Listener
 import com.abhishekjagushte.engage.network.MessageNetwork
 import com.abhishekjagushte.engage.repository.DataRepository
+import com.abhishekjagushte.engage.sync.M2MChatsSynchronizer
+import com.abhishekjagushte.engage.sync.One21Synchronizer
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.ktx.toObject
@@ -48,62 +52,27 @@ class MainActivityViewModel(
         }
     }
 
-    fun testSetMessageListener(){
+    fun set121MessageListener(){
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val details = dataRepository.getMydetails()
                 details?.let {
-                    test(username = it.username)
+                    listener121 =  One21Listener(dataRepository, it.username).set121Listener(it.username)
                 }
             }
         }
     }
 
-    private fun test(username: String){
-
-        listener121 = dataRepository.getLatestChats121Query(username)
-            .addSnapshotListener { snapshot, exception ->
-                if (exception != null) {
-                    Log.d(TAG, "setChatListener: Error ${exception.stackTrace}")
-                    return@addSnapshotListener
-                }
-                snapshot?.let {
-//                                for (doc in snapshot.documents) {
-//                                    Log.d(TAG, "setChatListener: ${doc.data}")
-//                                }
-                viewModelScope.launch {
-                    withContext(Dispatchers.IO){
-                        for (dc in snapshot.documentChanges) {
-                            when (dc.type) {
-                                DocumentChange.Type.ADDED -> {
-                                    //Log.w(TAG, "Added ${dc.document.data}")
-                                    dataRepository.receiveMessage121(dc.document.toObject<MessageNetwork>()
-                                        .convertDomainMessage121())
-                                }
-                                //DocumentChange.Type.MODIFIED -> Log.d(TAG, "Modified${dc.document.data}")
-                                //DocumentChange.Type.REMOVED -> Log.d(TAG, "Removed ${dc.document.data}")
-                            }
-//                        Log.d(TAG, "test: ${dc.data}")
-                        }
-                    }
-                }
-
-
-                    //Log.d(TAG, "testSetMessageListener: ${snapshot.documents.size}")
-                }
-            }
-    }
-
-    fun testSyncFunction() {
-        dataRepository.testSync().addOnSuccessListener {
-            it?.let {
-                Log.d(TAG, "testSyncFunction: ${it.data.toString()}")
+    fun testSyncFunction(context: Context) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO){
+                val m2MChatsSynchronizer = M2MChatsSynchronizer(dataRepository, context)
+                m2MChatsSynchronizer.synchronize()
+                val one21Synchronizer = One21Synchronizer(dataRepository, context)
+                one21Synchronizer.synchronize()
             }
         }
     }
-
-
-
 }
 
 //    private fun createNewChat121(con: Conversation) {

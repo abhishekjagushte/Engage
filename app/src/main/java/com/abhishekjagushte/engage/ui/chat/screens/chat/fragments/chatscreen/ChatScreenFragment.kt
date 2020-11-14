@@ -1,19 +1,27 @@
 package com.abhishekjagushte.engage.ui.chat.screens.chat.fragments.chatscreen
 
+import android.app.Activity.RESULT_OK
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.AbsListView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.abhishekjagushte.engage.EngageApplication
 import com.abhishekjagushte.engage.R
+import com.abhishekjagushte.engage.models.ConversationInfo
 import com.abhishekjagushte.engage.ui.chat.screens.chat.ChatFragment
 import com.abhishekjagushte.engage.ui.chat.screens.chat.ChatType
 import com.abhishekjagushte.engage.ui.chat.screens.chat.ChatViewModel
+import com.abhishekjagushte.engage.utils.Constants
+import com.abhishekjagushte.engage.utils.ImageUtil
 import kotlinx.android.synthetic.main.fragment_chat_screen.*
 
 
@@ -24,6 +32,9 @@ class ChatScreenFragment : Fragment(R.layout.fragment_chat_screen) {
     private lateinit var chatsAdapter: ChatsAdapter
 
     var isScrolling = false
+
+    val REQUEST_IMAGE_CAPTURE = 1
+    val IMAGE_PICK_CODE = 1000
 
     //TODO
     val scrollListener = object : RecyclerView.OnScrollListener(){
@@ -57,7 +68,6 @@ class ChatScreenFragment : Fragment(R.layout.fragment_chat_screen) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         SharedViewModel = (parentFragment as ChatFragment).viewModel
-
         //Setting shared viewmodel in this fragment's viewmodel
 
         val linearLayoutManager = LinearLayoutManager(context)
@@ -87,6 +97,11 @@ class ChatScreenFragment : Fragment(R.layout.fragment_chat_screen) {
                 }
         })
 
+        setSendButtonListener()
+        setAttachmentButtonListener()
+    }
+
+    private fun setSendButtonListener(){
         send_button.setOnClickListener {
             val message = message_input.text.toString().trim()
             if(!message.isEmpty()) {
@@ -103,6 +118,44 @@ class ChatScreenFragment : Fragment(R.layout.fragment_chat_screen) {
             }
         }
     }
+
+    private fun setAttachmentButtonListener(){
+        attachment_button.setOnClickListener {
+            val intent = Intent(Intent.ACTION_PICK)
+            intent.type = "image/*"
+            startActivityForResult(intent, IMAGE_PICK_CODE)
+        }
+    }
+
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(resultCode==RESULT_OK)
+        when(requestCode){
+            IMAGE_PICK_CODE -> handleImageSelected(data!!.data!!)
+        }
+    }
+
+
+    private fun handleImageSelected(uri: Uri){
+        val imageUtil = ImageUtil(requireActivity(), uri)
+        imageUtil.resolveBitmap()
+
+        //Get the compressed byte array to be sent to next fragment
+        val arr = imageUtil.getCompressedImageByteArray()
+
+        val bundle = Bundle()
+        bundle.putByteArray(Constants.IMAGE_KEY, arr)
+        bundle.putParcelable(Constants.CONVERSATION_INFO_KEY, ConversationInfo(
+            conversationID = SharedViewModel.conversationID.value!!,
+            conType = if (SharedViewModel.chatType.value==ChatType.CHAT_TYPE_121) 1 else 2,
+            receiverID = if (SharedViewModel.chatType.value==ChatType.CHAT_TYPE_121) SharedViewModel.conversationID.value!! else null,
+            replyToMessageID = null //TODO change to a certian message id this when you implementemt reply to message
+        ))
+
+        Navigation.findNavController(this.requireView()).navigate(R.id.action_chatFragment_to_imagePreviewFragment, bundle)
+    }
+
 
     //Sets all messages read by me
     private fun markMessagesRead() {

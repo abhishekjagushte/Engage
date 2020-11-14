@@ -1,6 +1,7 @@
 package com.abhishekjagushte.engage.workmanager.workers
 
 import android.content.Context
+import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.abhishekjagushte.engage.repository.DataRepository
@@ -13,19 +14,18 @@ class SyncWorker(
     workerParams: WorkerParameters,
     private val dataRepository: DataRepository
 ): CoroutineWorker(context, workerParams) {
+    private val TAG = "SyncWorker"
 
     override suspend fun doWork(): Result {
-        try {
-            val m2MChatsSynchronizer = M2MChatsSynchronizer(dataRepository, context)
-            m2MChatsSynchronizer.synchronize()
-            val one21Synchronizer = One21Synchronizer(dataRepository, context)
-            one21Synchronizer.synchronize()
+        val m2MChatsSynchronizer = M2MChatsSynchronizer(dataRepository, context)
+        m2MChatsSynchronizer.synchronize()
 
-            return Result.success()
+        val one21Synchronizer = One21Synchronizer(dataRepository, context)
+        one21Synchronizer.synchronize()
 
-        }catch (e: Exception){
-            e.printStackTrace()
-            return Result.retry()
-        }
+        Log.d(TAG, "doWork: Inside SyncWorker")
+
+        return Result.success()
+
     }
 }

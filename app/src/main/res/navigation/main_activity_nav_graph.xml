@@ -74,6 +74,9 @@
         <argument
             android:name="conversationID"
             app:argType="string" />
+        <action
+            android:id="@+id/action_chatFragment_to_imagePreviewFragment"
+            app:destination="@id/imagePreviewFragment" />
     </fragment>
 
     <fragment
@@ -171,5 +174,10 @@
             app:destination="@id/chatFragment"
             app:popUpTo="@id/chatListFragment" />
     </navigation>
+    <fragment
+        android:id="@+id/imagePreviewFragment"
+        android:name="com.abhishekjagushte.engage.ui.chat.screens.chat.fragments.chatscreen.features.attachment.images.ImagePreviewFragment"
+        android:label="fragment_image_preview"
+        tools:layout="@layout/fragment_image_preview" />
 
 </navigation>

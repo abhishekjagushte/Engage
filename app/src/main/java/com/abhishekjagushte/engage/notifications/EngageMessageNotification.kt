@@ -32,7 +32,7 @@ class EngageMessageNotification(
         dataRepository.getNotificationChannelID().addOnSuccessListener {
             coroutineScope.launch {
                 withContext(Dispatchers.IO){
-                    //Log.d(TAG, "makeMessageNotification: ${message.data}")
+                    Log.d(TAG, "makeMessageNotification: ${message.data}")
 
                     val msgNotification = dataRepository.getMessageNotification(message.messageID)
 
@@ -45,6 +45,8 @@ class EngageMessageNotification(
                         .setArguments(args)
                         .createPendingIntent()
 
+
+                    //TODO Gives error at this stage because of the first message sent out by one creating the group
 
                     val person = Person.Builder()
                         .setName(msgNotification.nickname?:msgNotification.senderID)
