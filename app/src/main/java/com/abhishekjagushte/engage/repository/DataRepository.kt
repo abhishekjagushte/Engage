@@ -286,6 +286,10 @@ class DataRepository @Inject constructor(
         return localDataSource.saveTextMessage121Local(message, conversationID, myUsername, otherUsername)
     }
 
+    fun saveImageMessage(message: Message) {
+        localDataSource.saveImageMessage(message)
+    }
+
     fun saveTextMessageM2M(
         message: String,
         conversationID: String,
@@ -465,5 +469,7 @@ class DataRepository @Inject constructor(
     fun testSync(): Task<HttpsCallableResult> {
         return functionsSource.testSync()
     }
+
+
 
 }

@@ -30,7 +30,6 @@ class ChatListFragment : Fragment() {
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
-
     lateinit var appBar: AppBarLayout
     lateinit var toolbar: Toolbar
     private lateinit var chatListAdapter: ChatListAdapter

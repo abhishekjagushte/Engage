@@ -72,6 +72,7 @@ object Constants {
 
     //MIME Types
     const val MIME_TYPE_TEXT = "text/plain"
+    const val MIME_TYPE_IMAGE_JPEG = "image/jpeg"
 
     //Conversation types
     const val CONVERSATION_TYPE_121 = 1
@@ -97,7 +98,21 @@ object Constants {
 
     //Data transfer constatnts
     const val IMAGE_KEY: String = "image"
+    const val IMAGE_URI_KEY = "image_uri"
     const val CONVERSATION_INFO_KEY = "conversationInfo"
+
+    //Permissions
+    const val WRITE_PERMISSION_REQUEST_CODE = 100
+    // Request code for creating a PDF document.
+    const val CREATE_FILE = 1
+
+    //Storage Paths
+    const val IMAGE_SENT_STORAGE_PATH = "/Engage/Media/Engage Images/Sent"
+
+    //Firebase cloud storage paths
+    const val MEDIA_121_IMAGES = "media121/Images"
+    const val MEDIA_M2M_ROOT = "groups/"
+    const val MEDIA_M2M_IMAGES = "Images/"
 
 }
 

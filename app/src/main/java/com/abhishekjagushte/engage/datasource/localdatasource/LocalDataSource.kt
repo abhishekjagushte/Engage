@@ -343,4 +343,9 @@ class LocalDataSource @Inject constructor (
     }
 
 
+    fun saveImageMessage(message: Message) {
+        //TODO set the messageID for message first
+        TODO("Save in local storage")
+    }
+
 }

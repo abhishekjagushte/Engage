@@ -138,21 +138,14 @@ class ChatScreenFragment : Fragment(R.layout.fragment_chat_screen) {
 
 
     private fun handleImageSelected(uri: Uri){
-        val imageUtil = ImageUtil(requireActivity(), uri)
-        imageUtil.resolveBitmap()
-
-        //Get the compressed byte array to be sent to next fragment
-        val arr = imageUtil.getCompressedImageByteArray()
-
         val bundle = Bundle()
-        bundle.putByteArray(Constants.IMAGE_KEY, arr)
+        bundle.putString(Constants.IMAGE_URI_KEY, uri.toString())
         bundle.putParcelable(Constants.CONVERSATION_INFO_KEY, ConversationInfo(
             conversationID = SharedViewModel.conversationID.value!!,
             conType = if (SharedViewModel.chatType.value==ChatType.CHAT_TYPE_121) 1 else 2,
             receiverID = if (SharedViewModel.chatType.value==ChatType.CHAT_TYPE_121) SharedViewModel.conversationID.value!! else null,
             replyToMessageID = null //TODO change to a certian message id this when you implementemt reply to message
         ))
-
         Navigation.findNavController(this.requireView()).navigate(R.id.action_chatFragment_to_imagePreviewFragment, bundle)
     }
 

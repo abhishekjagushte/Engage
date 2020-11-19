@@ -16,7 +16,7 @@ class ImageUtil (
     private val activity: Activity,
     private val uri: Uri?
 ){
-    private var image: Bitmap?=null
+    var image: Bitmap?=null
     private val TAG = "ImageUtil"
 
     private fun getBitmapLegacy(uri: Uri, contentResolver: ContentResolver): Bitmap {
@@ -29,15 +29,17 @@ class ImageUtil (
         return ImageDecoder.decodeBitmap(source)
     }
 
-    fun resolveBitmap(){
+    fun resolveBitmap(): Bitmap?{
         val contentResolver = activity.contentResolver!!
         if(uri!=null){
             Log.d(TAG, "resolveBitmap: URI is $uri")
             if(Build.VERSION.SDK_INT < 28) {
                 image = getBitmapLegacy(uri, contentResolver)
+                return image
             }
             else{
                 image = getBitmap(uri, contentResolver)
+                return image
             }
         }
         else{

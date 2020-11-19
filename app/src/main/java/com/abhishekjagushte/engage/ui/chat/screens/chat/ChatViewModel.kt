@@ -48,7 +48,6 @@ class ChatViewModel @Inject constructor(
     val conversation : LiveData<Conversation>
         get() = _conversation
 
-
     private var myUsername: String?=null//set up in setupScreen
 
     private val TAG = "ChatViewModel"
@@ -126,7 +125,6 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-
     fun setUI121(conversation: Conversation){
         TODO("Set the conversation name etc on the page")
     }
@@ -140,8 +138,8 @@ class ChatViewModel @Inject constructor(
     }
 
     //If a conversationID already exists then it will be fetched while login and will be fetched automatically
-    //this funct is called only when there isn't a conID present already so i can create a new one over here
-    // and then make a converstaion by sending the conversationid from here in firebase
+    //this function is called only when there isn't a conID present already so i can create a new one over here
+    // and then make a conversation by sending the conversationid from here in firebase
 
     private fun createNewConversation121(username: String){
         dataRepository.addConversation121(username)
@@ -211,7 +209,7 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    fun markMessagesRead() {
+    fun markMessagesRead(){
         viewModelScope.launch {
             withContext(Dispatchers.IO){
                 dataRepository.markMessagesRead(conversationID.value!!)
@@ -220,8 +218,7 @@ class ChatViewModel @Inject constructor(
     }
 
 
-    private fun setUpPushWorker(messageID: String)
-    {
+    private fun setUpPushWorker(messageID: String) {
         val data = Data.Builder().putString(Constants.MESSAGE_ID, messageID).build()
 
         val constraints = Constraints.Builder()
@@ -237,106 +234,7 @@ class ChatViewModel @Inject constructor(
         workManager.enqueue(pushWorker)
     }
 
-
     private fun setM2MChatListener(conversationID: String){
         listenerRegistration = dataRepository.setM2MChatListener(conversationID)
     }
-
-
 }
-
-
-/*
-
-    private fun getConversationIDFromUsername(username: String?) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO){
-                //Sets the myUsername here
-                myUsername = dataRepository.getMydetails()!!.username
-                val conID = dataRepository.getConversationIDFromUsername(username = username!!)
-                if(conID == null){
-                    _chatState.postValue(ChatState.NEW)
-                    Log.d(TAG, "getConversationIDFromUsername: Worked")
-                }
-                else{
-                    conversationID = conID
-                    _chatState.postValue(ChatState.EXISTING)
-                }
-            }
-        }
-    }
-
-private fun createNewChat121(username: String) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO){
-                val u = dataRepository.getMydetails()!!.username
-
-                dataRepository.createNewChat121(hashMapOf(
-                    "myID" to u,
-                    "otherID" to username
-                )).addOnCompleteListener {
-                    if(it.isSuccessful)
-                    {
-                        val res = (it.result!!.data as HashMap<*, *>).get("conversationID")
-                        Log.d(TAG, "createTestNewChat: $res is the new conversationID")
-                    }
-                }
-            }
-        }
-    }
-
-
-     //TODO tested with jio and wifi the delay is not that high enough to switch to listener
-    fun setChatListener(conversationID: String){
-        listener = dataRepository.setChatListener(conversationID).addSnapshotListener{ snapshot, exception ->
-            if(exception!=null){
-                Log.d(TAG, "setChatListener: Error")
-                return@addSnapshotListener
-            }
-
-            snapshot?.let {
-                for(doc in snapshot.documents) {
-                    Log.d(TAG, "setChatListener: ${doc.data}")
-                }
-            }
-        }
-    }
-
-
-
-    fun sendTextMessage121(message: String){
-        viewModelScope.launch {
-            withContext(Dispatchers.IO){
-                //new is only possible when chat type is 121
-                if(chatState.value == ChatState.NEW){
-                    //createNewChat121(username!!) //suspend function sets the conversationID
-
-                    //conversationID is username
-                    createNewConversation121(conversationID.value!!)
-
-                    Log.d(TAG, "sendMessage: The conversationID created and it is ${conversationID}")
-                    _chatState.postValue(ChatState.EXISTING)
-
-                    dataRepository.saveTextMessage121Local(
-                        message,
-                        conversationID.value!!,
-                        myUsername!!,
-                        conversationID.value!! //For 121 username = conversationID
-                    )
-                }
-                else {
-                    Log.d(TAG, "sendTextMessage121: sent")
-                    //sets the livedata for chats once the conversationID is initialized
-                    dataRepository.saveTextMessage121Local(
-                        message,
-                        conversationID.value!!,
-                        myUsername!!,
-                        conversationID.value!!
-                    )
-                }
-            }
-        }
-    }
-
-
- */

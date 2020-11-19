@@ -9,6 +9,7 @@ import com.abhishekjagushte.engage.ui.chat.screens.chat.fragments.chatscreen.di.
 import com.abhishekjagushte.engage.ui.chat.screens.chat.fragments.eventscreen.di.EventComponent
 import com.abhishekjagushte.engage.ui.activity.MainActivity
 import com.abhishekjagushte.engage.ui.activity.MainComponent
+import com.abhishekjagushte.engage.ui.chat.screens.chat.fragments.chatscreen.features.attachment.images.ImagePreviewFragment
 import com.abhishekjagushte.engage.ui.fragments.ContactListFragment
 import com.abhishekjagushte.engage.ui.main.screens.creategroup.addparticipants.di.AddParticipantsComponent
 import com.abhishekjagushte.engage.ui.main.screens.chatlist.di.ChatListComponent
@@ -43,6 +44,7 @@ interface AppComponent: AndroidInjector<EngageApplication>{
     fun inject(mainActivity: MainActivity)
     fun inject(testFragment: TestFragment)
     fun inject(contactListFragment: ContactListFragment)
+    fun inject(imagePreviewFragment: ImagePreviewFragment)
 
     fun addParticipantsComponent(): AddParticipantsComponent.Factory
     fun addMainComponent(): MainComponent.Factory
