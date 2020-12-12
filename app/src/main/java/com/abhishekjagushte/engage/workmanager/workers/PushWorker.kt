@@ -19,26 +19,32 @@ class PushWorker (
     private lateinit var task: Task<Void>
     private val TAG = "Pushworker"
 
+    //earlier this was used to send messages everytime, but i observeed that even if messages are sent while
+    //being offline, when back online again, they are sent so this is only requred when the app is not active, so this will be a periodic task
+
     override suspend fun doWork(): Result {
-        val messageID = inputData.getString(Constants.MESSAGE_ID)
-
-        messageID?.let{
-            task = dataRepository.pushMessage(messageID)
-            task.await()
-            //TODO sending messages to M2M users is implemented but not tested
-
-            return if (task.isSuccessful){
-                dataRepository.setMessageSent(messageID)
-                Log.i("PushWorker", "success")
-                Result.success()
-            }
-            else{
-                Log.i("PushWorker", "failure")
-                Result.failure()
+        val unsentMessages = dataRepository.getUnsentMessages()
+        for(msg in unsentMessages){
+            val messageID = msg.messageID
+            messageID.let{
+                task = dataRepository.pushMessage(messageID)
+                task.await()
+                //TODO sending messages to M2M users is implemented but not tested
+                return if (task.isSuccessful){
+                    dataRepository.setMessageSent(messageID)
+                    Log.i("PushWorker", "success")
+                    Result.success()
+                } else{
+                    Log.i("PushWorker", "failure")
+                    Result.failure()
+                }
             }
         }
-
         Log.d(TAG, "doWork: Returning success: no new message to be sent")
         return Result.success()
     }
 }
+
+/*
+
+ */

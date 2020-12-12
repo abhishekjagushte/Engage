@@ -5,6 +5,7 @@ import androidx.work.*
 import com.abhishekjagushte.engage.di.AppComponent
 import com.abhishekjagushte.engage.di.DaggerAppComponent
 import com.abhishekjagushte.engage.workmanager.factories.EngageWorkerFactory
+import com.abhishekjagushte.engage.workmanager.workers.PushWorker
 import com.abhishekjagushte.engage.workmanager.workers.SyncWorker
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -35,12 +36,19 @@ class EngageApplication : Application(), Configuration.Provider {
         super.onCreate()
         appComponent = initializeComponent()
         setUpSyncWorker()
+        setUpPushWorker()
     }
 
     private fun setUpSyncWorker(){
         val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
         val syncWorker = PeriodicWorkRequestBuilder<SyncWorker>(15, TimeUnit.MINUTES).setConstraints(constraints).build()
         workManager.enqueueUniquePeriodicWork("EngageSync", ExistingPeriodicWorkPolicy.KEEP, syncWorker)
+    }
+
+    private fun setUpPushWorker(){
+        val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+        val pushWorker = PeriodicWorkRequestBuilder<PushWorker>(15, TimeUnit.MINUTES).setConstraints(constraints).build()
+        workManager.enqueueUniquePeriodicWork("EngagePush", ExistingPeriodicWorkPolicy.KEEP, pushWorker)
     }
 
 }

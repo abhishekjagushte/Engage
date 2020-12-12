@@ -16,7 +16,7 @@ data class MessageView(
     var conversationID: String,
     var type: Int?,
     var conType: Int?,
-    var status: Int?,
+    var status: Int,
     var timeStamp: Long?,
     var data: String?,
     var senderID: String?,

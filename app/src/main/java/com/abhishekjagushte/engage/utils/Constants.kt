@@ -56,13 +56,14 @@ object Constants {
     const val TYPE_OTHER_MSG = 1
     const val TYPE_NOTICE: Int = 2
 
-
     const val STATUS_NOT_SENT = 0
     const val STATUS_SENT_BUT_NOT_DELIVERED = 1
     const val STATUS_SENT_BUT_NOT_READ = 2
     const val STATUS_SENT_AND_READ = 3
     const val STATUS_RECEIVED_BUT_NOT_READ = 4
     const val STATUS_RECEIVED_AND_READ_BY_ME = 5
+    const val STATUS_UPLOADING = 6
+    const val STATUS_UPLOAD_FAILED = 7
 
     const val NEEDS_PUSH_YES = 1
     const val NEEDS_PUSH_NO = 2
@@ -72,7 +73,7 @@ object Constants {
 
     //MIME Types
     const val MIME_TYPE_TEXT = "text/plain"
-    const val MIME_TYPE_IMAGE_JPEG = "image/jpeg"
+    const val MIME_TYPE_IMAGE_JPG = "image/jpeg"
 
     //Conversation types
     const val CONVERSATION_TYPE_121 = 1

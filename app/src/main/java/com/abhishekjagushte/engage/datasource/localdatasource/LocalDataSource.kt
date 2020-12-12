@@ -84,7 +84,7 @@ class LocalDataSource @Inject constructor (
         conversationID: String,
         myUsername: String,
         otherUsername: String
-    ): String {
+    ): Message {
 
         val messageID = firestore.collection("messages121").document().id
         val msg = Message(
@@ -105,7 +105,7 @@ class LocalDataSource @Inject constructor (
 
         databaseDao.insertMessage(msg)
 
-        return messageID
+        return msg
     }
 
     fun addConversation121(username: String){
@@ -119,7 +119,7 @@ class LocalDataSource @Inject constructor (
         databaseDao.insertConversation(conversation)
     }
 
-    fun getUnsentMessages(): LiveData<List<Message>> {
+    fun getUnsentMessages(): List<Message> {
         return databaseDao.getUnsentMessages()
     }
 
@@ -147,24 +147,22 @@ class LocalDataSource @Inject constructor (
                     .set(message.convertNetworkMessage())
             }
             else -> throw IllegalStateException("Message category is other than 121 or M2M")
+        }.addOnSuccessListener {
+            localDBScope.launch {
+                withContext(Dispatchers.IO){
+                    setMessageSent(message.messageID)
+                }
+            }
         }
     }
 
-    fun pushMessage(message: Message) {
-        when(message.conType){
+    fun pushMessage(message: Message): Task<Void> {
+
+        return when (message.conType) {
             Constants.CONVERSATION_TYPE_121 -> {
                 firestore.collection("messages121")
                     .document(message.messageID)
                     .set(message.convertNetworkMessage())
-                    .addOnSuccessListener {
-                        localDBScope.launch {
-                            withContext(Dispatchers.IO) {
-                                message.status = Constants.STATUS_SENT_BUT_NOT_DELIVERED
-                                databaseDao.updateMessage(message)
-                                Log.d(TAG, "pushMessage: ${message.data} sent")
-                            }
-                        }
-                    }
             }
 
             Constants.CONVERSATION_TYPE_M2M -> {
@@ -172,21 +170,55 @@ class LocalDataSource @Inject constructor (
                 firestore.collection("groups/${message.conversationID}/chats")
                     .document(message.messageID)
                     .set(message.convertNetworkMessage())
-                    .addOnSuccessListener {
-
-                        localDBScope.launch {
-                            withContext(Dispatchers.IO) {
-                                message.status = Constants.STATUS_SENT_BUT_NOT_DELIVERED
-                                databaseDao.updateMessage(message)
-                                Log.d(TAG, "pushMessage: ${message.data} sent")
-                            }
-                        }
-                    }
-
-
+            }
+            else -> throw IllegalStateException("Message category is other than 121 or M2M")
+        }.addOnSuccessListener {
+            localDBScope.launch {
+                withContext(Dispatchers.IO){
+                    setMessageSent(message.messageID)
+                }
             }
         }
     }
+
+
+//    fun pushMessage(message: Message) {
+//        when(message.conType){
+//            Constants.CONVERSATION_TYPE_121 -> {
+//                firestore.collection("messages121")
+//                    .document(message.messageID)
+//                    .set(message.convertNetworkMessage())
+//                    .addOnSuccessListener {
+//                        localDBScope.launch {
+//                            withContext(Dispatchers.IO) {
+//                                message.status = Constants.STATUS_SENT_BUT_NOT_DELIVERED
+//                                databaseDao.updateMessage(message)
+//                                Log.d(TAG, "pushMessage: ${message.data} sent")
+//                            }
+//                        }
+//                    }
+//            }
+//
+//            Constants.CONVERSATION_TYPE_M2M -> {
+//
+//                firestore.collection("groups/${message.conversationID}/chats")
+//                    .document(message.messageID)
+//                    .set(message.convertNetworkMessage())
+//                    .addOnSuccessListener {
+//
+//                        localDBScope.launch {
+//                            withContext(Dispatchers.IO) {
+//                                message.status = Constants.STATUS_SENT_BUT_NOT_DELIVERED
+//                                databaseDao.updateMessage(message)
+//                                Log.d(TAG, "pushMessage: ${message.data} sent")
+//                            }
+//                        }
+//                    }
+//
+//
+//            }
+//        }
+//    }
 
     fun getConversation(conversationID: String): Conversation? {
         return databaseDao.getConversation(conversationID)
@@ -283,7 +315,7 @@ class LocalDataSource @Inject constructor (
         message: String,
         conversationID: String,
         replyToId: String?
-    ): String {
+    ): Message {
         val messageID = firestore.collection("groups/${conversationID}/chats").document().id
         val msg = Message(
             messageID = messageID,
@@ -304,7 +336,7 @@ class LocalDataSource @Inject constructor (
 
         databaseDao.insertMessage(msg)
 
-        return messageID
+        return msg
     }
 
     fun addConversationM2M(name: String, conversationID: String) {
@@ -343,9 +375,16 @@ class LocalDataSource @Inject constructor (
     }
 
 
-    fun saveImageMessage(message: Message) {
-        //TODO set the messageID for message first
-        TODO("Save in local storage")
+    fun saveImageMessage(message: Message): Message {
+        var messageID = ""
+        if(message.conType == Constants.CONVERSATION_TYPE_121)
+            messageID = firestore.collection("messages121").document().id
+        else
+            messageID = firestore.collection("groups/${message.conversationID}/chats").document().id
+
+        message.messageID = messageID
+        databaseDao.insertMessage(message)
+        return message
     }
 
 }

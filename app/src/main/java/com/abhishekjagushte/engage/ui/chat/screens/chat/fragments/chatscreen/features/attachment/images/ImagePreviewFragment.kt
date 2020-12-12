@@ -1,19 +1,18 @@
 package com.abhishekjagushte.engage.ui.chat.screens.chat.fragments.chatscreen.features.attachment.images
 
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
-import android.provider.DocumentsContract
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
+import androidx.navigation.Navigation
 import com.abhishekjagushte.engage.EngageApplication
 import com.abhishekjagushte.engage.R
 import com.abhishekjagushte.engage.database.entities.Message
@@ -39,6 +38,8 @@ class ImagePreviewFragment : Fragment(R.layout.fragment_image_preview) {
 
     private val job: Job = Job()
     private val coroutineScope = CoroutineScope(Dispatchers.Main+job)
+    private lateinit var handler: Handler
+
 
     @Inject
     lateinit var dataRepository: DataRepository
@@ -53,6 +54,7 @@ class ImagePreviewFragment : Fragment(R.layout.fragment_image_preview) {
 
         imageView.setImageBitmap(imageToDisplay)
 
+        handler = Handler(Looper.getMainLooper())
         image_preview_fab.setOnClickListener(fabListener)
     }
 
@@ -89,11 +91,11 @@ class ImagePreviewFragment : Fragment(R.layout.fragment_image_preview) {
         if (uri == null)
             Toast.makeText(requireActivity(), "Image wasn't saved", Toast.LENGTH_SHORT).show()
         else {
-            constructMessage(time, uri)
+            constructAndSendMessage(time, uri)
         }
     }
 
-    private fun constructMessage(time: Long, uri: String){
+    private fun constructAndSendMessage(time: Long, uri: String){
         coroutineScope.launch {
             withContext(Dispatchers.IO){
                 val msgTxt = image_preview_message_input.text.toString().trim()
@@ -101,7 +103,7 @@ class ImagePreviewFragment : Fragment(R.layout.fragment_image_preview) {
                     messageID = "set while sending",
                     conversationID = conversationInfo.conversationID,
                     type = Constants.TYPE_MY_MSG,
-                    status = Constants.STATUS_NOT_SENT,
+                    status = Constants.STATUS_UPLOADING,
                     needs_push = Constants.NEEDS_PUSH_YES,
                     timeStamp = time,
                     serverTimestamp = time,
@@ -109,12 +111,17 @@ class ImagePreviewFragment : Fragment(R.layout.fragment_image_preview) {
                     senderID = dataRepository.getMydetails()!!.username,
                     receiverID = conversationInfo.receiverID,
                     deleted = Constants.DELETED_NO,
-                    mime_type = Constants.MIME_TYPE_IMAGE_JPEG,
+                    mime_type = Constants.MIME_TYPE_IMAGE_JPG,
                     conType = conversationInfo.conType,
                     local_uri = uri,
                     reply_toID = conversationInfo.replyToMessageID
                 )
-                //dataRepository.saveImageMessage(message)
+                val msg = dataRepository.saveImageMessage(message)
+                dataRepository.uploadImage(msg)
+                //UI change cannot take place on bg thread
+                handler.post {
+                    Navigation.findNavController(this@ImagePreviewFragment.requireView()).navigateUp()
+                }
             }
         }
     }

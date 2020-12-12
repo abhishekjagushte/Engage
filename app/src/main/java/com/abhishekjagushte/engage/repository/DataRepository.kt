@@ -12,6 +12,7 @@ import com.abhishekjagushte.engage.datasource.localdatasource.FirebaseInstanceSo
 import com.abhishekjagushte.engage.datasource.localdatasource.LocalDataSource
 import com.abhishekjagushte.engage.datasource.remotedatasource.FirebaseAuthDataSource
 import com.abhishekjagushte.engage.datasource.remotedatasource.FirebaseDataSource
+import com.abhishekjagushte.engage.datasource.remotedatasource.FirebaseStorageSource
 import com.abhishekjagushte.engage.datasource.remotedatasource.FunctionsSource
 import com.abhishekjagushte.engage.listeners.M2MListener
 import com.abhishekjagushte.engage.network.CreateGroupRequest
@@ -37,7 +38,8 @@ class DataRepository @Inject constructor(
     private val localDataSource: LocalDataSource,
     private val firebaseDataSource: FirebaseDataSource,
     private val firebaseInstanceId: FirebaseInstanceSource,
-    private val functionsSource: FunctionsSource
+    private val functionsSource: FunctionsSource,
+    private val storageSource: FirebaseStorageSource
 ){
     private val TAG: String = "DataRepository"
 
@@ -282,19 +284,23 @@ class DataRepository @Inject constructor(
         conversationID: String,
         myUsername: String,
         otherUsername: String
-    ): String {
+    ): Message {
         return localDataSource.saveTextMessage121Local(message, conversationID, myUsername, otherUsername)
     }
 
-    fun saveImageMessage(message: Message) {
-        localDataSource.saveImageMessage(message)
+    fun saveImageMessage(message: Message): Message {
+        return localDataSource.saveImageMessage(message)
+    }
+
+    fun uploadImage(message: Message){
+        storageSource.uploadImage121(message)
     }
 
     fun saveTextMessageM2M(
         message: String,
         conversationID: String,
         replyToId: String?
-    ): String {
+    ): Message {
         return localDataSource.saveTextMessageM2MLocal(message, conversationID, replyToId)
     }
 
@@ -302,7 +308,7 @@ class DataRepository @Inject constructor(
         localDataSource.addConversation121(username)
     }
 
-    fun getUnsentMessages(): LiveData<List<Message>> {
+    fun getUnsentMessages(): List<Message> {
         return localDataSource.getUnsentMessages()
     }
 
@@ -317,8 +323,9 @@ class DataRepository @Inject constructor(
     }
 
 
-    fun pushMessage(message: Message) {
-        localDataSource.pushMessage(message)//Since pushing messaage is more of a job for local databse updation, it is done in local db source
+    fun pushMessage(message: Message): Task<Void> {
+        return localDataSource.pushMessage(message)
+        //Since pushing messaage is more of a job for local databse updation, it is done in local db source
     }
 
     fun receiveMessage121(message: Message){

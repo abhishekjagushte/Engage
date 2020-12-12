@@ -16,6 +16,7 @@ import com.abhishekjagushte.engage.utils.Constants
 import com.abhishekjagushte.engage.workmanager.workers.PushWorker
 import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.*
+import java.lang.IllegalStateException
 import javax.inject.Inject
 
 enum class ChatState{
@@ -149,9 +150,31 @@ class ChatViewModel @Inject constructor(
         val factory: DataSource.Factory<Int, MessageView> = dataRepository.getChats(conversationID.value!!)
 
         val convertedFactory = factory.map{
+//            return@map when(it.type){
+//                0 -> ChatDataItem.MyTextMessage(it)
+//                else -> ChatDataItem.OtherTextMessage(it)
+//            }
+
             return@map when(it.type){
-                0 -> ChatDataItem.MyTextMessage(it)
-                else -> ChatDataItem.OtherTextMessage(it)
+
+                Constants.TYPE_MY_MSG -> {
+                    when (it.mime_type) {
+                        Constants.MIME_TYPE_TEXT -> ChatDataItem.MyTextMessage(it)
+                        Constants.MIME_TYPE_IMAGE_JPG -> {
+                            Log.d(TAG, "getChatsAll: Here $it")
+                            ChatDataItem.MyImageMessage(it)
+                        }
+                        else -> throw IllegalStateException("MIME_TYPE_NOT_DEFINED")
+                    }
+                }
+
+                else -> {
+                    when(it.mime_type){
+                        Constants.MIME_TYPE_TEXT -> ChatDataItem.OtherTextMessage(it)
+                        Constants.MIME_TYPE_IMAGE_JPG -> ChatDataItem.OtherImageMessage(it)
+                        else -> throw IllegalStateException("MIME_TYPE_NOT_DEFINED")
+                    }
+                }
             }
         }
 
@@ -174,26 +197,47 @@ class ChatViewModel @Inject constructor(
                     Log.d(TAG, "sendMessage: The conversationID created and it is ${conversationID}")
                     _chatState.postValue(ChatState.EXISTING)
 
-                    val messageID = dataRepository.saveTextMessage121Local(
+                    val msg = dataRepository.saveTextMessage121Local(
                         message,
                         conversationID.value!!,
                         myUsername!!,
                         conversationID.value!! //For 121 username = conversationID
                     )
 
-                    setUpPushWorker(messageID)
+                    viewModelScope.launch {
+                        withContext(Dispatchers.IO){
+                            dataRepository.pushMessage(msg).addOnSuccessListener {
+                                viewModelScope.launch {
+                                    withContext(Dispatchers.IO){
+                                        dataRepository.setMessageSent(msg.messageID)
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
                 else {
                     Log.d(TAG, "sendTextMessage121: sent")
                     //sets the livedata for chats once the conversationID is initialized
-                    val messageID  = dataRepository.saveTextMessage121Local(
+                    val msg  = dataRepository.saveTextMessage121Local(
                         message,
                         conversationID.value!!,
                         myUsername!!,
                         conversationID.value!!
                     )
 
-                    setUpPushWorker(messageID)
+                    viewModelScope.launch {
+                        withContext(Dispatchers.IO){
+                            dataRepository.pushMessage(msg).addOnSuccessListener {
+                                viewModelScope.launch {
+                                    Log.d(TAG, "sendTextMessage121: called")
+                                    withContext(Dispatchers.IO){
+                                        dataRepository.setMessageSent(msg.messageID)
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -203,8 +247,8 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             withContext(Dispatchers.IO){
                 Log.d(TAG, "sendTextMessageM2M: ${conversationID.value}")
-                val messageID = dataRepository.saveTextMessageM2M(message, conversationID.value!!, replyToId)
-                setUpPushWorker(messageID)
+                val msg = dataRepository.saveTextMessageM2M(message, conversationID.value!!, replyToId)
+                dataRepository.pushMessage(msg)
             }
         }
     }
@@ -216,7 +260,6 @@ class ChatViewModel @Inject constructor(
             }
         }
     }
-
 
     private fun setUpPushWorker(messageID: String) {
         val data = Data.Builder().putString(Constants.MESSAGE_ID, messageID).build()

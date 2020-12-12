@@ -10,7 +10,6 @@ import android.view.View
 import android.widget.AbsListView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -21,7 +20,6 @@ import com.abhishekjagushte.engage.ui.chat.screens.chat.ChatFragment
 import com.abhishekjagushte.engage.ui.chat.screens.chat.ChatType
 import com.abhishekjagushte.engage.ui.chat.screens.chat.ChatViewModel
 import com.abhishekjagushte.engage.utils.Constants
-import com.abhishekjagushte.engage.utils.ImageUtil
 import kotlinx.android.synthetic.main.fragment_chat_screen.*
 
 
@@ -74,7 +72,7 @@ class ChatScreenFragment : Fragment(R.layout.fragment_chat_screen) {
         //linearLayoutManager.stackFromEnd = true
         linearLayoutManager.reverseLayout = true
         recyclerView.layoutManager = linearLayoutManager
-        chatsAdapter = ChatsAdapter()
+        chatsAdapter = ChatsAdapter(viewLifecycleOwner)
 
         //adds the data change listener for scrolling when new msg available
         chatsAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver(){

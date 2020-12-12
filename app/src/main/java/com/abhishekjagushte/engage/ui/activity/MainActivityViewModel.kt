@@ -1,18 +1,10 @@
 package com.abhishekjagushte.engage.ui.activity
 
-import android.content.Context
 import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import com.abhishekjagushte.engage.database.entities.Message
 import com.abhishekjagushte.engage.listeners.One21Listener
-import com.abhishekjagushte.engage.network.MessageNetwork
 import com.abhishekjagushte.engage.repository.DataRepository
-import com.abhishekjagushte.engage.sync.M2MChatsSynchronizer
-import com.abhishekjagushte.engage.sync.One21Synchronizer
-import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.ListenerRegistration
-import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.*
 
 class MainActivityViewModel(
@@ -21,18 +13,8 @@ class MainActivityViewModel(
 
     private val TAG = "MainActivityViewModel"
     private var listener121: ListenerRegistration?=null
-
-
     val job: Job = Job()
     val viewModelScope: CoroutineScope = CoroutineScope(Dispatchers.Main + job)
-
-    fun printPanda(){
-        Log.d(TAG, "printPanda: Printed")
-    }
-
-    fun getUnsentMessages(): LiveData<List<Message>> {
-        return dataRepository.getUnsentMessages()
-    }
 
     override fun onCleared() {
         super.onCleared()
@@ -40,16 +22,6 @@ class MainActivityViewModel(
         //Removes 121 listener
         listener121?.remove()
         Log.d(TAG, "onCleared: MainActivity ViewModel onCleared")
-    }
-
-    fun sendMessages(unsentMessages: List<Message>) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO){
-                for(m in unsentMessages){
-                    dataRepository.pushMessage(m)
-                }
-            }
-        }
     }
 
     fun set121MessageListener(){
@@ -62,6 +34,18 @@ class MainActivityViewModel(
             }
         }
     }
+}
+
+/*
+
+    fun printPanda(){
+        Log.d(TAG, "printPanda: Printed")
+    }
+
+    fun getUnsentMessages(): LiveData<List<Message>> {
+        return dataRepository.getUnsentMessages()
+    }
+
 
     fun testSyncFunction(context: Context) {
         viewModelScope.launch {
@@ -73,7 +57,18 @@ class MainActivityViewModel(
             }
         }
     }
-}
+
+    //    fun sendMessages(unsentMessages: List<Message>) {
+//        viewModelScope.launch {
+//            withContext(Dispatchers.IO){
+//                for(m in unsentMessages){
+//                    dataRepository.pushMessage(m)
+//                }
+//            }
+//        }
+//    }
+ */
+
 
 //    private fun createNewChat121(con: Conversation) {
 //        val myUsername = dataRepository.getMydetails()!!.username

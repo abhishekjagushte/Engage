@@ -80,7 +80,7 @@ interface DatabaseDao{
 
 
     @Query("SELECT * FROM messages WHERE status == 0")
-    fun getUnsentMessages(): LiveData<List<Message>>
+    fun getUnsentMessages(): List<Message>
 
     @Update
     fun updateMessage(message: Message)
