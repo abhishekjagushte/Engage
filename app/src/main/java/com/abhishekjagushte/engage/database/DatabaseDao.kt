@@ -144,4 +144,7 @@ interface DatabaseDao{
 
     @Query("SELECT conversations.conversationID, timeStamp AS lastMessageTimeStamp FROM conversations INNER JOIN messages ON conversations.lastMessageID == messages.messageID AND conversations.type =2 ")
     fun getM2MSyncRequirement(): List<M2MSyncRequirement>
+
+    @Query("UPDATE messages SET status = 4 WHERE messageID = :messageID")
+    fun setMessageReceived(messageID: String)
 }

@@ -161,7 +161,7 @@ class ChatViewModel @Inject constructor(
                     when (it.mime_type) {
                         Constants.MIME_TYPE_TEXT -> ChatDataItem.MyTextMessage(it)
                         Constants.MIME_TYPE_IMAGE_JPG -> {
-                            Log.d(TAG, "getChatsAll: Here $it")
+                            //Log.d(TAG, "getChatsAll: Here $it")
                             ChatDataItem.MyImageMessage(it)
                         }
                         else -> throw IllegalStateException("MIME_TYPE_NOT_DEFINED")

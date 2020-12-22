@@ -1,5 +1,6 @@
 package com.abhishekjagushte.engage.repository
 
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -28,6 +29,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.*
 import com.google.firebase.functions.HttpsCallableResult
 import com.google.firebase.iid.InstanceIdResult
+import com.google.firebase.storage.FileDownloadTask
 import kotlinx.coroutines.*
 import org.json.JSONObject
 import java.util.*
@@ -477,6 +479,17 @@ class DataRepository @Inject constructor(
         return functionsSource.testSync()
     }
 
+    fun downloadImage(message: Message, uri: Uri): FileDownloadTask {
+        return storageSource.downloadImage(message, uri)
+    }
+
+    fun setMessageReceived(messageID: String) {
+        repoScope.launch {
+            withContext(Dispatchers.IO) {
+                localDataSource.setMessageReceived(messageID)
+            }
+        }
+    }
 
 
 }

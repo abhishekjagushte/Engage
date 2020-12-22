@@ -16,14 +16,19 @@ import androidx.recyclerview.widget.RecyclerView
 import com.abhishekjagushte.engage.EngageApplication
 import com.abhishekjagushte.engage.R
 import com.abhishekjagushte.engage.models.ConversationInfo
+import com.abhishekjagushte.engage.repository.DataRepository
 import com.abhishekjagushte.engage.ui.chat.screens.chat.ChatFragment
 import com.abhishekjagushte.engage.ui.chat.screens.chat.ChatType
 import com.abhishekjagushte.engage.ui.chat.screens.chat.ChatViewModel
 import com.abhishekjagushte.engage.utils.Constants
 import kotlinx.android.synthetic.main.fragment_chat_screen.*
+import javax.inject.Inject
 
 
 class ChatScreenFragment : Fragment(R.layout.fragment_chat_screen) {
+
+    @Inject
+    lateinit var dataRepository: DataRepository
 
     private val TAG = "ChatScreenFragment";
     private lateinit var SharedViewModel: ChatViewModel
@@ -72,7 +77,7 @@ class ChatScreenFragment : Fragment(R.layout.fragment_chat_screen) {
         //linearLayoutManager.stackFromEnd = true
         linearLayoutManager.reverseLayout = true
         recyclerView.layoutManager = linearLayoutManager
-        chatsAdapter = ChatsAdapter(viewLifecycleOwner)
+        chatsAdapter = ChatsAdapter(viewLifecycleOwner, dataRepository)
 
         //adds the data change listener for scrolling when new msg available
         chatsAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver(){
@@ -166,7 +171,7 @@ class ChatScreenFragment : Fragment(R.layout.fragment_chat_screen) {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         (requireParentFragment().requireActivity().application as EngageApplication).appComponent.addChatScreenComponent().create().inject(this)
-
+        (requireParentFragment().requireActivity().application as EngageApplication).appComponent.inject(this)
     }
 
 }

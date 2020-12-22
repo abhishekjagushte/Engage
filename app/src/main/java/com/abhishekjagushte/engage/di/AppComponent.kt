@@ -4,15 +4,16 @@ import android.app.Application
 import com.abhishekjagushte.engage.EngageApplication
 import com.abhishekjagushte.engage.notifications.NotificationHandler
 import com.abhishekjagushte.engage.ui.SplashScreenFragment
-import com.abhishekjagushte.engage.ui.chat.screens.chat.ChatComponent
-import com.abhishekjagushte.engage.ui.chat.screens.chat.fragments.chatscreen.di.ChatScreenComponent
-import com.abhishekjagushte.engage.ui.chat.screens.chat.fragments.eventscreen.di.EventComponent
 import com.abhishekjagushte.engage.ui.activity.MainActivity
 import com.abhishekjagushte.engage.ui.activity.MainComponent
+import com.abhishekjagushte.engage.ui.chat.screens.chat.ChatComponent
+import com.abhishekjagushte.engage.ui.chat.screens.chat.fragments.chatscreen.ChatScreenFragment
+import com.abhishekjagushte.engage.ui.chat.screens.chat.fragments.chatscreen.di.ChatScreenComponent
 import com.abhishekjagushte.engage.ui.chat.screens.chat.fragments.chatscreen.features.attachment.images.ImagePreviewFragment
+import com.abhishekjagushte.engage.ui.chat.screens.chat.fragments.eventscreen.di.EventComponent
 import com.abhishekjagushte.engage.ui.fragments.ContactListFragment
-import com.abhishekjagushte.engage.ui.main.screens.creategroup.addparticipants.di.AddParticipantsComponent
 import com.abhishekjagushte.engage.ui.main.screens.chatlist.di.ChatListComponent
+import com.abhishekjagushte.engage.ui.main.screens.creategroup.addparticipants.di.AddParticipantsComponent
 import com.abhishekjagushte.engage.ui.main.screens.profile.di.ProfileComponent
 import com.abhishekjagushte.engage.ui.main.screens.search.di.SearchComponent
 import com.abhishekjagushte.engage.ui.main.screens.test.TestFragment
@@ -45,6 +46,8 @@ interface AppComponent: AndroidInjector<EngageApplication>{
     fun inject(testFragment: TestFragment)
     fun inject(contactListFragment: ContactListFragment)
     fun inject(imagePreviewFragment: ImagePreviewFragment)
+    fun inject(chatScreenFragment: ChatScreenFragment)
+
 
     fun addParticipantsComponent(): AddParticipantsComponent.Factory
     fun addMainComponent(): MainComponent.Factory

@@ -97,6 +97,7 @@ class EngageMessageNotification(
     private fun getNotificationText(msgNotification: MessageNotificationView): String {
         return when(msgNotification.mime_type){
             Constants.MIME_TYPE_TEXT -> msgNotification.data!!
+            Constants.MIME_TYPE_IMAGE_JPG -> "Image"//TODO
             else -> throw IllegalStateException("Message mime type is wrong")
         }
     }

@@ -157,7 +157,6 @@ class LocalDataSource @Inject constructor (
     }
 
     fun pushMessage(message: Message): Task<Void> {
-
         return when (message.conType) {
             Constants.CONVERSATION_TYPE_121 -> {
                 firestore.collection("messages121")
@@ -385,6 +384,14 @@ class LocalDataSource @Inject constructor (
         message.messageID = messageID
         databaseDao.insertMessage(message)
         return message
+    }
+
+    fun setMessageReceived(messageID: String) {
+        databaseDao.setMessageReceived(messageID)
+    }
+
+    fun updateMessage(message: Message) {
+        databaseDao.updateMessage(message)
     }
 
 }

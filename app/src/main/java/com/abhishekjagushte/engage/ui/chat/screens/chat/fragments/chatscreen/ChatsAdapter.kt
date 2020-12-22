@@ -1,5 +1,6 @@
 package com.abhishekjagushte.engage.ui.chat.screens.chat.fragments.chatscreen
 
+import android.net.Uri
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -15,7 +16,9 @@ import com.abhishekjagushte.engage.databinding.ImageMessageContainerLeftBinding
 import com.abhishekjagushte.engage.databinding.ImageMessageContainerRightBinding
 import com.abhishekjagushte.engage.databinding.TextMessageContainerLeftBinding
 import com.abhishekjagushte.engage.databinding.TextMessageContainerRightBinding
+import com.abhishekjagushte.engage.datasource.remotedatasource.downloadmanager.MediaDownloader
 import com.abhishekjagushte.engage.datasource.remotedatasource.uploadmanager.UploadManager
+import com.abhishekjagushte.engage.repository.DataRepository
 import com.abhishekjagushte.engage.utils.Constants
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -30,7 +33,10 @@ const val OTHER_TEXT_MESSAGE = 2
 const val MY_IMAGE_MESSAGE =3
 const val OTHER_IMAGE_MESSAGE = 4
 
-class ChatsAdapter(private val viewLifecycleOwner: LifecycleOwner) : PagedListAdapter<ChatDataItem, RecyclerView.ViewHolder>(ChatDiffCallBack()){
+class ChatsAdapter(
+    private val viewLifecycleOwner: LifecycleOwner,
+    private val dataRepository: DataRepository
+) : PagedListAdapter<ChatDataItem, RecyclerView.ViewHolder>(ChatDiffCallBack()){
 
     private val adapterScope = CoroutineScope(Dispatchers.Default)
 
@@ -40,7 +46,7 @@ class ChatsAdapter(private val viewLifecycleOwner: LifecycleOwner) : PagedListAd
             MY_TEXT_MESSAGE -> MyTextMessageViewHolder.from(parent)
             OTHER_TEXT_MESSAGE -> OtherTextMessageViewHolder.from(parent)
             MY_IMAGE_MESSAGE -> MyImageMessageViewHolder.from(parent, viewLifecycleOwner)
-            OTHER_IMAGE_MESSAGE -> OtherImageMessageViewHolder.from(parent)
+            OTHER_IMAGE_MESSAGE -> OtherImageMessageViewHolder.from(parent, dataRepository, viewLifecycleOwner)
             else -> throw ClassCastException("Unknown viewType ${viewType}")
         }
     }
@@ -134,11 +140,12 @@ class MyImageMessageViewHolder private constructor(
 
     fun bind(message: MessageView){
         binding.message = message
-        Glide.with(binding.root.context)
-            .load(message.local_uri)
-            .apply(RequestOptions().skipMemoryCache(true).diskCacheStrategy(DiskCacheStrategy.NONE))
-            .into(binding.imageMsgIv)
+//        Glide.with(binding.root.context)
+//            .load(message.local_uri)
+//            //.apply(RequestOptions().skipMemoryCache(true).diskCacheStrategy(DiskCacheStrategy.NONE))
+//            .into(binding.imageMsgIv)
 
+        binding.imageMsgIv.setImageURI(Uri.parse(message.local_uri))
         setUpProgressBar(message)
 
         binding.executePendingBindings()
@@ -172,20 +179,66 @@ class MyImageMessageViewHolder private constructor(
 
 }
 
-class OtherImageMessageViewHolder private constructor(val binding: ImageMessageContainerLeftBinding): RecyclerView.ViewHolder(binding.root){
+class OtherImageMessageViewHolder private constructor(
+    val binding: ImageMessageContainerLeftBinding,
+    private val dataRepository: DataRepository,
+    private val viewLifecycleOwner: LifecycleOwner
+): RecyclerView.ViewHolder(binding.root){
+
+    private val TAG = "OtherImageMessageViewHolder"
 
     fun bind(message: MessageView){
         binding.message = message
-        Glide.with(binding.root.context).load(message.local_uri).into(binding.imageMsgIv)
+        binding.executePendingBindings()
+
+        setUpDownloadLogic(message)
+    }
+
+    private fun setUpDownloadLogic(message: MessageView) {
+        Log.d(TAG, "setUpDownloadLogic: ${message.server_url}")
+        if(message.status == Constants.STATUS_RECEIVED_MEDIA_NOT_DOWNLOADED) {
+            binding.downloadButton.visibility = View.VISIBLE
+            binding.downloadButton.setOnClickListener{
+                val mediaDownloader = MediaDownloader(message.convertDomainMessage(), dataRepository)
+                val msg = mediaDownloader.start()
+                message.local_uri = msg.local_uri
+
+                mediaDownloader.progress.observe(viewLifecycleOwner, Observer {
+                    it?.let {
+                        if(it<100)
+                            binding.progressBar.visibility = View.VISIBLE
+                        else {
+                            binding.progressBar.visibility = View.GONE
+                            displayImage(message)
+                            dataRepository.setMessageReceived(messageID = message.messageID)
+                        }
+                    }
+                })
+            }
+            binding.executePendingBindings()
+        }
+    }
+
+    private fun displayImage(message: MessageView){
+//        Glide.with(binding.root.context)
+//            .load(message.local_uri)
+//            .apply(RequestOptions().skipMemoryCache(true).diskCacheStrategy(DiskCacheStrategy.NONE))
+//            .into(binding.imageMsgIv)
+        binding.imageMsgIv.setImageURI((Uri.parse(message.local_uri)))
         binding.executePendingBindings()
     }
 
+
     companion object{
-        fun from(parent: ViewGroup): OtherImageMessageViewHolder {
+        fun from(
+            parent: ViewGroup,
+            dataRepository: DataRepository,
+            viewLifecycleOwner: LifecycleOwner
+        ): OtherImageMessageViewHolder {
             val layoutInflater = LayoutInflater.from(parent.context)
             val binding = ImageMessageContainerLeftBinding.inflate(layoutInflater, parent, false)
 
-            return OtherImageMessageViewHolder(binding)
+            return OtherImageMessageViewHolder(binding, dataRepository, viewLifecycleOwner)
         }
     }
 

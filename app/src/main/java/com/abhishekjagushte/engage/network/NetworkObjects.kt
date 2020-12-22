@@ -62,9 +62,10 @@ class MessageNetwork(
 
     val reply_toID: String?=null
 ){
-    //TODO this is test function
+
     fun convertDomainMessage121(): Message{
-        return Message(
+
+        val msg = Message(
             messageID = messageID!!,
             timeStamp = System.currentTimeMillis(),
             conversationID =  senderID!!,
@@ -81,6 +82,11 @@ class MessageNetwork(
             serverTimestamp = timeStamp!!.time,
             status = Constants.STATUS_RECEIVED_BUT_NOT_READ
         )
+
+        if(mime_type == Constants.MIME_TYPE_IMAGE_JPG)
+            msg.status = Constants.STATUS_RECEIVED_MEDIA_NOT_DOWNLOADED
+
+        return msg
     }
 
     fun convertDomainMessageM2M(conversationID: String): Message{

@@ -16,7 +16,7 @@ class Message(
     var status: Int?, //status of message required for if message read by other party
     var needs_push: Int?, //determines whether push needs to be done if device was offline
     var timeStamp: Long?, //this timestamp will be the timestamp while sending the message
-    var serverTimestamp: Long?,
+    var serverTimestamp: Long? = null,
     var data: String?, //the data of message
     var senderID: String?, //the senderID of the message
     var receiverID: String?, //the receiverID for the message
@@ -43,7 +43,8 @@ class Message(
             data = data,
             senderID = senderID,
             receiverID = receiverID,
-            mime_type = mime_type
+            mime_type = mime_type,
+            server_url = server_url
         )
     }
 

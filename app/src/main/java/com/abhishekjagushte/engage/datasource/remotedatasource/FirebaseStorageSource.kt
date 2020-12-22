@@ -8,9 +8,12 @@ import com.abhishekjagushte.engage.datasource.localdatasource.LocalDataSource
 import com.abhishekjagushte.engage.datasource.remotedatasource.uploadmanager.MediaUploader
 import com.abhishekjagushte.engage.datasource.remotedatasource.uploadmanager.UploadManager
 import com.abhishekjagushte.engage.utils.Constants
+import com.abhishekjagushte.engage.utils.FilePathContract
+import com.google.firebase.storage.FileDownloadTask
 import com.google.firebase.storage.StorageMetadata
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
+import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -23,8 +26,11 @@ class FirebaseStorageSource @Inject constructor(
     private val localDataSource: LocalDataSource
 ) {
 
-    private val TAG = "FirebaseStorageSource"
+    private val job: Job = Job()
+    private val storageScope = CoroutineScope(Dispatchers.Main + job)
 
+
+    private val TAG = "FirebaseStorageSource"
     private fun createPathM2M(fileName: String, message: Message): String {
         return when(message.mime_type){
             TYPE_IMAGE -> "groups/${message.conversationID}/images/$fileName"
@@ -58,10 +64,20 @@ class FirebaseStorageSource @Inject constructor(
 
         task.addOnCompleteListener {
             if(it.isSuccessful){
-                message.server_url = path
-                localDataSource.pushMessage(message)
+                storageScope.launch {
+                    withContext(Dispatchers.IO) {
+                        message.server_url = path
+                        localDataSource.pushMessage(message)
+                        localDataSource.updateMessage(message)
+                    }
+                }
             }
         }
+    }
+
+    fun downloadImage(message: Message, uri: Uri): FileDownloadTask {
+        val ref = storage.child(message.server_url!!)
+        return ref.getFile(uri)
     }
 
 }

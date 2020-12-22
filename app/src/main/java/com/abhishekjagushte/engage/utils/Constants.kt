@@ -64,6 +64,7 @@ object Constants {
     const val STATUS_RECEIVED_AND_READ_BY_ME = 5
     const val STATUS_UPLOADING = 6
     const val STATUS_UPLOAD_FAILED = 7
+    const val STATUS_RECEIVED_MEDIA_NOT_DOWNLOADED = 8
 
     const val NEEDS_PUSH_YES = 1
     const val NEEDS_PUSH_NO = 2
@@ -109,6 +110,7 @@ object Constants {
 
     //Storage Paths
     const val IMAGE_SENT_STORAGE_PATH = "/Engage/Media/Engage Images/Sent"
+    const val IMAGE_RECEIVED_STORAGE_PATH = "/Engage/Media/Engage Images/Received"
 
     //Firebase cloud storage paths
     const val MEDIA_121_IMAGES = "media121/Images"

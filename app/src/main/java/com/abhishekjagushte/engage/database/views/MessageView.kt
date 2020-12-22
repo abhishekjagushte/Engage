@@ -1,6 +1,8 @@
 package com.abhishekjagushte.engage.database.views
 
 import androidx.room.DatabaseView
+import com.abhishekjagushte.engage.database.entities.Message
+import com.abhishekjagushte.engage.utils.Constants
 
 @DatabaseView(value =
 """
@@ -28,4 +30,26 @@ data class MessageView(
     var latitude: Double?,
     var longitude: Double?,
     var reply_toID: String?
-)
+){
+    fun convertDomainMessage(): Message{
+        return Message(
+            messageID = messageID,
+            conversationID = conversationID,
+            type = type,
+            conType = conType!!,
+            status = status,
+            timeStamp = timeStamp,
+            data = data,
+            senderID = senderID,
+            receiverID = receiverID,
+            deleted = deleted,
+            mime_type = mime_type,
+            server_url = server_url,
+            local_uri = local_uri,
+            latitude = latitude,
+            longitude = longitude,
+            reply_toID = reply_toID,
+            needs_push = Constants.NEEDS_PUSH_NO
+        )
+    }
+}
