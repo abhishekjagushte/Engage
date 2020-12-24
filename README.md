@@ -1,4 +1,11 @@
 # Engage
 
+Engage is an Android Chat Application that uses Kotlin and Google Firebase. Developed with Android Architectural Components and MVVM Design Pattern, this app provides real-time chatting. Future planned features are providing an event page for "events" among individuals and groups. These events will include polling, reminders and more!
 
-TEST APP FOR EVENTS,MEETINGS CREATION AND MANAGEMENT AMONG SMALL GROUPS OF FRIENDS
+Currently implemented:
+1. Sign Up and Authentication
+2. Searching users across app
+3. Sending friend requests and receiving friend requests
+4. Notifications via FCM
+5. One to One Chats
+6. Group Chats
