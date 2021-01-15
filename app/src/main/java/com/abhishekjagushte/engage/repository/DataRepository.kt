@@ -15,6 +15,7 @@ import com.abhishekjagushte.engage.datasource.remotedatasource.FirebaseAuthDataS
 import com.abhishekjagushte.engage.datasource.remotedatasource.FirebaseDataSource
 import com.abhishekjagushte.engage.datasource.remotedatasource.FirebaseStorageSource
 import com.abhishekjagushte.engage.datasource.remotedatasource.FunctionsSource
+import com.abhishekjagushte.engage.datasource.remotedatasource.uploadmanager.MediaUploader
 import com.abhishekjagushte.engage.listeners.M2MListener
 import com.abhishekjagushte.engage.network.CreateGroupRequest
 import com.abhishekjagushte.engage.network.convertDomainObject
@@ -30,6 +31,8 @@ import com.google.firebase.firestore.*
 import com.google.firebase.functions.HttpsCallableResult
 import com.google.firebase.iid.InstanceIdResult
 import com.google.firebase.storage.FileDownloadTask
+import com.google.firebase.storage.StorageMetadata
+import com.google.firebase.storage.UploadTask
 import kotlinx.coroutines.*
 import org.json.JSONObject
 import java.util.*
@@ -80,7 +83,7 @@ class DataRepository @Inject constructor(
 //        }
     }
 
-    fun setNameAndUsername(name: String, username: String, completeStatus: MutableLiveData<String>){
+    fun setNameAndUsername(name: String, username: String, profileImageUri: Uri?, completeStatus: MutableLiveData<String>){
         firebaseInstanceId.getNotificationChannelID()
             .addOnCompleteListener(OnCompleteListener { task ->
                 if (!task.isSuccessful) {
@@ -294,8 +297,17 @@ class DataRepository @Inject constructor(
         return localDataSource.saveImageMessage(message)
     }
 
-    fun uploadImage(message: Message){
-        storageSource.uploadImage121(message)
+    fun uploadImage(message: Message, height: Int, width: Int){
+        val mediaUploader = MediaUploader(message, this, MediaUploader.ImageProperties(height, width))
+        mediaUploader.start()
+    }
+
+    fun updateImageSent(message: Message){
+        localDataSource.updateImageSent(message)
+    }
+
+    fun uploadImageStorageSource(message: Message, metadata: StorageMetadata, path: String): UploadTask{
+        return storageSource.uploadImage(message, metadata, path)
     }
 
     fun saveTextMessageM2M(
@@ -487,6 +499,15 @@ class DataRepository @Inject constructor(
         repoScope.launch {
             withContext(Dispatchers.IO) {
                 localDataSource.setMessageReceived(messageID)
+            }
+        }
+    }
+
+    fun updateMessage(message: Message){
+        repoScope.launch {
+
+            withContext(Dispatchers.IO){
+                localDataSource.updateMessage(message)
             }
         }
     }

@@ -394,4 +394,12 @@ class LocalDataSource @Inject constructor (
         databaseDao.updateMessage(message)
     }
 
+    fun updateImageSent(message: Message){
+        localDBScope.launch {
+            withContext(Dispatchers.IO){
+                updateMessage(message)
+                pushMessage(message)
+            }
+        }
+    }
 }

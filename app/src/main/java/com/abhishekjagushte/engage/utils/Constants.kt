@@ -117,6 +117,10 @@ object Constants {
     const val MEDIA_M2M_ROOT = "groups/"
     const val MEDIA_M2M_IMAGES = "Images/"
 
+    //Chat State String
+    const val CHAT_STATE_NEW = "NEW"
+    const val CHAT_STATE_EXISTING = "EXISTING"
+
 }
 
 //Contacts

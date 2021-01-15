@@ -19,18 +19,18 @@ import kotlinx.coroutines.*
 import java.lang.IllegalStateException
 import javax.inject.Inject
 
-enum class ChatState{
+enum class ChatState {
     NEW, EXISTING
 }
 
-enum class ChatType{
+enum class ChatType {
     CHAT_TYPE_121, CHAT_TYPE_M2M
 }
 
 class ChatViewModel @Inject constructor(
     private val dataRepository: DataRepository,
     private val workManager: WorkManager
-) : ViewModel(){
+) : ViewModel() {
 
     var listenerRegistration: ListenerRegistration? = null
 
@@ -42,14 +42,14 @@ class ChatViewModel @Inject constructor(
     }
 
     private var _conversationID = MutableLiveData<String>()
-    val conversationID : LiveData<String>
+    val conversationID: LiveData<String>
         get() = _conversationID
 
     private var _conversation = MutableLiveData<Conversation>()
-    val conversation : LiveData<Conversation>
+    val conversation: LiveData<Conversation>
         get() = _conversation
 
-    private var myUsername: String?=null//set up in setupScreen
+    private var myUsername: String? = null//set up in setupScreen
 
     private val TAG = "ChatViewModel"
 
@@ -69,21 +69,20 @@ class ChatViewModel @Inject constructor(
         _chatState.value = ChatState.NEW
     }
 
-    fun setupScreen(conversationID: String){
+    fun setupScreen(conversationID: String) {
         _conversationID.value = conversationID
         //this is to set senderid and receiverid in messages
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val conversation = dataRepository.getConversation(conversationID)
                 myUsername = dataRepository.getMydetails()!!.username
-                if (conversation != null){
+                if (conversation != null) {
 
-                    if(conversation.type == Constants.CONVERSATION_TYPE_121) {
+                    if (conversation.type == Constants.CONVERSATION_TYPE_121) {
                         _chatType.postValue(ChatType.CHAT_TYPE_121)
                         //TODO : setUI121(conversation)
                         Log.d(TAG, "setupScreen: Type 121")
-                    }
-                    else{
+                    } else {
                         _chatType.postValue(ChatType.CHAT_TYPE_M2M)
                         //TODO : setUIM2M(conversation)
 
@@ -98,8 +97,7 @@ class ChatViewModel @Inject constructor(
                     _conversation.postValue(conversation)
 
                     _chatState.postValue(ChatState.EXISTING)
-                }
-                else{
+                } else {
                     //The chat will always be 121 if not present in db
                     _chatType.postValue(ChatType.CHAT_TYPE_121)
                     _chatState.postValue(ChatState.NEW)
@@ -108,14 +106,14 @@ class ChatViewModel @Inject constructor(
 
                     val con = Conversation(
                         conversationID = conversationID,
-                        name = contact?.nickname?: conversationID,
+                        name = contact?.nickname ?: conversationID,
                         type = Constants.CONVERSATION_TYPE_121,
-                        active = Constants.CONVERSATION_ACTIVE_NO)
+                        active = Constants.CONVERSATION_ACTIVE_NO
+                    )
 
-                    if(contact!=null){
+                    if (contact != null) {
                         _conversation.postValue(con)
-                    }
-                    else{
+                    } else {
                         TODO("Handle if contact not found")
                     }
 
@@ -126,15 +124,15 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    fun setUI121(conversation: Conversation){
+    fun setUI121(conversation: Conversation) {
         TODO("Set the conversation name etc on the page")
     }
 
-    fun setUIM2M(conversation: Conversation){
+    fun setUIM2M(conversation: Conversation) {
         TODO("Set the conversation name etc on the page")
     }
 
-    fun setUINew(username: String){
+    fun setUINew(username: String) {
         TODO("Set the screen for a new chat")
     }
 
@@ -142,20 +140,21 @@ class ChatViewModel @Inject constructor(
     //this function is called only when there isn't a conID present already so i can create a new one over here
     // and then make a conversation by sending the conversationid from here in firebase
 
-    private fun createNewConversation121(username: String){
+    private fun createNewConversation121(username: String) {
         dataRepository.addConversation121(username)
     }
 
     fun getChatsAll(): LiveData<PagedList<ChatDataItem>> {
-        val factory: DataSource.Factory<Int, MessageView> = dataRepository.getChats(conversationID.value!!)
+        val factory: DataSource.Factory<Int, MessageView> =
+            dataRepository.getChats(conversationID.value!!)
 
-        val convertedFactory = factory.map{
+        val convertedFactory = factory.map {
 //            return@map when(it.type){
 //                0 -> ChatDataItem.MyTextMessage(it)
 //                else -> ChatDataItem.OtherTextMessage(it)
 //            }
 
-            return@map when(it.type){
+            return@map when (it.type) {
 
                 Constants.TYPE_MY_MSG -> {
                     when (it.mime_type) {
@@ -169,7 +168,7 @@ class ChatViewModel @Inject constructor(
                 }
 
                 else -> {
-                    when(it.mime_type){
+                    when (it.mime_type) {
                         Constants.MIME_TYPE_TEXT -> ChatDataItem.OtherTextMessage(it)
                         Constants.MIME_TYPE_IMAGE_JPG -> ChatDataItem.OtherImageMessage(it)
                         else -> throw IllegalStateException("MIME_TYPE_NOT_DEFINED")
@@ -178,23 +177,26 @@ class ChatViewModel @Inject constructor(
             }
         }
 
-        val pagedListBuilder: LivePagedListBuilder<Int, ChatDataItem>
-            = LivePagedListBuilder<Int, ChatDataItem>(convertedFactory, 50)
+        val pagedListBuilder: LivePagedListBuilder<Int, ChatDataItem> =
+            LivePagedListBuilder<Int, ChatDataItem>(convertedFactory, 50)
 
         return pagedListBuilder.build()
     }
 
-    fun sendTextMessage121(message: String){
+    fun sendTextMessage121(message: String) {
         viewModelScope.launch {
-            withContext(Dispatchers.IO){
+            withContext(Dispatchers.IO) {
                 //new is only possible when chat type is 121
-                if(chatState.value == ChatState.NEW){
+                if (chatState.value == ChatState.NEW) {
                     //createNewChat121(username!!) //suspend function sets the conversationID
 
                     //conversationID is username
                     createNewConversation121(conversationID.value!!)
 
-                    Log.d(TAG, "sendMessage: The conversationID created and it is ${conversationID}")
+                    Log.d(
+                        TAG,
+                        "sendMessage: The conversationID created and it is ${conversationID}"
+                    )
                     _chatState.postValue(ChatState.EXISTING)
 
                     val msg = dataRepository.saveTextMessage121Local(
@@ -205,21 +207,20 @@ class ChatViewModel @Inject constructor(
                     )
 
                     viewModelScope.launch {
-                        withContext(Dispatchers.IO){
+                        withContext(Dispatchers.IO) {
                             dataRepository.pushMessage(msg).addOnSuccessListener {
                                 viewModelScope.launch {
-                                    withContext(Dispatchers.IO){
+                                    withContext(Dispatchers.IO) {
                                         dataRepository.setMessageSent(msg.messageID)
                                     }
                                 }
                             }
                         }
                     }
-                }
-                else {
+                } else {
                     Log.d(TAG, "sendTextMessage121: sent")
                     //sets the livedata for chats once the conversationID is initialized
-                    val msg  = dataRepository.saveTextMessage121Local(
+                    val msg = dataRepository.saveTextMessage121Local(
                         message,
                         conversationID.value!!,
                         myUsername!!,
@@ -227,11 +228,11 @@ class ChatViewModel @Inject constructor(
                     )
 
                     viewModelScope.launch {
-                        withContext(Dispatchers.IO){
+                        withContext(Dispatchers.IO) {
                             dataRepository.pushMessage(msg).addOnSuccessListener {
                                 viewModelScope.launch {
                                     Log.d(TAG, "sendTextMessage121: called")
-                                    withContext(Dispatchers.IO){
+                                    withContext(Dispatchers.IO) {
                                         dataRepository.setMessageSent(msg.messageID)
                                     }
                                 }
@@ -245,17 +246,18 @@ class ChatViewModel @Inject constructor(
 
     fun sendTextMessageM2M(message: String, replyToId: String?) {
         viewModelScope.launch {
-            withContext(Dispatchers.IO){
+            withContext(Dispatchers.IO) {
                 Log.d(TAG, "sendTextMessageM2M: ${conversationID.value}")
-                val msg = dataRepository.saveTextMessageM2M(message, conversationID.value!!, replyToId)
+                val msg =
+                    dataRepository.saveTextMessageM2M(message, conversationID.value!!, replyToId)
                 dataRepository.pushMessage(msg)
             }
         }
     }
 
-    fun markMessagesRead(){
+    fun markMessagesRead() {
         viewModelScope.launch {
-            withContext(Dispatchers.IO){
+            withContext(Dispatchers.IO) {
                 dataRepository.markMessagesRead(conversationID.value!!)
             }
         }
@@ -277,7 +279,7 @@ class ChatViewModel @Inject constructor(
         workManager.enqueue(pushWorker)
     }
 
-    private fun setM2MChatListener(conversationID: String){
+    private fun setM2MChatListener(conversationID: String) {
         listenerRegistration = dataRepository.setM2MChatListener(conversationID)
     }
 }

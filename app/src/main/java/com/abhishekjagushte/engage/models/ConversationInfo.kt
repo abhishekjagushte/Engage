@@ -12,5 +12,6 @@ data class ConversationInfo(
     //senderID will be mine always
 
     //In case reply to is there
-    var replyToMessageID: String?
+    var replyToMessageID: String?,
+    var ChatState: String
 ): Parcelable

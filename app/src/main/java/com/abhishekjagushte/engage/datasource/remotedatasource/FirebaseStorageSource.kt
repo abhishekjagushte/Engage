@@ -53,26 +53,10 @@ class FirebaseStorageSource @Inject constructor(
         return "ENG_IMG_${message.timeStamp}.jpg"
     }
 
-    fun uploadImage121(message: Message) {
-        val fileName = createImageFileName(message)
-        val path = createPath121(fileName, message)
-        val uri = Uri.parse(message.local_uri)
+    fun uploadImage(message: Message, metadata: StorageMetadata, path: String): UploadTask {
         val ref = storage.child(path)
-        val task = ref.putFile(uri)
-        val uploader = MediaUploader(message, task)
-        UploadManager.addUploader(message, uploader)
-
-        task.addOnCompleteListener {
-            if(it.isSuccessful){
-                storageScope.launch {
-                    withContext(Dispatchers.IO) {
-                        message.server_url = path
-                        localDataSource.pushMessage(message)
-                        localDataSource.updateMessage(message)
-                    }
-                }
-            }
-        }
+        val task = ref.putFile(Uri.parse(message.local_uri), metadata)
+        return task
     }
 
     fun downloadImage(message: Message, uri: Uri): FileDownloadTask {
