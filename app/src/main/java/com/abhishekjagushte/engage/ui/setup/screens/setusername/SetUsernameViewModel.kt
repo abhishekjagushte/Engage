@@ -42,7 +42,7 @@ class SetUsernameViewModel @Inject constructor(
         if(noteText.value == ""){
             this.name = name
             this.username = username
-            dataRepository.setNameAndUsername(name, username, changeCompleteStatus)
+            dataRepository.setNameAndUsername(name, username, null, changeCompleteStatus)
             //The status of this task is observed from the fragment
         }
     }

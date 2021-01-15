@@ -18,6 +18,7 @@ import com.abhishekjagushte.engage.R
 import com.abhishekjagushte.engage.models.ConversationInfo
 import com.abhishekjagushte.engage.repository.DataRepository
 import com.abhishekjagushte.engage.ui.chat.screens.chat.ChatFragment
+import com.abhishekjagushte.engage.ui.chat.screens.chat.ChatState
 import com.abhishekjagushte.engage.ui.chat.screens.chat.ChatType
 import com.abhishekjagushte.engage.ui.chat.screens.chat.ChatViewModel
 import com.abhishekjagushte.engage.utils.Constants
@@ -147,7 +148,8 @@ class ChatScreenFragment : Fragment(R.layout.fragment_chat_screen) {
             conversationID = SharedViewModel.conversationID.value!!,
             conType = if (SharedViewModel.chatType.value==ChatType.CHAT_TYPE_121) 1 else 2,
             receiverID = if (SharedViewModel.chatType.value==ChatType.CHAT_TYPE_121) SharedViewModel.conversationID.value!! else null,
-            replyToMessageID = null //TODO change to a certian message id this when you implementemt reply to message
+            replyToMessageID = null, //TODO change to a certian message id this when you implementemt reply to message
+            ChatState = if (SharedViewModel.chatState.value == ChatState.NEW) Constants.CHAT_STATE_NEW else Constants.CHAT_STATE_EXISTING
         ))
         Navigation.findNavController(this.requireView()).navigate(R.id.action_chatFragment_to_imagePreviewFragment, bundle)
     }

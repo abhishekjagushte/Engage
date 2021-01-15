@@ -35,7 +35,6 @@ class ImagePreviewFragment : Fragment(R.layout.fragment_image_preview) {
     private lateinit var conversationInfo: ConversationInfo
     private val TAG = "ImagePreviewFragment"
     private lateinit var imageToDisplay: Bitmap
-
     private val job: Job = Job()
     private val coroutineScope = CoroutineScope(Dispatchers.Main+job)
     private lateinit var handler: Handler
@@ -116,8 +115,13 @@ class ImagePreviewFragment : Fragment(R.layout.fragment_image_preview) {
                     local_uri = uri,
                     reply_toID = conversationInfo.replyToMessageID
                 )
+
+                //This case is true only in 121 chats
+                if(conversationInfo.ChatState == Constants.CHAT_STATE_NEW){
+                    dataRepository.addConversation121(conversationInfo.receiverID!!)
+                }
                 val msg = dataRepository.saveImageMessage(message)
-                dataRepository.uploadImage(msg)
+                dataRepository.uploadImage(msg, imageToDisplay.height, imageToDisplay.width)
                 //UI change cannot take place on bg thread
                 handler.post {
                     Navigation.findNavController(this@ImagePreviewFragment.requireView()).navigateUp()
