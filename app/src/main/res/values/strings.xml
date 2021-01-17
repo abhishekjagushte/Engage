@@ -37,4 +37,9 @@
     <string name="search_for_friends">Search for friends...</string>
     <string name="set_name">Set Name</string>
     <string name="group_name">Group Name</string>
+    <string name="reminder">Reminder</string>
+    <string name="poll">Poll</string>
+    <string name="reminder_title">Reminder Title</string>
+    <string name="reminder_description">Reminder description</string>
+    <string name="create_reminder">Create Reminder</string>
 </resources>

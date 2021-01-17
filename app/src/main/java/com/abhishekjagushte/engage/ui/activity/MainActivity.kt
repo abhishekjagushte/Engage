@@ -67,6 +67,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
             R.id.signUpFragment -> bottomNavigationView.visibility = View.GONE
             R.id.chooseMethodFragment -> bottomNavigationView.visibility = View.GONE
             R.id.imagePreviewFragment -> bottomNavigationView.visibility = View.GONE
+            R.id.createReminderDialog -> bottomNavigationView.visibility = View.GONE
 
             else -> bottomNavigationView.visibility = View.VISIBLE
         }
