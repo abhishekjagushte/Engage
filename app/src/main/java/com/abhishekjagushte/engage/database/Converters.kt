@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.room.TypeConverter
 import java.io.ByteArrayOutputStream
+import java.util.*
 
 class Converters {
 
@@ -24,6 +25,22 @@ class Converters {
             return null
 
         return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+    }
+
+    @TypeConverter
+    fun fromLong(timestamp: Long?): Date?{
+        if (timestamp==null)
+            return null
+        else
+            return Date(timestamp)
+    }
+
+    @TypeConverter
+    fun fromDate(date: Date?): Long?{
+        if (date==null)
+            return null
+        else
+            return date.time
     }
 
 }

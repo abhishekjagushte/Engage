@@ -18,7 +18,8 @@ import com.abhishekjagushte.engage.database.views.MessageView
         ContactsConversationsCrossRef::class,
         Conversation::class,
         SuggestedContacts::class,
-        Message::class],
+        Message::class,
+        Event::class],
     version = 1,
     views = [MessageView::class, ConversationView::class, MessageNotificationView::class],
     exportSchema = false)
