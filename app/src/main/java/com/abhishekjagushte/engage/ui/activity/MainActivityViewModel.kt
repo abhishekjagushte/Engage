@@ -1,5 +1,6 @@
 package com.abhishekjagushte.engage.ui.activity
 
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.abhishekjagushte.engage.listeners.One21Listener
@@ -15,6 +16,7 @@ class MainActivityViewModel(
     private var listener121: ListenerRegistration?=null
     val job: Job = Job()
     val viewModelScope: CoroutineScope = CoroutineScope(Dispatchers.Main + job)
+    var profileImageCommunication: Uri? = null
 
     override fun onCleared() {
         super.onCleared()

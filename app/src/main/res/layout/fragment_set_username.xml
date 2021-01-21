@@ -1,55 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center_vertical|center_horizontal"
-    android:orientation="vertical"
+    android:gravity="center"
+    android:background="#fff"
+    xmlns:tools="http://schemas.android.com/tools"
     tools:context=".ui.setup.screens.setusername.SetUsernameFragment">
 
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="30dp"
-        android:text="@string/one_last_step"
-        android:textSize="24sp" />
-
-    <com.google.android.material.textfield.TextInputLayout
+    <LinearLayout
         android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp">
+        android:layout_height="match_parent"
+        android:layout_gravity="center_horizontal|center_vertical"
+        android:background="#fff"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/name_input"
-            android:layout_width="match_parent"
+        <RelativeLayout
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_marginBottom="30dp">
+
+            <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/profile_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_mail_profile_picture_male"
+                app:civ_border_color="#FF000000"
+                app:civ_border_width="2dp" />
+
+            <ImageButton
+                android:id="@+id/change_profile_image"
+                android:layout_width="wrap_content"
+                android:background="#00FFFFFF"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_change_profile"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true" />
+        </RelativeLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/OuterEditText">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/name_input"
+                    style="@style/EditText"
+                    android:hint="@string/name" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+            <com.google.android.material.textfield.TextInputLayout style="@style/OuterEditText">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/username_input"
+                    style="@style/EditText"
+                    android:hint="@string/username" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+        <Button
+            android:id="@+id/confirm_button"
+            style="@style/SubmitButton"
+            android:layout_marginTop="20dp"
+            android:text="@string/sign_up"
+            android:textColor="#fff" />
+
+        <TextView
+            android:id="@+id/noteText"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="@string/name" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="25dp">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/username_input"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/username" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-
-    <Button
-        android:id="@+id/confirm_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/sign_up" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:id="@+id/noteText"/>
-
+            android:layout_marginTop="20dp" />
+    </LinearLayout>
 </LinearLayout>

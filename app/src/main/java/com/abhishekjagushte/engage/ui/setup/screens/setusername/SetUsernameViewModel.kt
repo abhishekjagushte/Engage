@@ -1,5 +1,6 @@
 package com.abhishekjagushte.engage.ui.setup.screens.setusername
 
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -36,7 +37,9 @@ class SetUsernameViewModel @Inject constructor(
         changeCompleteStatus.value = NOT_INITIATED
     }
 
-    fun confirmSetup(name: String, username: String) {
+    fun confirmSetup(name: String, username: String,profileImageUri: Uri?) {
+
+
         //check if the noteText is empty to get proper status
         Log.d(TAG, noteText.value?:"Notetext value is null")
         if(noteText.value == ""){

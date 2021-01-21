@@ -1,7 +1,14 @@
 package com.abhishekjagushte.engage.ui.setup.screens.setusername
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
+import android.os.StrictMode
+import android.os.StrictMode.VmPolicy
+import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -15,37 +22,68 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.abhishekjagushte.engage.ui.fragments.BottomSheet
 import com.abhishekjagushte.engage.EngageApplication
 import com.abhishekjagushte.engage.R
+import com.abhishekjagushte.engage.ui.activity.MainActivity
 import com.abhishekjagushte.engage.utils.Constants
 import com.google.android.material.textfield.TextInputEditText
+import com.theartofdev.edmodo.cropper.CropImage
+import de.hdodenhof.circleimageview.CircleImageView
+import kotlinx.android.synthetic.main.fragment_set_username.view.*
+import java.io.File
 import javax.inject.Inject
+
 
 class SetUsernameFragment: Fragment() {
 
     private val TAG: String = "SetUsernameFragment"
+    private var profileImageUri:Uri? = null
+    private lateinit var profileImageView: CircleImageView
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
     private val viewModel by viewModels<SetUsernameViewModel> { viewModelFactory }
 
-
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         val view = inflater.inflate(R.layout.fragment_set_username, container, false)
-
         val nameInput = view.findViewById<TextInputEditText>(R.id.name_input)
         val usernameInput = view.findViewById<TextInputEditText>(R.id.username_input)
         val confirmButton = view.findViewById<Button>(R.id.confirm_button)
         val noteText = view.findViewById<TextView>(R.id.noteText)
 
+        profileImageView = view.findViewById(R.id.profile_image)
+
+
         val args = SetUsernameFragmentArgs.fromBundle(requireArguments())
         viewModel.email = args.email
         viewModel.password = args.password
 
+        val builder = VmPolicy.Builder()
+        StrictMode.setVmPolicy(builder.build())
+
+        //Set Profile Picture
+        view.change_profile_image.setOnClickListener()
+        {
+            findNavController().navigate(R.id.action_setUsernameFragment_to_bottomSheet)
+        }
+
+
+        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Uri>("returnedProfileImageFromSlider")?.observe(
+            viewLifecycleOwner) { result ->
+            result?.let {
+                profileImageUri=it
+                profileImageView.setImageURI(profileImageUri)
+            }
+        }
+
         //check username to be unique from firebase
-        usernameInput.addTextChangedListener(object: TextWatcher{
+        usernameInput.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
 
             }
@@ -61,29 +99,27 @@ class SetUsernameFragment: Fragment() {
 
         })
 
-        viewModel.noteText.observe( viewLifecycleOwner, Observer {
-            noteText.setText(it?: "")
-            Log.d(TAG,it)
+        viewModel.noteText.observe(viewLifecycleOwner, Observer {
+            noteText.setText(it ?: "")
+            Log.d(TAG, it)
         })
 
         viewModel.changeCompleteStatus.observe(viewLifecycleOwner, Observer {
-            when(it){
+            when (it) {
                 Constants.LOCAL_DB_SUCCESS -> updateUI()
                 Constants.FIREBASE_CHANGE_FAILED -> confirmFailed()
                 Constants.LOCAL_DB_FAILED -> confirmFailed()
-                else -> Log.d(TAG,"Not initiated")
+                else -> Log.d(TAG, "Not initiated")
             }
         })
 
         confirmButton.setOnClickListener {
-
             val name = nameInput.text.toString()
             val username = usernameInput.text.toString()
 
             if(checkInputs(name, username)){
-                viewModel.confirmSetup(name, username)
+                viewModel.confirmSetup(name, username, profileImageUri)
             }
-
         }
 
         return view
@@ -95,13 +131,13 @@ class SetUsernameFragment: Fragment() {
 
 
     private fun updateUI() {
-        Log.d(TAG,"Updated Successfully")
+        Log.d(TAG, "Updated Successfully")
         findNavController().navigate(R.id.action_global_chatListFragment)
     }
 
 
     private fun checkInputs(name: String, username: String): Boolean {
-        return checkName(name) && viewModel.usernameValid.value?:false
+        return checkName(name) && viewModel.usernameValid.value?:false 
     }
 
     private fun checkName(name: String): Boolean{

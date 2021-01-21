@@ -5,37 +5,46 @@
     android:layout_height="match_parent"
     android:gravity="center_vertical|center_horizontal"
     android:orientation="vertical"
+    android:background="#fff"
     tools:context=".ui.setup.screens.ChooseMethodFragment">
 
-    <TextView
-        android:id="@+id/welcome_line"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="15dp"
-        android:text="@string/welcome_to_engage"
-        android:textSize="27sp" />
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        android:text="@string/tagline"
-        android:textSize="20sp" />
+    <LinearLayout
+        android:layout_width="300dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_horizontal|center_vertical"
+        android:background="#fff"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/title2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:text="@string/welcome_to_engage"
+            android:textStyle="bold"
+            android:textSize="40dp"
+            android:textColor="#003863"/>
+
+        <TextView
+            android:id="@+id/title1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="45dp"
+            android:text="@string/tagline"
+            android:textSize="22dp"
+            android:textColor="#000"/>
 
     <Button
         android:id="@+id/login_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/SubmitButton"
         android:layout_marginBottom="15dp"
-        android:background="@android:color/transparent"
         android:text="@string/login" />
 
     <Button
         android:id="@+id/signup_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
+        style="@style/SubmitButton"
         android:text="@string/sign_up" />
-
+    </LinearLayout>
 </LinearLayout>
