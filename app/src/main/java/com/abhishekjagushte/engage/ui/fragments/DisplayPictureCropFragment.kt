@@ -10,4 +10,5 @@ import com.abhishekjagushte.engage.R
 
 class DisplayPictureCropFragment : Fragment(R.layout.fragment_display_picture_crop) {
 
+
 }
