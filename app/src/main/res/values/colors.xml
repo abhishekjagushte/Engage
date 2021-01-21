@@ -5,4 +5,5 @@
     <color name="colorAccent">#03DAC5</color>
 
     <color name="selected_background">#80B1AC</color>
+    <color name = "secondarycolor">#d0d3d2</color>
 </resources>
