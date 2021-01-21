@@ -26,6 +26,9 @@
             <nav-graph android:value="@navigation/main_activity_nav_graph"/>
         </activity>
 
+        <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+            android:theme="@style/Base.Theme.AppCompat"/>
+
         <service
             android:name=".notifications.NotificationHandler"
             android:exported="false">

@@ -3,6 +3,7 @@
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
-
     <color name="selected_background">#80B1AC</color>
+    <color name="submit_button_text_color">#ffffff</color>
+    <color name="transparent">#00000000</color>
 </resources>

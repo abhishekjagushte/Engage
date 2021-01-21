@@ -123,4 +123,11 @@ dependencies {
     //Firebase Storage
     implementation 'com.google.firebase:firebase-storage-ktx'
     implementation platform('com.google.firebase:firebase-bom:26.1.1')
+
+    //Profile Photo
+    implementation 'com.theartofdev.edmodo:android-image-cropper:2.5.+'
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
+    implementation 'com.google.android.material:material:1.1.0'
+
+
 }

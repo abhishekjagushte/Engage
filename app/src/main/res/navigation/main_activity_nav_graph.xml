@@ -142,6 +142,9 @@
             <argument
                 android:name="password"
                 app:argType="string" />
+            <action
+                android:id="@+id/action_setUsernameFragment_to_bottomSheet"
+                app:destination="@id/bottomSheet" />
         </fragment>
 
         <action
@@ -150,6 +153,15 @@
             app:enterAnim="@anim/slide_in_right"
             app:popUpTo="@id/splashScreen"
             app:popUpToInclusive="true" />
+        <dialog
+            android:id="@+id/bottomSheet"
+            android:name="com.abhishekjagushte.engage.ui.fragments.BottomSheet"
+            android:label="fragment_bottom_sheet"
+            tools:layout="@layout/fragment_bottom_sheet" >
+            <action
+                android:id="@+id/action_bottomSheet_to_setUsernameFragment"
+                app:destination="@id/setUsernameFragment" />
+        </dialog>
 
     </navigation>
 
