@@ -22,7 +22,7 @@
             android:layout_marginTop="4dp"
             android:layout_marginEnd="30dp"
             android:layout_marginBottom="4dp"
-            android:background="#A7ACAB"
+            android:background="@drawable/left_message_box_background"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -31,11 +31,7 @@
 
             <TextView
                 android:id="@+id/sender_name_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginEnd="4dp"
+                style="@style/leftMessageBox"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
@@ -44,20 +40,15 @@
 
             <TextView
                 android:id="@+id/message_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:layout_marginTop="4dp"
+                style="@style/leftMessageBox"
                 android:text="@{message.data}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/sender_name_tv" />
 
             <TextView
                 android:id="@+id/time_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:layout_marginEnd="4dp"
+                style="@style/leftMessageBox"
+                android:textSize="10dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/message_tv"
