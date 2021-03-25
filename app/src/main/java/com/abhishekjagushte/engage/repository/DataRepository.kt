@@ -1,12 +1,21 @@
 package com.abhishekjagushte.engage.repository
 
+import android.app.AlarmManager
+import android.app.Application
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import android.net.Uri
+import android.os.Bundle
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.DataSource
+import com.abhishekjagushte.engage.broadcastreceiver.AlarmReceiver
 import com.abhishekjagushte.engage.database.entities.*
+import com.abhishekjagushte.engage.database.entities.jsonmodels.Reminder
 import com.abhishekjagushte.engage.database.views.ConversationView
+import com.abhishekjagushte.engage.database.views.EventView
 import com.abhishekjagushte.engage.database.views.MessageNotificationView
 import com.abhishekjagushte.engage.database.views.MessageView
 import com.abhishekjagushte.engage.datasource.localdatasource.FirebaseInstanceSource
@@ -16,6 +25,7 @@ import com.abhishekjagushte.engage.datasource.remotedatasource.FirebaseDataSourc
 import com.abhishekjagushte.engage.datasource.remotedatasource.FirebaseStorageSource
 import com.abhishekjagushte.engage.datasource.remotedatasource.FunctionsSource
 import com.abhishekjagushte.engage.datasource.remotedatasource.uploadmanager.MediaUploader
+import com.abhishekjagushte.engage.listeners.EventM2MListener
 import com.abhishekjagushte.engage.listeners.M2MListener
 import com.abhishekjagushte.engage.network.CreateGroupRequest
 import com.abhishekjagushte.engage.network.convertDomainObject
@@ -33,6 +43,9 @@ import com.google.firebase.iid.InstanceIdResult
 import com.google.firebase.storage.FileDownloadTask
 import com.google.firebase.storage.StorageMetadata
 import com.google.firebase.storage.UploadTask
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.*
 import org.json.JSONObject
 import java.util.*
@@ -44,8 +57,9 @@ class DataRepository @Inject constructor(
     private val firebaseDataSource: FirebaseDataSource,
     private val firebaseInstanceId: FirebaseInstanceSource,
     private val functionsSource: FunctionsSource,
-    private val storageSource: FirebaseStorageSource
-){
+    private val storageSource: FirebaseStorageSource,
+    private val application: Application
+) {
     private val TAG: String = "DataRepository"
 
     private val repoJob = Job()
@@ -53,7 +67,7 @@ class DataRepository @Inject constructor(
 
 
     //Functions that send Status to Viewmodels.....
-    fun login(email: String, password: String, completeStatus: MutableLiveData<String>){
+    fun login(email: String, password: String, completeStatus: MutableLiveData<String>) {
 
         TODO("Implement the import of contacts and conversations while logging in compulsory!")
 
@@ -83,7 +97,12 @@ class DataRepository @Inject constructor(
 //        }
     }
 
-    fun setNameAndUsername(name: String, username: String, profileImageUri: Uri?, completeStatus: MutableLiveData<String>){
+    fun setNameAndUsername(
+        name: String,
+        username: String,
+        profileImageUri: Uri?,
+        completeStatus: MutableLiveData<String>
+    ) {
         firebaseInstanceId.getNotificationChannelID()
             .addOnCompleteListener(OnCompleteListener { task ->
                 if (!task.isSuccessful) {
@@ -93,10 +112,10 @@ class DataRepository @Inject constructor(
 
                 // Get new Instance ID token
                 val token = task.result?.token
-                Log.d(TAG,token?:"Not generated")
+                Log.d(TAG, token ?: "Not generated")
 
-                if(token!=null){
-                    val pair = authDataSource.setNameAndUsername(name,username, token)
+                if (token != null) {
+                    val pair = authDataSource.setNameAndUsername(name, username, token)
 
                     pair.first.addOnSuccessListener {
                         completeStatus.value = Constants.FIREBASE_CHANGE_COMPLETE
@@ -118,19 +137,19 @@ class DataRepository @Inject constructor(
                         }
                     }.addOnFailureListener {
                         completeStatus.value = Constants.FIREBASE_CHANGE_FAILED
-                        Log.d(TAG,Constants.FIREBASE_CHANGE_FAILED)
+                        Log.d(TAG, Constants.FIREBASE_CHANGE_FAILED)
                         Log.d(TAG, "setNameAndUsername: firebase change failed")
                     }
                 }
             })
     }
 
-    fun updateNotificationChannelID(id: String){
+    fun updateNotificationChannelID(id: String) {
         repoScope.launch {
-            withContext(Dispatchers.IO){
+            withContext(Dispatchers.IO) {
 
                 val c = localDataSource.getMyDetails()
-                if(c!=null){
+                if (c != null) {
                     Log.d(TAG, c.username + "****************")
 
                     firebaseDataSource.updateNotificationChannelID(id, c.username)
@@ -170,7 +189,6 @@ class DataRepository @Inject constructor(
     }
 
 
-
     //Internal Repo Functions
 
     //Profile Fragment
@@ -186,11 +204,11 @@ class DataRepository @Inject constructor(
         return firebaseDataSource.getContactFirestoreFromUsername(username)
     }
 
-    fun updateContact(contact: Contact){
+    fun updateContact(contact: Contact) {
         localDataSource.updateContact(contact)
     }
 
-    fun getMydetails(): ContactNameUsername?{
+    fun getMydetails(): ContactNameUsername? {
         return localDataSource.getMyDetails()
     }
 
@@ -203,7 +221,7 @@ class DataRepository @Inject constructor(
         return authDataSource.getCurrentUser()
     }
 
-    fun signUpAddCredentialsLocal(email: String, password: String){
+    fun signUpAddCredentialsLocal(email: String, password: String) {
         localDataSource.signUpAddCredentialsLocal(email, password)
     }
 
@@ -211,20 +229,20 @@ class DataRepository @Inject constructor(
         return firebaseDataSource.checkUsername(username)
     }
 
-    private fun addMyDetailsInContacts(contact: Contact){
+    private fun addMyDetailsInContacts(contact: Contact) {
         localDataSource.addMyDetailsInContacts(contact)
     }
 
-    private fun getCurrentUserUID():String{
+    private fun getCurrentUserUID(): String {
         return authDataSource.getCurrentUserUID()
     }
 
-    fun signup(email: String, password:String): Task<AuthResult> {
-        return authDataSource.signUp(email,password)
+    fun signup(email: String, password: String): Task<AuthResult> {
+        return authDataSource.signUp(email, password)
     }
 
 
-    fun addContact(contact: Contact){
+    fun addContact(contact: Contact) {
         localDataSource.addContact(contact)
     }
 
@@ -237,7 +255,7 @@ class DataRepository @Inject constructor(
         val name = data.get("name")
         val username = data.get("username")
 
-        if(name !=null && username!=null){
+        if (name != null && username != null) {
             val contact = Contact(
                 name = name,
                 username = username,
@@ -246,7 +264,7 @@ class DataRepository @Inject constructor(
             )
 
             repoScope.launch {
-                withContext(Dispatchers.IO){
+                withContext(Dispatchers.IO) {
                     localDataSource.addContact(contact)
                 }
             }
@@ -260,7 +278,7 @@ class DataRepository @Inject constructor(
 
         Log.d(TAG, "friendRequestAccepted: $conID is the conversationID")
 
-        if(name !=null && username!=null){
+        if (name != null && username != null) {
             val contact = Contact(
                 name = name,
                 username = username,
@@ -269,7 +287,7 @@ class DataRepository @Inject constructor(
             )
 
             repoScope.launch {
-                withContext(Dispatchers.IO){
+                withContext(Dispatchers.IO) {
                     localDataSource.updateContact(contact) //Replace strategy so no worries
                 }
             }
@@ -284,29 +302,43 @@ class DataRepository @Inject constructor(
         return localDataSource.getChats(conversationID)
     }
 
+    fun getEvents(conversationID: String): DataSource.Factory<Int, EventView> {
+        return localDataSource.getEvents(conversationID)
+    }
+
     fun saveTextMessage121Local(
         message: String,
         conversationID: String,
         myUsername: String,
         otherUsername: String
     ): Message {
-        return localDataSource.saveTextMessage121Local(message, conversationID, myUsername, otherUsername)
+        return localDataSource.saveTextMessage121Local(
+            message,
+            conversationID,
+            myUsername,
+            otherUsername
+        )
     }
 
     fun saveImageMessage(message: Message): Message {
         return localDataSource.saveImageMessage(message)
     }
 
-    fun uploadImage(message: Message, height: Int, width: Int){
-        val mediaUploader = MediaUploader(message, this, MediaUploader.ImageProperties(height, width))
+    fun uploadImage(message: Message, height: Int, width: Int) {
+        val mediaUploader =
+            MediaUploader(message, this, MediaUploader.ImageProperties(height, width))
         mediaUploader.start()
     }
 
-    fun updateImageSent(message: Message){
+    fun updateImageSent(message: Message) {
         localDataSource.updateImageSent(message)
     }
 
-    fun uploadImageStorageSource(message: Message, metadata: StorageMetadata, path: String): UploadTask{
+    fun uploadImageStorageSource(
+        message: Message,
+        metadata: StorageMetadata,
+        path: String
+    ): UploadTask {
         return storageSource.uploadImage(message, metadata, path)
     }
 
@@ -318,7 +350,7 @@ class DataRepository @Inject constructor(
         return localDataSource.saveTextMessageM2MLocal(message, conversationID, replyToId)
     }
 
-    fun addConversation121(username: String){
+    fun addConversation121(username: String) {
         localDataSource.addConversation121(username)
     }
 
@@ -342,20 +374,79 @@ class DataRepository @Inject constructor(
         //Since pushing messaage is more of a job for local databse updation, it is done in local db source
     }
 
-    fun receiveMessage121(message: Message){
-        if(localDataSource.getConversation(message.senderID!!)==null) {
+    fun receiveMessage121(message: Message) {
+        if (localDataSource.getConversation(message.senderID!!) == null) {
             Log.d(TAG, "receiveMessage121: conversation not present")
             localDataSource.addConversation121(message.senderID!!)
         }
         localDataSource.insertMessage(message)
     }
 
-    fun receiveMessageM2M(message: Message){
-        if(localDataSource.getConversation(message.conversationID)==null) {
+    fun receiveEvent121(event: Event) {
+        if (localDataSource.getConversation(event.senderID!!) == null) {
+            Log.d(TAG, "receiveEvent121: conversation not present")
+            localDataSource.addConversation121(event.senderID!!)
+        }
+        localDataSource.insertEvent(event)
+        checkEvent(event)
+        Log.d(TAG, "receiveEvent121: event added ${event.conversationID} ${event.eventID}")
+    }
+
+    fun checkEvent(event: Event) {
+        when (event.event_type) {
+            Constants.EVENT_TYPE_REMINDER -> {
+                createAlarmReminder(event)
+            }
+        }
+    }
+
+    private fun createAlarmReminder(event: Event) {
+        val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+        val jsonAdapter: JsonAdapter<Reminder> = moshi.adapter(Reminder::class.java)
+        val reminder = jsonAdapter.fromJson(event.data!!)!!
+        var reminderTime = reminder.reminderTime
+
+        //In case this is received late
+        if (reminder.reminderTime < System.currentTimeMillis())
+            reminderTime += 1000 * 60
+
+        val args = Bundle()
+        args.putString(Constants.CONVERSATION_ID, event.conversationID)
+        args.putString(Constants.TITLE, reminder.title)
+        args.putString(Constants.DESCRIPTION, reminder.description)
+        args.putLong(Constants.TIME, reminderTime)
+        args.putLong(Constants.REMINDER_TIME, reminder.reminderTime)
+        args.putString(Constants.EVENT_ID, event.eventID)
+
+        val alarmManager =
+            application.applicationContext.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(application, AlarmReceiver::class.java)
+        intent.putExtra("args", args)
+
+        val pendingIntent = PendingIntent.getBroadcast(
+            application,
+            1,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, reminder.reminderTime, pendingIntent)
+    }
+
+    fun receiveMessageM2M(message: Message) {
+        if (localDataSource.getConversation(message.conversationID) == null) {
             Log.d(TAG, "receiveMessageM2M: conversation not present")
             //localDataSource.addGroupMessaageReceivedFirst(message.conversationID)
         }
         localDataSource.insertMessage(message)
+    }
+
+    fun receiveEventM2M(event: Event) {
+        if (localDataSource.getConversation(event.conversationID) == null) {
+            Log.d(TAG, "receiveMessageM2M: conversation not present")
+            //localDataSource.addGroupMessaageReceivedFirst(message.conversationID)
+        }
+        localDataSource.insertEvent(event)
     }
 
     fun markMessagesRead(conversationID: String) {
@@ -404,7 +495,7 @@ class DataRepository @Inject constructor(
         return functionsSource.createGroup(request)
     }
 
-    fun getNewConversationIDM2M(): String{
+    fun getNewConversationIDM2M(): String {
         return firebaseDataSource.getNewConversationIDM2M()
     }
 
@@ -419,7 +510,7 @@ class DataRepository @Inject constructor(
     }
 
     fun syncM2MChat(syncMap: M2MSyncRequirement): Task<QuerySnapshot> {
-        return  firebaseDataSource.syncM2MChat(syncMap)
+        return firebaseDataSource.syncM2MChat(syncMap)
     }
 
 
@@ -429,8 +520,8 @@ class DataRepository @Inject constructor(
 
     fun addNewGroup(name: String?, conversationID: String?) {
         repoScope.launch {
-            withContext(Dispatchers.IO){
-                if(!localDataSource.checkConversationExists(conversationID!!))
+            withContext(Dispatchers.IO) {
+                if (!localDataSource.checkConversationExists(conversationID!!))
                     localDataSource.addConversationM2M(name!!, conversationID)
 
             }
@@ -445,11 +536,15 @@ class DataRepository @Inject constructor(
         return localDataSource.getMessageNotification(messageID)
     }
 
+    fun getEventNotification(eventID: String): MessageNotificationView {
+        return localDataSource.getEventNotification(eventID)
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // Test
     ///////////////////////////////////////////////////////////////////////////
-    fun addTestDateData(){
-        firebaseDataSource.addTestDateData();
+    fun addTestDateData() {
+        //firebaseDataSource.addTestDateData();
     }
 
 
@@ -462,10 +557,15 @@ class DataRepository @Inject constructor(
         val last121MessageTimeStamp = Date(timestamp)
 
         Log.d(TAG, "set121ChatListener: $last121MessageTimeStamp")
-        
+
         return firebaseDataSource.set121ChatListener(last121MessageTimeStamp, username)
     }
 
+    fun setEvents121Listener(myUsername: String): Query {
+        val lastEventTimestamp121 = localDataSource.getLast121EventTimestamp()
+        val last121EventTimestamp = Date(lastEventTimestamp121)
+        return firebaseDataSource.set121EventListener(last121EventTimestamp, myUsername)
+    }
 
 
     fun setM2MChatListener(conversationID: String): ListenerRegistration {
@@ -474,9 +574,24 @@ class DataRepository @Inject constructor(
         val lastMessageTimeStamp = Date(timestamp)
 
         Log.d(TAG, "setM2MChatListener: $lastMessageTimeStamp")
-        
+
         val query = firebaseDataSource.setM2MChatListener(conversationID, lastMessageTimeStamp)
         val listener = M2MListener(this, repoScope, conversationID, myUsername)
+        return query.addSnapshotListener { value, error ->
+            listener.m2mListener(value, error)
+        }
+    }
+
+
+    fun setM2MEventListener(conversationID: String): ListenerRegistration {
+        val myUsername = localDataSource.getMyDetails()!!.username
+        val timestamp = localDataSource.getLastM2MEventTimestampForConversation(conversationID)
+        val lastEventTimeStamp = Date(timestamp)
+
+        Log.d(TAG, "setM2MChatListener: $lastEventTimeStamp")
+
+        val query = firebaseDataSource.setM2MEventListener(conversationID, lastEventTimeStamp)
+        val listener = EventM2MListener(this, repoScope, myUsername)
         return query.addSnapshotListener { value, error ->
             listener.m2mListener(value, error)
         }
@@ -503,11 +618,32 @@ class DataRepository @Inject constructor(
         }
     }
 
-    fun updateMessage(message: Message){
+    fun updateMessage(message: Message) {
         repoScope.launch {
 
-            withContext(Dispatchers.IO){
+            withContext(Dispatchers.IO) {
                 localDataSource.updateMessage(message)
+            }
+        }
+    }
+
+    fun createReminderEvent(event: Event) {
+        repoScope.launch {
+            withContext(Dispatchers.IO) {
+                event.senderID = getMydetails()!!.username
+                localDataSource.createReminderEvent(event)
+            }
+        }
+    }
+
+    fun markReminderDone(eventID: String, receiverID: String) {
+        repoScope.launch {
+            withContext(Dispatchers.IO){
+                val senderID = getMydetails()!!.username
+                firebaseDataSource.markReminderDone(eventID, senderID).addOnSuccessListener {
+                    localDataSource.markReminderDone(eventID)
+                    functionsSource.markReminderDone(eventID, senderID, receiverID) //calls function
+                }
             }
         }
     }

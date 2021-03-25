@@ -7,6 +7,7 @@ import com.abhishekjagushte.engage.database.views.ConversationView
 import com.abhishekjagushte.engage.database.views.MessageNotificationView
 import com.abhishekjagushte.engage.database.views.MessageView
 import androidx.paging.DataSource
+import com.abhishekjagushte.engage.database.views.EventView
 
 @Dao
 interface DatabaseDao{
@@ -128,6 +129,9 @@ interface DatabaseDao{
     @Query("SELECT * FROM message_notification_view WHERE messageID = :messageID")
     fun getMessageNotification(messageID: String): MessageNotificationView
 
+    @Query("SELECT * FROM event_notification_view WHERE eventID = :eventID")
+    fun getEventNotification(eventID: String): MessageNotificationView
+
     @Query("SELECT * FROM messages WHERE messageID = :messageID")
     fun getMessage(messageID: String): Message
 
@@ -142,9 +146,26 @@ interface DatabaseDao{
     @Query("SELECT MAX(timeStamp) FROM messages WHERE conversationID = :conversationID")
     fun getLastM2MMessageTimestampForConversation(conversationID: String): Long
 
+    @Query("SELECT MAX(timeStamp) FROM events WHERE conversationID = :conversationID")
+    fun getLastM2MEventTimestampForConversation(conversationID: String): Long
+
     @Query("SELECT conversations.conversationID, timeStamp AS lastMessageTimeStamp FROM conversations INNER JOIN messages ON conversations.lastMessageID == messages.messageID AND conversations.type =2 ")
     fun getM2MSyncRequirement(): List<M2MSyncRequirement>
 
     @Query("UPDATE messages SET status = 4 WHERE messageID = :messageID")
     fun setMessageReceived(messageID: String)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertEvent(event: Event)
+
+    @Query("SELECT * FROM events_view WHERE conversationID == :conversationID ORDER BY timeStamp DESC")
+    fun getEvents(conversationID: String): DataSource.Factory<Int, EventView>
+    //LiveData<List<MessageView>>
+
+    @Query("SELECT MAX(timeStamp) FROM events WHERE conType = 1")//contype 1 = 121
+    fun getLast121EventTimestamp(): Long
+
+    @Query("UPDATE events SET status = 2 WHERE eventID = :eventID")
+    fun markReminderDone(eventID: String)
+
 }

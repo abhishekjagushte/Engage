@@ -6,12 +6,6 @@ import com.abhishekjagushte.engage.network.DateTest
 import com.abhishekjagushte.engage.utils.Constants
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.*
-import com.google.firebase.firestore.ktx.toObject
-import com.google.firebase.ktx.Firebase
-import java.time.LocalDateTime
-import java.time.OffsetDateTime
-import java.time.ZoneId
-import java.time.ZoneOffset
 import java.util.*
 import javax.inject.Inject
 
@@ -108,11 +102,34 @@ class FirebaseDataSource @Inject constructor(
         return query
     }
 
+    fun setM2MEventListener(conversationID: String, lastMessageTimeStamp: Date): Query {
+        val query = firestore
+            .collection("groups/$conversationID/events")
+            .whereGreaterThanOrEqualTo("timeStamp", lastMessageTimeStamp)
+
+        return query
+    }
+
     fun syncM2MChat(syncMap: M2MSyncRequirement): Task<QuerySnapshot> {
         val query = firestore
             .collection("groups/${syncMap.conversationID}/chats")
             .whereGreaterThanOrEqualTo("timeStamp", Date(syncMap.lastMessageTimeStamp))
 
         return query.get()
+    }
+
+    fun set121EventListener(last121EventTimestamp: Date, myUsername: String): Query {
+        val query = firestore
+            .collection("users/$myUsername/events121")
+            .whereGreaterThanOrEqualTo("timeStamp", last121EventTimestamp)
+
+        return query
+    }
+
+    fun markReminderDone(eventID: String, myUsername: String): Task<Void> {
+        val query = firestore.collection("user/$myUsername/events121")
+            .document(eventID).update("status", Constants.REMINDER_STATUS_INACTIVE)
+
+        return query
     }
 }

@@ -65,6 +65,7 @@ object Constants {
     const val STATUS_UPLOADING = 6
     const val STATUS_UPLOAD_FAILED = 7
     const val STATUS_RECEIVED_MEDIA_NOT_DOWNLOADED = 8
+    const val STATUS_EVENT_RECEIVED = 1
 
     const val NEEDS_PUSH_YES = 1
     const val NEEDS_PUSH_NO = 2
@@ -72,12 +73,26 @@ object Constants {
     const val DELETED_NO = 1
     const val DELETED_YES = 2
 
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Events
+    const val REMINDER_STATUS_ACTIVE = 1
+    const val REMINDER_STATUS_INACTIVE = 2
+
+    const val EVENT_MINE = 1
+    const val EVENT_OTHER = 2
+
+    const val EVENT_TYPE_REMINDER = 1
+    const val EVENT_TYPE_POLL= 2
+    ///////////////////////////////////////////////////////////////////////////
+
+
     //MIME Types
     const val MIME_TYPE_TEXT = "text/plain"
     const val MIME_TYPE_IMAGE_JPG = "image/jpeg"
 
     //Conversation types
-    const val CONVERSATION_TYPE_121 = 1
+    const val CONVERSATION_TYPE_121: Int = 1
     const val CONVERSATION_TYPE_M2M = 2
 
     const val CONVERSATION_ACTIVE_YES = 1
@@ -120,6 +135,13 @@ object Constants {
     //Chat State String
     const val CHAT_STATE_NEW = "NEW"
     const val CHAT_STATE_EXISTING = "EXISTING"
+
+    const val CONVERSATION_ID = "conversationID"
+    const val TITLE = "title"
+    const val DESCRIPTION = "description"
+    const val TIME = "time"
+    const val REMINDER_TIME = "reminderTime"
+    const val EVENT_ID: String = "eventID"
 
 }
 

@@ -186,6 +186,14 @@
         android:id="@+id/createReminderDialog"
         android:name="com.abhishekjagushte.engage.ui.chat.screens.events.createscreens.CreateReminderDialog"
         android:label="fragment_create_reminder_dialog"
-        tools:layout="@layout/fragment_create_reminder_dialog" />
+        tools:layout="@layout/fragment_create_reminder_dialog" >
+        <argument
+            android:name="conversationType"
+            app:argType="integer" />
+        <argument
+            android:name="conversationID"
+            app:argType="string"
+            app:nullable="true" />
+    </dialog>
 
 </navigation>

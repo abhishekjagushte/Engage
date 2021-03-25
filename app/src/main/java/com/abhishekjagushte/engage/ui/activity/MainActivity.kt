@@ -50,6 +50,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         navController.addOnDestinationChangedListener(this)
 
         viewModel.set121MessageListener()
+        viewModel.set121EventsListener()
     }
 
     override fun onDestinationChanged(

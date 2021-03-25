@@ -19,10 +19,28 @@
         <item name="android:textSize">21sp</item>
     </style>
 
+    <style name="event_text_large">
+        <item name="android:textColor">@color/colorAccent</item>
+        <item name="android:textSize">21sp</item>
+    </style>
+
+
     <style name="confirm_button_large">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="event" parent="CardView">
+        <item name="android:layout_marginLeft">16dp</item>
+        <item name="android:layout_marginRight">16dp</item>
+        <item name="android:layout_marginBottom">8dp</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="cardCornerRadius">10dp</item>
+    </style>
+
+    <style name="event.reminder">
+        <item name="android:background">@color/colorPrimaryDark</item>
     </style>
 
 </resources>

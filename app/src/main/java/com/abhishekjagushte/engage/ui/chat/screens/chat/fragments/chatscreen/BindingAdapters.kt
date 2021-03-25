@@ -15,6 +15,14 @@ fun TextView.setTimeString(message: MessageView){
     }
 }
 
+@BindingAdapter("setDateTimeString")
+fun TextView.setDateTimeString(millis: Long){
+    val dateTime = millis
+    dateTime.let {
+        text = StringFormatting.getTime(it)
+    }
+}
+
 @BindingAdapter("setSenderName")
 fun TextView.setSenderName(message: MessageView){
     if(message.conType == Constants.CONVERSATION_TYPE_121)

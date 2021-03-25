@@ -6,6 +6,7 @@ import androidx.paging.DataSource
 import com.abhishekjagushte.engage.database.*
 import com.abhishekjagushte.engage.database.entities.*
 import com.abhishekjagushte.engage.database.views.ConversationView
+import com.abhishekjagushte.engage.database.views.EventView
 import com.abhishekjagushte.engage.database.views.MessageNotificationView
 import com.abhishekjagushte.engage.database.views.MessageView
 import com.abhishekjagushte.engage.network.CreateGroupRequest
@@ -361,12 +362,20 @@ class LocalDataSource @Inject constructor (
         return databaseDao.getMessageNotification(messageID)
     }
 
+    fun getEventNotification(eventID: String): MessageNotificationView {
+        return databaseDao.getEventNotification(eventID)
+    }
+
     fun getLast121MessageTimestamp(): Long {
         return databaseDao.getLast121MessageTimestamp()
     }
 
     fun getLastM2MMessageTimestampForConversation(conversationID: String): Long {
         return databaseDao.getLastM2MMessageTimestampForConversation(conversationID)
+    }
+
+    fun getLastM2MEventTimestampForConversation(conversationID: String): Long {
+        return databaseDao.getLastM2MEventTimestampForConversation(conversationID)
     }
 
     fun getM2MSyncMap(): List<M2MSyncRequirement> {
@@ -401,5 +410,33 @@ class LocalDataSource @Inject constructor (
                 pushMessage(message)
             }
         }
+    }
+
+    fun createReminderEvent(event: Event) {
+        if(event.conType==Constants.CONVERSATION_TYPE_121){
+            val docref = firestore.collection("users/${event.conversationID}/events121").document()
+            event.eventID = docref.id
+            docref.set(event.convertEventNetwork()).addOnSuccessListener {
+                Log.d(TAG, "createReminderEvent: Done successfully")
+            }
+            databaseDao.insertEvent(event)
+            Log.e(TAG, "createReminderEvent: $event", )
+        }
+    }
+
+    fun getEvents(conversationID: String): DataSource.Factory<Int, EventView> {
+        return databaseDao.getEvents(conversationID)
+    }
+
+    fun getLast121EventTimestamp(): Long {
+        return databaseDao.getLast121EventTimestamp()
+    }
+
+    fun insertEvent(event: Event) {
+        databaseDao.insertEvent(event)
+    }
+
+    fun markReminderDone(eventID: String) {
+        databaseDao.markReminderDone(eventID)
     }
 }
