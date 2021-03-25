@@ -1,7 +1,8 @@
 package com.abhishekjagushte.engage.network
 
-import android.provider.SyncStateContract
+import androidx.room.PrimaryKey
 import com.abhishekjagushte.engage.database.entities.Contact
+import com.abhishekjagushte.engage.database.entities.Event
 import com.abhishekjagushte.engage.database.entities.Message
 import com.abhishekjagushte.engage.utils.Constants
 import com.google.firebase.firestore.ServerTimestamp
@@ -117,3 +118,39 @@ data class CreateGroupRequest(
     val creator: String,
     var participants: List<String>
 )
+
+class EventNetwork(
+    var eventID: String? = null,
+    var conversationID: String? = null,
+
+    @ServerTimestamp
+    var timeStamp: Date?=null, //this timestamp will be the timestamp while sending the message
+
+    var data: String? = null, //the data of message
+    var senderID: String? = null, //the senderID of the message
+    var receiverID: String? = null, //the receiverID for the message
+    var lastUpdatedTimestamp: Date? = null, //contains information about when this event was updated last time
+
+    //Media
+    var event_type: Int? = null, //the mime type
+    var server_url: String?=null, // the cloud url for the media
+){
+    fun convertDomainEvent121(type: Int): Event {
+        return Event(
+            eventID = eventID!!,
+            conversationID = senderID!!,
+            type = type,
+            status = Constants.STATUS_EVENT_RECEIVED,
+            needs_push = Constants.NEEDS_PUSH_NO,
+            timeStamp = timeStamp,
+            serverTimestamp = timeStamp,
+            data = data,
+            senderID = senderID,
+            receiverID = receiverID,
+            deleted = Constants.DELETED_NO,
+            lastUpdatedTimestamp = timeStamp,
+            event_type = Constants.EVENT_TYPE_REMINDER,
+            conType = Constants.CONVERSATION_TYPE_121
+        )
+    }
+}

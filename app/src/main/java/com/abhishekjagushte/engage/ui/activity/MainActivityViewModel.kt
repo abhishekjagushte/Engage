@@ -3,6 +3,7 @@ package com.abhishekjagushte.engage.ui.activity
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.abhishekjagushte.engage.listeners.Events121Listener
 import com.abhishekjagushte.engage.listeners.One21Listener
 import com.abhishekjagushte.engage.repository.DataRepository
 import com.google.firebase.firestore.ListenerRegistration
@@ -36,6 +37,18 @@ class MainActivityViewModel(
             }
         }
     }
+
+    fun set121EventsListener(){
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val details = dataRepository.getMydetails()
+                details?.let{
+                    listener121 =  Events121Listener(dataRepository, it.username).set121Listener()
+                }
+            }
+        }
+    }
+
 }
 
 /*

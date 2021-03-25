@@ -42,6 +42,8 @@
             android:authorities="${applicationId}.workmanager-init"
             tools:node="remove" />
 
+        <receiver android:name=".broadcastreceiver.AlarmReceiver"/>
+        
     </application>
 
 </manifest>

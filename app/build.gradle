@@ -130,4 +130,9 @@ dependencies {
     implementation 'com.google.android.material:material:1.1.0'
 
 
+
+    implementation "com.leinardi.android:speed-dial:3.1.1"
+
+    //Moshi JSON converter
+    implementation "com.squareup.moshi:moshi-kotlin:1.11.0"
 }

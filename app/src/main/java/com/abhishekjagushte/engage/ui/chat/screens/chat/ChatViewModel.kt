@@ -10,7 +10,9 @@ import androidx.paging.PagedList
 import androidx.work.*
 import com.abhishekjagushte.engage.database.views.MessageView
 import com.abhishekjagushte.engage.database.entities.Conversation
+import com.abhishekjagushte.engage.database.views.EventView
 import com.abhishekjagushte.engage.repository.DataRepository
+import com.abhishekjagushte.engage.ui.chat.adapters.EventDataItem
 import com.abhishekjagushte.engage.ui.chat.screens.chat.fragments.chatscreen.ChatDataItem
 import com.abhishekjagushte.engage.utils.Constants
 import com.abhishekjagushte.engage.workmanager.workers.PushWorker
@@ -89,6 +91,7 @@ class ChatViewModel @Inject constructor(
                         //Sets the listener
                         Log.d(TAG, "setupScreen: $conversationID")
                         setM2MChatListener(conversationID)
+                        setM2MEventListener(conversationID)
 
                         Log.d(TAG, "setupScreen: Type M2M")
                     }
@@ -144,23 +147,34 @@ class ChatViewModel @Inject constructor(
         dataRepository.addConversation121(username)
     }
 
+    fun getEvents(): LiveData<PagedList<EventDataItem>> {
+        val factory: DataSource.Factory<Int, EventView> =
+            dataRepository.getEvents(conversationID.value!!)
+
+        val convertedFactory = factory.map {
+            return@map when(it.event_type){
+                Constants.EVENT_TYPE_REMINDER -> EventDataItem.ReminderItem(it)
+                Constants.EVENT_TYPE_POLL -> EventDataItem.PollItem(it)
+                else -> throw IllegalStateException("Event type incorrect")
+            }
+        }
+
+        val pagedListBuilder: LivePagedListBuilder<Int, EventDataItem> = LivePagedListBuilder(convertedFactory, 20)
+
+        return pagedListBuilder.build()
+    }
+
     fun getChatsAll(): LiveData<PagedList<ChatDataItem>> {
         val factory: DataSource.Factory<Int, MessageView> =
             dataRepository.getChats(conversationID.value!!)
 
         val convertedFactory = factory.map {
-//            return@map when(it.type){
-//                0 -> ChatDataItem.MyTextMessage(it)
-//                else -> ChatDataItem.OtherTextMessage(it)
-//            }
-
             return@map when (it.type) {
 
                 Constants.TYPE_MY_MSG -> {
                     when (it.mime_type) {
                         Constants.MIME_TYPE_TEXT -> ChatDataItem.MyTextMessage(it)
                         Constants.MIME_TYPE_IMAGE_JPG -> {
-                            //Log.d(TAG, "getChatsAll: Here $it")
                             ChatDataItem.MyImageMessage(it)
                         }
                         else -> throw IllegalStateException("MIME_TYPE_NOT_DEFINED")
@@ -281,5 +295,9 @@ class ChatViewModel @Inject constructor(
 
     private fun setM2MChatListener(conversationID: String) {
         listenerRegistration = dataRepository.setM2MChatListener(conversationID)
+    }
+
+    private fun setM2MEventListener(conversationID: String) {
+        listenerRegistration = dataRepository.setM2MEventListener(conversationID)
     }
 }

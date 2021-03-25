@@ -1,23 +1,21 @@
 package com.abhishekjagushte.engage.listeners
 
 import android.util.Log
-import com.abhishekjagushte.engage.network.MessageNetwork
+import com.abhishekjagushte.engage.network.EventNetwork
 import com.abhishekjagushte.engage.repository.DataRepository
+import com.abhishekjagushte.engage.utils.Constants
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.*
 
-class One21Listener(
-    private val dataRepository: DataRepository,
-    private val username: String
-) {
+class Events121Listener(private val dataRepository: DataRepository, private val username: String) {
     val job: Job = Job()
     val coroutineScope = CoroutineScope(Dispatchers.Main + job)
     private val TAG = "One21Listener"
 
-    fun set121Listener(username: String): ListenerRegistration {
-        val listener121 = dataRepository.getLatestChats121Query(username)
+    fun set121Listener(): ListenerRegistration {
+        val listener121 = dataRepository.setEvents121Listener(username)
             .addSnapshotListener { snapshot, exception ->
                 if (exception != null) {
                     Log.d(TAG, "setChatListener: Error ${exception.stackTrace}")
@@ -33,9 +31,9 @@ class One21Listener(
                                 when (dc.type) {
                                     DocumentChange.Type.ADDED -> {
                                         //Log.w(TAG, "Added ${dc.document.data}")
-                                        dataRepository.receiveMessage121(
-                                            dc.document.toObject<MessageNetwork>()
-                                                .convertDomainMessage121()
+                                        dataRepository.receiveEvent121(
+                                            dc.document.toObject<EventNetwork>()
+                                                .convertDomainEvent121(Constants.EVENT_OTHER)
                                         )
                                     }
                                     //DocumentChange.Type.MODIFIED -> Log.d(TAG, "Modified${dc.document.data}")

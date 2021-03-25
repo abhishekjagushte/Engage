@@ -2,6 +2,7 @@ package com.abhishekjagushte.engage.di
 
 import android.app.Application
 import com.abhishekjagushte.engage.EngageApplication
+import com.abhishekjagushte.engage.broadcastreceiver.AlarmReceiver
 import com.abhishekjagushte.engage.notifications.NotificationHandler
 import com.abhishekjagushte.engage.ui.SplashScreenFragment
 import com.abhishekjagushte.engage.ui.activity.MainActivity
@@ -11,6 +12,7 @@ import com.abhishekjagushte.engage.ui.chat.screens.chat.fragments.chatscreen.Cha
 import com.abhishekjagushte.engage.ui.chat.screens.chat.fragments.chatscreen.di.ChatScreenComponent
 import com.abhishekjagushte.engage.ui.chat.screens.chat.fragments.chatscreen.features.attachment.images.ImagePreviewFragment
 import com.abhishekjagushte.engage.ui.chat.screens.chat.fragments.eventscreen.di.EventComponent
+import com.abhishekjagushte.engage.ui.chat.screens.events.createscreens.CreateReminderDialog
 import com.abhishekjagushte.engage.ui.fragments.ContactListFragment
 import com.abhishekjagushte.engage.ui.main.screens.chatlist.di.ChatListComponent
 import com.abhishekjagushte.engage.ui.main.screens.creategroup.addparticipants.di.AddParticipantsComponent
@@ -47,7 +49,8 @@ interface AppComponent: AndroidInjector<EngageApplication>{
     fun inject(contactListFragment: ContactListFragment)
     fun inject(imagePreviewFragment: ImagePreviewFragment)
     fun inject(chatScreenFragment: ChatScreenFragment)
-
+    fun inject(createReminderDialog: CreateReminderDialog)
+    fun inject(alarmReceiver: AlarmReceiver)
 
     fun addParticipantsComponent(): AddParticipantsComponent.Factory
     fun addMainComponent(): MainComponent.Factory

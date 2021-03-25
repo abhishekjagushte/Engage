@@ -50,6 +50,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         navController.addOnDestinationChangedListener(this)
 
         viewModel.set121MessageListener()
+        viewModel.set121EventsListener()
     }
 
     override fun onDestinationChanged(
@@ -68,6 +69,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
             R.id.chooseMethodFragment -> bottomNavigationView.visibility = View.GONE
             R.id.bottomSheet -> bottomNavigationView.visibility = View.GONE
             R.id.imagePreviewFragment -> bottomNavigationView.visibility = View.GONE
+            R.id.createReminderDialog -> bottomNavigationView.visibility = View.GONE
 
             else -> bottomNavigationView.visibility = View.VISIBLE
         }

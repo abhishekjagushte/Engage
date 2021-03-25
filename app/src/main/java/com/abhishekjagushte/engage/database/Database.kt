@@ -7,9 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.abhishekjagushte.engage.database.entities.*
-import com.abhishekjagushte.engage.database.views.ConversationView
-import com.abhishekjagushte.engage.database.views.MessageNotificationView
-import com.abhishekjagushte.engage.database.views.MessageView
+import com.abhishekjagushte.engage.database.views.*
 
 
 @Database(
@@ -18,9 +16,10 @@ import com.abhishekjagushte.engage.database.views.MessageView
         ContactsConversationsCrossRef::class,
         Conversation::class,
         SuggestedContacts::class,
-        Message::class],
+        Message::class,
+        Event::class],
     version = 1,
-    views = [MessageView::class, ConversationView::class, MessageNotificationView::class],
+    views = [MessageView::class, ConversationView::class, MessageNotificationView::class, EventView::class, EventNotificationView::class],
     exportSchema = false)
 @TypeConverters(Converters::class)
 

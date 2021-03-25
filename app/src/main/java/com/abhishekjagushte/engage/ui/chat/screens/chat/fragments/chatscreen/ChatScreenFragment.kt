@@ -169,7 +169,6 @@ class ChatScreenFragment : Fragment(R.layout.fragment_chat_screen) {
         }
     }
 
-
     override fun onAttach(context: Context) {
         super.onAttach(context)
         (requireParentFragment().requireActivity().application as EngageApplication).appComponent.addChatScreenComponent().create().inject(this)
