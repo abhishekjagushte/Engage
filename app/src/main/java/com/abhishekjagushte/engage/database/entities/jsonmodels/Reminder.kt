@@ -6,7 +6,7 @@ import com.squareup.moshi.JsonClass
 data class Reminder(
     val title: String,
     val description: String,
-    val status: Int,
+    var status: Int,
     val createdTime: Long,
     val reminderTime: Long,
     val timeOffset: Long?

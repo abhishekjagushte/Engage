@@ -105,6 +105,12 @@ class NotificationHandler : FirebaseMessagingService(){
                         }
                     }
                 }
+
+                "6" -> {
+                    Log.d(TAG, "onMessageReceived: ${p0.data}")
+                    dataRepository.markReminderDoneLocal(p0.data.get("eventID") as String)
+                }
+                
             }
         }
     }

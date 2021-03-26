@@ -50,6 +50,7 @@ import kotlinx.coroutines.*
 import org.json.JSONObject
 import java.util.*
 import javax.inject.Inject
+import kotlin.collections.HashMap
 
 class DataRepository @Inject constructor(
     private val authDataSource: FirebaseAuthDataSource,
@@ -431,6 +432,7 @@ class DataRepository @Inject constructor(
         )
 
         alarmManager.setExact(AlarmManager.RTC_WAKEUP, reminder.reminderTime, pendingIntent)
+        Log.e(TAG, "createAlarmReminder: Alarm Created", )
     }
 
     fun receiveMessageM2M(message: Message) {
@@ -636,16 +638,18 @@ class DataRepository @Inject constructor(
         }
     }
 
-    fun markReminderDone(eventID: String, receiverID: String) {
+    fun markReminderDone(eventID: String, senderID: String) {
         repoScope.launch {
             withContext(Dispatchers.IO){
-                val senderID = getMydetails()!!.username
-                firebaseDataSource.markReminderDone(eventID, senderID).addOnSuccessListener {
-                    localDataSource.markReminderDone(eventID)
-                    functionsSource.markReminderDone(eventID, senderID, receiverID) //calls function
-                }
+                val receiverID = getMydetails()!!.username
+                localDataSource.markReminderDone(eventID)
+                functionsSource.markReminderDone(eventID, senderID, receiverID) //calls function
             }
         }
+    }
+
+    fun markReminderDoneLocal(eventID: String) {
+        localDataSource.markReminderDone(eventID)
     }
 
 

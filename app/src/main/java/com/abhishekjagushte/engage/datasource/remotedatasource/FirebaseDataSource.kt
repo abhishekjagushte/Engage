@@ -75,7 +75,7 @@ class FirebaseDataSource @Inject constructor(
         val query = firestore
             .collection("messages121")
             .whereEqualTo("receiverID", username)
-            .whereGreaterThanOrEqualTo("timeStamp", Date())
+            .whereGreaterThan("timeStamp", Date())
             .limit(50)
 
         return query
@@ -85,7 +85,7 @@ class FirebaseDataSource @Inject constructor(
         val query = firestore
             .collection("messages121")
             .whereEqualTo("receiverID", username)
-            .whereGreaterThanOrEqualTo("timeStamp", last121MessageTimeStamp)
+            .whereGreaterThan("timeStamp", last121MessageTimeStamp)
 
         return query
     }
@@ -97,7 +97,7 @@ class FirebaseDataSource @Inject constructor(
     fun setM2MChatListener(conversationID: String, lastMessageTimeStamp: Date): Query {
         val query = firestore
             .collection("groups/$conversationID/chats")
-            .whereGreaterThanOrEqualTo("timeStamp", lastMessageTimeStamp)
+            .whereGreaterThan("timeStamp", lastMessageTimeStamp)
 
         return query
     }
@@ -105,7 +105,7 @@ class FirebaseDataSource @Inject constructor(
     fun setM2MEventListener(conversationID: String, lastMessageTimeStamp: Date): Query {
         val query = firestore
             .collection("groups/$conversationID/events")
-            .whereGreaterThanOrEqualTo("timeStamp", lastMessageTimeStamp)
+            .whereGreaterThan("timeStamp", lastMessageTimeStamp)
 
         return query
     }
@@ -113,7 +113,7 @@ class FirebaseDataSource @Inject constructor(
     fun syncM2MChat(syncMap: M2MSyncRequirement): Task<QuerySnapshot> {
         val query = firestore
             .collection("groups/${syncMap.conversationID}/chats")
-            .whereGreaterThanOrEqualTo("timeStamp", Date(syncMap.lastMessageTimeStamp))
+            .whereGreaterThan("timeStamp", Date(syncMap.lastMessageTimeStamp))
 
         return query.get()
     }
@@ -121,7 +121,7 @@ class FirebaseDataSource @Inject constructor(
     fun set121EventListener(last121EventTimestamp: Date, myUsername: String): Query {
         val query = firestore
             .collection("users/$myUsername/events121")
-            .whereGreaterThanOrEqualTo("timeStamp", last121EventTimestamp)
+            .whereGreaterThan("timeStamp", last121EventTimestamp)
 
         return query
     }

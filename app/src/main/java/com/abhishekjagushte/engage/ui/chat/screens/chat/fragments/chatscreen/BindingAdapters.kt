@@ -8,7 +8,7 @@ import com.abhishekjagushte.engage.utils.Constants
 import com.abhishekjagushte.engage.utils.StringFormatting
 
 @BindingAdapter("setTimeString")
-fun TextView.setTimeString(message: MessageView){
+fun TextView.setTimeString(message: MessageView) {
     val dateTime = message.timeStamp
     dateTime!!.let {
         text = StringFormatting.getTime(it)
@@ -16,20 +16,20 @@ fun TextView.setTimeString(message: MessageView){
 }
 
 @BindingAdapter("setDateTimeString")
-fun TextView.setDateTimeString(millis: Long){
+fun TextView.setDateTimeString(millis: Long) {
     val dateTime = millis
     dateTime.let {
-        text = StringFormatting.getTime(it)
+        text = StringFormatting.getDateTimeString(it)
     }
 }
 
 @BindingAdapter("setSenderName")
-fun TextView.setSenderName(message: MessageView){
-    if(message.conType == Constants.CONVERSATION_TYPE_121)
+fun TextView.setSenderName(message: MessageView) {
+    if (message.conType == Constants.CONVERSATION_TYPE_121)
         this.visibility = View.GONE
     else {
 
-        if(message.nickname.isNullOrEmpty())
+        if (message.nickname.isNullOrEmpty())
             text = message.senderID
         else
             text = message.nickname

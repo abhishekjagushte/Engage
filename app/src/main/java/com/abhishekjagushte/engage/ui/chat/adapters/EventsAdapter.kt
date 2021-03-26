@@ -1,5 +1,7 @@
 package com.abhishekjagushte.engage.ui.chat.adapters
 
+import android.graphics.Paint
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagedList
@@ -74,7 +76,15 @@ class ReminderItemSenderViewHolder(private val binding: ItemEventReminderSenderB
         val jsonAdapter: JsonAdapter<Reminder> = moshi.adapter(Reminder::class.java)
         val reminder = jsonAdapter.fromJson(json!!)
 
+        reminder!!.status = eventView.status
+        Log.d("***", "bind: ${eventView.status}")
+        if(eventView.status == Constants.REMINDER_STATUS_INACTIVE) {
+            binding.reminderDescriptionTv.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
+            binding.reminderTitleTv.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
+        }
         binding.reminder = reminder
+
+        binding.executePendingBindings()
     }
 
     companion object{
@@ -95,10 +105,17 @@ class ReminderItemReceiverViewHolder(private val binding: ItemEventReminderRecei
         val reminder = jsonAdapter.fromJson(json!!)
 
         binding.markDoneButton.setOnClickListener {
-            dataRepository.markReminderDone(eventView.eventID, eventView.receiverID!!)
+            Log.e("**", "bind: clicked", )
+            dataRepository.markReminderDone(eventView.eventID, eventView.senderID!!)
+        }
+
+        if(eventView.status == Constants.REMINDER_STATUS_INACTIVE) {
+            binding.reminderDescriptionTv.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
+            binding.reminderTitleTv.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
         }
 
         binding.reminder = reminder
+        binding.executePendingBindings()
     }
 
     companion object{
@@ -116,19 +133,22 @@ class EventsDiffCallback: DiffUtil.ItemCallback<EventDataItem>() {
     }
 
     override fun areContentsTheSame(oldItem: EventDataItem, newItem: EventDataItem): Boolean {
-        return true//TODO
+        return oldItem.status == newItem.status
     }
 
 }
 
 sealed class EventDataItem {
     abstract val id: String
+    abstract val status: Int
 
     data class ReminderItem(val eventView: EventView): EventDataItem(){
         override val id: String = eventView.eventID
+        override val status: Int = eventView.status
     }
 
     data class PollItem(val eventView: EventView): EventDataItem(){
+        override val status: Int = eventView.status
         override val id: String = "1"
     }
 }

@@ -58,10 +58,11 @@
 
             <TextView
                 android:id="@+id/reminder_date_time_tv"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintBottom_toBottomOf="@+id/mark_done_button"
                 app:layout_constraintStart_toStartOf="@+id/reminder_description_tv"
+                app:setDateTimeString="@{reminder.reminderTime}"
                 app:layout_constraintTop_toTopOf="@+id/mark_done_button"
                 tools:text="12 March 2021, 5:20 PM" />
 
