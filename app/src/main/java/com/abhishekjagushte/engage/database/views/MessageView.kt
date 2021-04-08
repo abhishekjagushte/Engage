@@ -9,7 +9,7 @@ import com.abhishekjagushte.engage.utils.Constants
     SELECT contacts.nickname, messages.messageID, messages.conversationID ,messages.type, messages.conType, messages.status,
     messages.timeStamp, messages.data, messages.senderID, messages.receiverID, messages.deleted, messages.mime_type, 
     messages.server_url, messages.local_uri, messages.latitude, messages.longitude,
-    messages.reply_toID FROM messages LEFT JOIN contacts ON messages.senderID = contacts.username
+    messages.reply_toID, messages.thumb_nail_uri FROM messages LEFT JOIN contacts ON messages.senderID = contacts.username
     """
     , viewName = "message_view")
 data class MessageView(
@@ -27,6 +27,7 @@ data class MessageView(
     var mime_type: String?,
     var server_url: String?,
     var local_uri: String?,
+    var thumb_nail_uri: String?,
     var latitude: Double?,
     var longitude: Double?,
     var reply_toID: String?

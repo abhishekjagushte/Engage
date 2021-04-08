@@ -119,8 +119,8 @@ interface DatabaseDao{
     fun insertConversationCrossRef(contactsConversationsCrossRef: ContactsConversationsCrossRef)
 
     //5 means read_by_me and 4 means not read ...see constants file
-    @Query("UPDATE messages SET status = 5 WHERE status = 4 AND conversationID = :conversationID ")
-    fun markMessagesRead(conversationID: String)
+    @Query("UPDATE messages SET status = 5 WHERE status = 4 AND mime_type=:text_mime_type AND conversationID = :conversationID ")
+    fun markMessagesRead(conversationID: String, text_mime_type: String)
 
     //gets all the messages unread by me
     @Query("SELECT * FROM message_notification_view where status = 4")

@@ -351,7 +351,7 @@ class LocalDataSource @Inject constructor (
     }
 
     fun markMessagesRead(conversationID: String) {
-        databaseDao.markMessagesRead(conversationID)
+        databaseDao.markMessagesRead(conversationID, Constants.MIME_TYPE_TEXT)
     }
 
     fun getUnreadMessages(): List<MessageNotificationView> {

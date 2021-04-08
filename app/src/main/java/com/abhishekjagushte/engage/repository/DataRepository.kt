@@ -8,6 +8,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.DataSource
@@ -48,6 +49,7 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.*
 import org.json.JSONObject
+import java.io.File
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.HashMap
@@ -380,7 +382,37 @@ class DataRepository @Inject constructor(
             Log.d(TAG, "receiveMessage121: conversation not present")
             localDataSource.addConversation121(message.senderID!!)
         }
-        localDataSource.insertMessage(message)
+        when (message.mime_type) {
+            Constants.MIME_TYPE_IMAGE_JPG -> {
+                setThumbnail(message)
+            }
+            Constants.MIME_TYPE_TEXT -> localDataSource.insertMessage(message)
+        }
+
+        Log.e(TAG, "receiveMessage121: ${message.status}", )
+
+    }
+
+    fun setThumbnail(message: Message) {
+        val path = message.server_url!!
+        var fileName = path.split("/").last()
+        fileName = Constants.THUMBNAIL_PREFIX + fileName
+        val root = application.filesDir!!
+        val storageDirectory = File(root, Constants.THUMBNAIL_DIRECTORY_PATH)
+
+        if (!storageDirectory.exists())
+            storageDirectory.mkdirs()
+
+        val file = File(storageDirectory, fileName)
+        val uri = file.toUri()
+        storageSource.downloadImage(path, uri).addOnSuccessListener {
+            message.thumb_nail_uri = uri.toString()
+            repoScope.launch {
+                withContext(Dispatchers.IO) {
+                    localDataSource.insertMessage(message)
+                }
+            }
+        }
     }
 
     fun receiveEvent121(event: Event) {
@@ -432,7 +464,7 @@ class DataRepository @Inject constructor(
         )
 
         alarmManager.setExact(AlarmManager.RTC_WAKEUP, reminder.reminderTime, pendingIntent)
-        Log.e(TAG, "createAlarmReminder: Alarm Created", )
+        Log.e(TAG, "createAlarmReminder: Alarm Created")
     }
 
     fun receiveMessageM2M(message: Message) {
@@ -609,7 +641,7 @@ class DataRepository @Inject constructor(
     }
 
     fun downloadImage(message: Message, uri: Uri): FileDownloadTask {
-        return storageSource.downloadImage(message, uri)
+        return storageSource.downloadImage(message.server_url!!, uri)
     }
 
     fun setMessageReceived(messageID: String) {
@@ -640,7 +672,7 @@ class DataRepository @Inject constructor(
 
     fun markReminderDone(eventID: String, senderID: String) {
         repoScope.launch {
-            withContext(Dispatchers.IO){
+            withContext(Dispatchers.IO) {
                 val receiverID = getMydetails()!!.username
                 localDataSource.markReminderDone(eventID)
                 functionsSource.markReminderDone(eventID, senderID, receiverID) //calls function

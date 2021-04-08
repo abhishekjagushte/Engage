@@ -11,7 +11,9 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import com.abhishekjagushte.engage.EngageApplication
 import com.abhishekjagushte.engage.R
+import com.abhishekjagushte.engage.permissions.WriteExternalStoragePermissionHelper
 import com.abhishekjagushte.engage.repository.DataRepository
+import com.abhishekjagushte.engage.utils.Constants
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -51,6 +53,12 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
 
         viewModel.set121MessageListener()
         viewModel.set121EventsListener()
+
+        WriteExternalStoragePermissionHelper(
+            this,
+            this.applicationContext,
+            Constants.WRITE_PERMISSION_REQUEST_CODE
+        ).permissionsForSave()
     }
 
     override fun onDestinationChanged(

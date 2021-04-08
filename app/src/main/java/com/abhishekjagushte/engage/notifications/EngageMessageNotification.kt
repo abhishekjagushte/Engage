@@ -34,7 +34,7 @@ class EngageMessageNotification(
                 withContext(Dispatchers.IO){
                     Log.d(TAG, "makeMessageNotification: ${message.data}")
 
-                    val msgNotification = dataRepository.getMessageNotification(message.messageID)
+                    val msgNotification = dataRepository.getMessageNotification(message.messageID) ?: return@withContext
 
                     val args = Bundle()
                     args.putString("conversationID", message.conversationID)

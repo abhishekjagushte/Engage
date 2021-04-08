@@ -1,8 +1,11 @@
 package com.abhishekjagushte.engage.datasource.remotedatasource
 
+import android.app.Application
+import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
+import androidx.core.net.toUri
 import com.abhishekjagushte.engage.database.entities.Message
 import com.abhishekjagushte.engage.datasource.localdatasource.LocalDataSource
 import com.abhishekjagushte.engage.datasource.remotedatasource.uploadmanager.MediaUploader
@@ -15,6 +18,7 @@ import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
+import java.io.File
 import javax.inject.Inject
 
 const val TYPE_IMAGE = Constants.MIME_TYPE_IMAGE_JPG
@@ -23,7 +27,8 @@ const val TYPE_DOCUMENT = "s"//TODO
 
 class FirebaseStorageSource @Inject constructor(
     private val storage: StorageReference,
-    private val localDataSource: LocalDataSource
+    private val localDataSource: LocalDataSource,
+    private val application: Application
 ) {
 
     private val job: Job = Job()
@@ -59,8 +64,13 @@ class FirebaseStorageSource @Inject constructor(
         return task
     }
 
-    fun downloadImage(message: Message, uri: Uri): FileDownloadTask {
-        val ref = storage.child(message.server_url!!)
+    fun downloadImage(path: String, uri: Uri): FileDownloadTask {
+        val ref = storage.child(path)
+        return ref.getFile(uri)
+    }
+
+    fun downloadImageThumbnail(path: String, uri: Uri): FileDownloadTask {
+        val ref = storage.child(path)
         return ref.getFile(uri)
     }
 

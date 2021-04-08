@@ -179,7 +179,6 @@ class MyImageMessageViewHolder private constructor(
             return MyImageMessageViewHolder(binding, viewLifecycleOwner)
         }
     }
-
 }
 
 class OtherImageMessageViewHolder private constructor(
@@ -192,9 +191,20 @@ class OtherImageMessageViewHolder private constructor(
 
     fun bind(message: MessageView) {
         binding.message = message
-        binding.executePendingBindings()
-
+        message.thumb_nail_uri?.let { uri ->
+            binding.imageMsgIv.setImageURI(Uri.parse(uri))
+        }
         setUpDownloadLogic(message)
+        setImageClickListener(message)
+        binding.executePendingBindings()
+    }
+
+    private fun setImageClickListener(message: MessageView){
+        binding.imageMsgIv.setOnClickListener {
+            if(message.status == Constants.STATUS_RECEIVED_AND_READ_BY_ME){
+
+            }
+        }
     }
 
     private fun setUpDownloadLogic(message: MessageView) {

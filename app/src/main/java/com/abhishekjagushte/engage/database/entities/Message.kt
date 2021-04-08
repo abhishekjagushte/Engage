@@ -1,6 +1,5 @@
 package com.abhishekjagushte.engage.database.entities
 
-import android.graphics.Bitmap
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.abhishekjagushte.engage.network.MessageNetwork
@@ -29,7 +28,7 @@ class Message(
     var latitude: Double?=null, //latitude for location sharing
     var longitude: Double?=null, //logitude for location sharing
 
-    var thumb_nail: Bitmap?=null, //thumbnail for the media
+    var thumb_nail_uri: String?=null, //thumbnail for the media
 
     var reply_toID: String?=null,
 
@@ -79,7 +78,7 @@ class Message(
                 server_url = serverUrl,
                 latitude = latitude,
                 longitude = longitude,
-                thumb_nail = null,
+                thumb_nail_uri = null,
                 reply_toID = replyToid,
 
                 type = Constants.TYPE_OTHER_MSG,
@@ -117,7 +116,7 @@ class Message(
                 server_url = serverUrl,
                 latitude = latitude,
                 longitude = longitude,
-                thumb_nail = null,
+                thumb_nail_uri = null,
                 reply_toID = replyToid,
 
                 type = Constants.TYPE_OTHER_MSG,
