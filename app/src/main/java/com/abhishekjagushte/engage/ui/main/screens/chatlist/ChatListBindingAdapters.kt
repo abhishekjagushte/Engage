@@ -1,6 +1,8 @@
 package com.abhishekjagushte.engage.ui.main.screens.chatlist
 
 import android.util.Log
+import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import com.abhishekjagushte.engage.database.views.ConversationView
@@ -13,6 +15,7 @@ fun TextView.setMessageDataString(conversationView: ConversationView){
     var string = ""
     when(conversationView.mime_type){
         Constants.MIME_TYPE_TEXT -> string+=conversationView.data
+        Constants.MIME_TYPE_IMAGE_JPG -> string+="Image"
     }
     text = string
 }
@@ -31,5 +34,12 @@ fun TextView.setChatName(conversationView: ConversationView){
     when(conversationView.conType){
         Constants.CONVERSATION_TYPE_121 -> text = conversationView.nickname
         Constants.CONVERSATION_TYPE_M2M -> text = conversationView.name
+    }
+}
+
+@BindingAdapter("setMessageStatusImage")
+fun ImageView.setMessageStatusImage(conversationView: ConversationView){
+    when(conversationView.type){
+        Constants.TYPE_OTHER_MSG -> this.visibility = View.GONE
     }
 }

@@ -1,14 +1,10 @@
 package com.abhishekjagushte.engage.ui.setup.screens.setusername
 
-import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.os.StrictMode
 import android.os.StrictMode.VmPolicy
-import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -22,16 +18,12 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import com.abhishekjagushte.engage.ui.fragments.BottomSheet
 import com.abhishekjagushte.engage.EngageApplication
 import com.abhishekjagushte.engage.R
-import com.abhishekjagushte.engage.ui.activity.MainActivity
 import com.abhishekjagushte.engage.utils.Constants
 import com.google.android.material.textfield.TextInputEditText
-import com.theartofdev.edmodo.cropper.CropImage
 import de.hdodenhof.circleimageview.CircleImageView
 import kotlinx.android.synthetic.main.fragment_set_username.view.*
-import java.io.File
 import javax.inject.Inject
 
 
@@ -68,11 +60,9 @@ class SetUsernameFragment: Fragment() {
         StrictMode.setVmPolicy(builder.build())
 
         //Set Profile Picture
-        view.change_profile_image.setOnClickListener()
-        {
+        view.change_profile_image.setOnClickListener() {
             findNavController().navigate(R.id.action_setUsernameFragment_to_bottomSheet)
         }
-
 
         findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Uri>("returnedProfileImageFromSlider")?.observe(
             viewLifecycleOwner) { result ->

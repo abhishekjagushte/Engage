@@ -58,14 +58,6 @@ class ChatListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val navController = Navigation.findNavController(view)
-        val appBarConfiguration = AppBarConfiguration.Builder(R.id.chatListFragment).build()
-
-        appBar = view.findViewById(R.id.app_bar)
-        toolbar = view.findViewById(R.id.toolbar)
-        NavigationUI.setupWithNavController(toolbar, navController, appBarConfiguration)
-
         recyclerView.layoutManager = LinearLayoutManager(context)
         chatListAdapter = ChatListAdapter()
         recyclerView.adapter = chatListAdapter

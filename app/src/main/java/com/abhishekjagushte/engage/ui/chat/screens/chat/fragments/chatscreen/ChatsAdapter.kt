@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
+import androidx.navigation.findNavController
 import androidx.paging.PagedList
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -19,6 +20,7 @@ import com.abhishekjagushte.engage.databinding.TextMessageContainerRightBinding
 import com.abhishekjagushte.engage.datasource.remotedatasource.downloadmanager.MediaDownloader
 import com.abhishekjagushte.engage.datasource.remotedatasource.uploadmanager.UploadManager
 import com.abhishekjagushte.engage.repository.DataRepository
+import com.abhishekjagushte.engage.ui.chat.screens.chat.ChatFragmentDirections
 import com.abhishekjagushte.engage.utils.Constants
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -143,13 +145,12 @@ class MyImageMessageViewHolder private constructor(
 
     fun bind(message: MessageView) {
         binding.message = message
-//        Glide.with(binding.root.context)
-//            .load(message.local_uri)
-//            //.apply(RequestOptions().skipMemoryCache(true).diskCacheStrategy(DiskCacheStrategy.NONE))
-//            .into(binding.imageMsgIv)
-
         binding.imageMsgIv.setImageURI(Uri.parse(message.local_uri))
         setUpProgressBar(message)
+
+        binding.imageMsgIv.setOnClickListener {
+            binding.root.findNavController().navigate(ChatFragmentDirections.actionChatFragmentToImageViewFragment("You", message.local_uri!!, message.timeStamp!!))
+        }
 
         binding.executePendingBindings()
     }
@@ -162,8 +163,6 @@ class MyImageMessageViewHolder private constructor(
                         binding.progressBarImageRight.progress = it.toInt()
                     else
                         binding.progressBarImageRight.visibility = View.GONE
-
-                    Log.d(TAG, "setUpProgressBar: $it")
                 })
             }
         } else {
@@ -202,7 +201,7 @@ class OtherImageMessageViewHolder private constructor(
     private fun setImageClickListener(message: MessageView){
         binding.imageMsgIv.setOnClickListener {
             if(message.status == Constants.STATUS_RECEIVED_AND_READ_BY_ME){
-
+                binding.root.findNavController().navigate(ChatFragmentDirections.actionChatFragmentToImageViewFragment(message.nickname!!, message.local_uri!!, message.timeStamp!!))
             }
         }
     }

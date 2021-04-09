@@ -80,6 +80,9 @@
         <action
             android:id="@+id/action_chatFragment_to_createReminderDialog"
             app:destination="@id/createReminderDialog" />
+        <action
+            android:id="@+id/action_chatFragment_to_imageViewFragment"
+            app:destination="@id/imageViewFragment" />
     </fragment>
 
     <fragment
@@ -207,5 +210,20 @@
             app:argType="string"
             app:nullable="true" />
     </dialog>
+    <fragment
+        android:id="@+id/imageViewFragment"
+        android:name="com.abhishekjagushte.engage.ui.fragments.ImageViewFragment"
+        android:label="fragment_image_view"
+        tools:layout="@layout/fragment_image_view" >
+        <argument
+            android:name="chatName"
+            app:argType="string" />
+        <argument
+            android:name="imageUri"
+            app:argType="string" />
+        <argument
+            android:name="messageTime"
+            app:argType="long" />
+    </fragment>
 
 </navigation>
