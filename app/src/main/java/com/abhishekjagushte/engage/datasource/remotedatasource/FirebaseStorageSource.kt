@@ -1,15 +1,9 @@
 package com.abhishekjagushte.engage.datasource.remotedatasource
 
 import android.app.Application
-import android.content.Context
 import android.net.Uri
-import android.provider.MediaStore
-import android.util.Log
-import androidx.core.net.toUri
 import com.abhishekjagushte.engage.database.entities.Message
 import com.abhishekjagushte.engage.datasource.localdatasource.LocalDataSource
-import com.abhishekjagushte.engage.datasource.remotedatasource.uploadmanager.MediaUploader
-import com.abhishekjagushte.engage.datasource.remotedatasource.uploadmanager.UploadManager
 import com.abhishekjagushte.engage.utils.Constants
 import com.abhishekjagushte.engage.utils.FilePathContract
 import com.google.firebase.storage.FileDownloadTask
@@ -18,7 +12,6 @@ import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
-import java.io.File
 import javax.inject.Inject
 
 const val TYPE_IMAGE = Constants.MIME_TYPE_IMAGE_JPG
@@ -72,6 +65,31 @@ class FirebaseStorageSource @Inject constructor(
     fun downloadImageThumbnail(path: String, uri: Uri): FileDownloadTask {
         val ref = storage.child(path)
         return ref.getFile(uri)
+    }
+
+    fun setProfilePicture(profilePictureUri: Uri, path: String): UploadTask {
+        val ref = storage.child(path)
+        return ref.putFile(profilePictureUri, StorageMetadata.Builder()
+            .setContentType("image/jpg").build())
+    }
+
+    suspend fun getProfilePhotoThumbnail(username: String, timestamp: Long): FileDownloadTask? {
+        val path = Constants.PROFILE_PHOTO_PATH_CLOUD + Constants.THUMBNAIL_PREFIX + username + ".jpg"
+        val ref = storage.child(path)
+
+        try {
+            val metadata = ref.metadata.await()
+            metadata?.let {
+                if(it.updatedTimeMillis>timestamp){
+                    localDataSource.updateContactTimestamp(System.currentTimeMillis(), username)
+                    val uri = FilePathContract.getContactsProfilePhotoUri(username)
+                    return ref.getFile(uri)
+                }
+            }
+        }catch (e: Exception){
+            e.printStackTrace()
+        }
+        return null
     }
 
 }

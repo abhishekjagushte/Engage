@@ -1,9 +1,9 @@
 package com.abhishekjagushte.engage.ui.setup.screens.setusername
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.net.Uri
-import android.os.Bundle
-import android.os.StrictMode
+import android.os.*
 import android.os.StrictMode.VmPolicy
 import android.text.Editable
 import android.text.TextWatcher
@@ -12,18 +12,33 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.abhishekjagushte.engage.EngageApplication
 import com.abhishekjagushte.engage.R
+import com.abhishekjagushte.engage.permissions.WriteExternalStoragePermissionHelper
+import com.abhishekjagushte.engage.repository.DataRepository
 import com.abhishekjagushte.engage.utils.Constants
+import com.abhishekjagushte.engage.utils.ImageUtil
 import com.google.android.material.textfield.TextInputEditText
 import de.hdodenhof.circleimageview.CircleImageView
+import kotlinx.android.synthetic.main.fragment_set_username.*
+import kotlinx.android.synthetic.main.fragment_set_username.profile_image
 import kotlinx.android.synthetic.main.fragment_set_username.view.*
+import kotlinx.android.synthetic.main.fragment_settings.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
+import java.io.OutputStream
 import javax.inject.Inject
 
 
@@ -38,6 +53,11 @@ class SetUsernameFragment: Fragment() {
 
     private val viewModel by viewModels<SetUsernameViewModel> { viewModelFactory }
 
+    @Inject
+    lateinit var dataRepository: DataRepository
+
+    private lateinit var progressBar2: ProgressBar
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -48,6 +68,13 @@ class SetUsernameFragment: Fragment() {
         val usernameInput = view.findViewById<TextInputEditText>(R.id.username_input)
         val confirmButton = view.findViewById<Button>(R.id.confirm_button)
         val noteText = view.findViewById<TextView>(R.id.noteText)
+        progressBar2 = view.findViewById<ProgressBar>(R.id.progressBar2)
+
+        WriteExternalStoragePermissionHelper(
+            requireActivity(),
+            requireContext(),
+            Constants.WRITE_PERMISSION_REQUEST_CODE
+        ).permissionsForSave()
 
         profileImageView = view.findViewById(R.id.profile_image)
 
@@ -64,11 +91,11 @@ class SetUsernameFragment: Fragment() {
             findNavController().navigate(R.id.action_setUsernameFragment_to_bottomSheet)
         }
 
-        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Uri>("returnedProfileImageFromSlider")?.observe(
+        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Pair<Uri?, Bitmap?>>("returnedProfileImageFromSlider")?.observe(
             viewLifecycleOwner) { result ->
-            result?.let {
-                profileImageUri=it
-                profileImageView.setImageURI(profileImageUri)
+            result.second?.let {
+                profileImageUri = result.first
+                profile_image.setImageBitmap(it)
             }
         }
 
@@ -96,7 +123,9 @@ class SetUsernameFragment: Fragment() {
 
         viewModel.changeCompleteStatus.observe(viewLifecycleOwner, Observer {
             when (it) {
-                Constants.LOCAL_DB_SUCCESS -> updateUI()
+                Constants.LOCAL_DB_SUCCESS -> {
+                    uploadAndSaveProfilePicture()
+                }
                 Constants.FIREBASE_CHANGE_FAILED -> confirmFailed()
                 Constants.LOCAL_DB_FAILED -> confirmFailed()
                 else -> Log.d(TAG, "Not initiated")
@@ -106,7 +135,7 @@ class SetUsernameFragment: Fragment() {
         confirmButton.setOnClickListener {
             val name = nameInput.text.toString()
             val username = usernameInput.text.toString()
-
+            progressBar2.visibility = View.VISIBLE //will be visible till dp uploads
             if(checkInputs(name, username)){
                 viewModel.confirmSetup(name, username, profileImageUri)
             }
@@ -114,6 +143,28 @@ class SetUsernameFragment: Fragment() {
 
         return view
     }
+
+    private fun uploadAndSaveProfilePicture(){
+        val handler = Handler(Looper.myLooper()!!)
+        if(profileImageUri!=null)
+        profileImageUri?.let{imageUri ->
+            lifecycleScope.launch {
+                withContext(Dispatchers.IO){
+
+                    dataRepository.setProfilePicture(imageUri).addOnSuccessListener {
+                        saveFinalImage(imageUri)
+                        handler.post {
+                            progressBar2.visibility = View.GONE
+                            updateUI()
+                        }
+                    }
+                }
+            }
+        }
+        else
+            updateUI()
+    }
+
 
     private fun confirmFailed() {
         Log.d(TAG, "Failed")
@@ -138,5 +189,25 @@ class SetUsernameFragment: Fragment() {
         super.onAttach(context)
         (requireActivity().application as EngageApplication).appComponent.addSetUsernameComponent()
             .create().inject(this)
+    }
+
+    private fun saveFinalImage(croppedImageUri: Uri): Uri {
+        val mediaStorageDir = File(
+            Environment.getExternalStorageDirectory().toString() + "//Engage",
+            "dp"
+        )
+        if (!mediaStorageDir.exists()) {
+            mediaStorageDir.mkdirs()
+        }
+        val file = File(mediaStorageDir.path + File.separator + "profile_img.jpg")
+
+        val imageUtil = ImageUtil(requireActivity(), croppedImageUri)
+        val bitmap = imageUtil.resolveBitmap()
+
+        val stream: OutputStream = FileOutputStream(file)
+        bitmap!!.compress(Bitmap.CompressFormat.JPEG, 60, stream)
+        stream.flush()
+        stream.close()
+        return file.toUri()
     }
 }

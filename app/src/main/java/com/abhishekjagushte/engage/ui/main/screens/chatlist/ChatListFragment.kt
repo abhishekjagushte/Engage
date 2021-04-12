@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -20,6 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.abhishekjagushte.engage.EngageApplication
 import com.abhishekjagushte.engage.R
 import com.abhishekjagushte.engage.databinding.FragmentChatListBinding
+import com.abhishekjagushte.engage.repository.DataRepository
 import com.google.android.material.appbar.AppBarLayout
 import kotlinx.android.synthetic.main.fragment_chat_list.*
 import javax.inject.Inject
@@ -29,6 +31,9 @@ class ChatListFragment : Fragment() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    @Inject
+    lateinit var dataRepository: DataRepository
 
     lateinit var appBar: AppBarLayout
     lateinit var toolbar: Toolbar
@@ -59,7 +64,7 @@ class ChatListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recyclerView.layoutManager = LinearLayoutManager(context)
-        chatListAdapter = ChatListAdapter()
+        chatListAdapter = ChatListAdapter(dataRepository, lifecycleScope)
         recyclerView.adapter = chatListAdapter
 
         observeChatList()

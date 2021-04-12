@@ -159,6 +159,7 @@
             app:enterAnim="@anim/slide_in_right"
             app:popUpTo="@id/splashScreen"
             app:popUpToInclusive="true" />
+
         <dialog
             android:id="@+id/bottomSheet"
             android:name="com.abhishekjagushte.engage.ui.fragments.BottomSheet"
@@ -225,5 +226,15 @@
             android:name="messageTime"
             app:argType="long" />
     </fragment>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.abhishekjagushte.engage.ui.main.screens.settings.SettingsFragment"
+        android:label="fragment_settings"
+        tools:layout="@layout/fragment_settings" /><action android:id="@+id/action_global_settingsFragment" app:destination="@id/settingsFragment"/>
+    <fragment
+        android:id="@+id/bottomSheet2"
+        android:name="com.abhishekjagushte.engage.ui.fragments.BottomSheet"
+        android:label="fragment_bottom_sheet"
+        tools:layout="@layout/fragment_bottom_sheet" /><action android:id="@+id/action_global_bottomSheet2" app:destination="@id/bottomSheet2"/>
 
 </navigation>

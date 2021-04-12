@@ -141,7 +141,7 @@ class ProfileFragmentViewModel @Inject constructor(
                             localContact.bio = p.bio
                             localContact.dp_thmb = p.dp_thmb
                             localContact.networkID = p.networkID
-                            localContact.timeStamp = p.timeStamp
+                            localContact.dp_timeStamp = p.dp_timeStamp
                             viewModelScope.launch {
                                 withContext(Dispatchers.IO) {
                                     dataRepository.updateContact(localContact)

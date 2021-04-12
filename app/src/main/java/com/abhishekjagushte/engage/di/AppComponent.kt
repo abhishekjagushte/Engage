@@ -18,6 +18,7 @@ import com.abhishekjagushte.engage.ui.main.screens.chatlist.di.ChatListComponent
 import com.abhishekjagushte.engage.ui.main.screens.creategroup.addparticipants.di.AddParticipantsComponent
 import com.abhishekjagushte.engage.ui.main.screens.profile.di.ProfileComponent
 import com.abhishekjagushte.engage.ui.main.screens.search.di.SearchComponent
+import com.abhishekjagushte.engage.ui.main.screens.settings.SettingsFragment
 import com.abhishekjagushte.engage.ui.main.screens.test.TestFragment
 import com.abhishekjagushte.engage.ui.setup.screens.login.di.LoginComponent
 import com.abhishekjagushte.engage.ui.setup.screens.setusername.di.SetUsernameComponent
@@ -51,6 +52,7 @@ interface AppComponent: AndroidInjector<EngageApplication>{
     fun inject(chatScreenFragment: ChatScreenFragment)
     fun inject(createReminderDialog: CreateReminderDialog)
     fun inject(alarmReceiver: AlarmReceiver)
+    fun inject(settingsFragment: SettingsFragment)
 
     fun addParticipantsComponent(): AddParticipantsComponent.Factory
     fun addMainComponent(): MainComponent.Factory

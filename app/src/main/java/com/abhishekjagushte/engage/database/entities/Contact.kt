@@ -24,8 +24,7 @@ class Contact(
     var dp_thmb: Bitmap? = null,
     var type: Int,
 
-    @ColumnInfo(name="time_stamp")
-    var timeStamp: String? = null
+    var dp_timeStamp: String? = null
 
     //conversation ID removed from the contacts
 ){

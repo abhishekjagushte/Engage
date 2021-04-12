@@ -1,3 +1,4 @@
+
 package com.abhishekjagushte.engage.repository
 
 import android.app.AlarmManager
@@ -172,6 +173,13 @@ class DataRepository @Inject constructor(
 
     fun getNotificationChannelID(): Task<InstanceIdResult> {
         return firebaseInstanceId.getNotificationChannelID()
+    }
+
+    suspend fun getProfilePhotoThumbnail(username: String, dpTimestamp: Long?): FileDownloadTask? {
+        dpTimestamp?.let {
+            return storageSource.getProfilePhotoThumbnail(username, dpTimestamp)
+        }
+        return storageSource.getProfilePhotoThumbnail(username, 0)
     }
 
 
@@ -413,6 +421,12 @@ class DataRepository @Inject constructor(
                 }
             }
         }
+    }
+
+    suspend fun setProfilePicture(profilePictureUri: Uri): UploadTask {
+        val myUsername = getMydetails()!!.username
+        val path = "users/$myUsername.jpg"
+        return storageSource.setProfilePicture(profilePictureUri, path)
     }
 
     fun receiveEvent121(event: Event) {

@@ -2,6 +2,7 @@ package com.abhishekjagushte.engage.utils
 
 object Constants {
 
+    const val PROFILE_PHOTO_FILENAME: String = "profile_img.jpg"
     const val THUMBNAIL_PREFIX = "thumb_"
     const val MESSAGE_ID: String = "MESSAGE_ID"
     const val SEARCH_TIME_DELAY: Long = 500L
@@ -127,7 +128,11 @@ object Constants {
     //Storage Paths
     const val IMAGE_SENT_STORAGE_PATH = "/Engage/Media/Engage Images/Sent"
     const val IMAGE_RECEIVED_STORAGE_PATH = "/Engage/Media/Engage Images/Received"
+    const val PROFILE_PHOTO_LOCAL_STORAGE_PATH = "/Engage/dp"
     const val THUMBNAIL_DIRECTORY_PATH = "/thumbs"
+    const val PROFILE_PHOTO_PATH_CLOUD = "users/"
+    const val PROFILE_PHOTO_PATH_OTHERS_LOACL = "/Engage/Profiles/dp"
+
 
     //Firebase cloud storage paths
     const val MEDIA_121_IMAGES = "media121/Images"

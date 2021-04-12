@@ -1,8 +1,10 @@
 package com.abhishekjagushte.engage.ui.main.screens.chatlist
 
+import android.net.Uri
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.DiffUtil
@@ -10,6 +12,9 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.abhishekjagushte.engage.database.views.ConversationView
 import com.abhishekjagushte.engage.databinding.ConversationItemBinding
+import com.abhishekjagushte.engage.repository.DataRepository
+import com.abhishekjagushte.engage.utils.Constants
+import com.abhishekjagushte.engage.utils.FilePathContract
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,15 +23,15 @@ import kotlinx.coroutines.withContext
 const val CHAT_LIST_ITEM = 1
 const val NOT_DECIDED = 2
 
-class ChatListAdapter : ListAdapter<ChatListDataItem, RecyclerView.ViewHolder> (ChatListDiffCallback()){
+class ChatListAdapter(private val dataRepository: DataRepository, val lifecycleCoroutineScope: LifecycleCoroutineScope) : ListAdapter<ChatListDataItem, RecyclerView.ViewHolder> (ChatListDiffCallback()){
 
     private val adapterScope = CoroutineScope(Dispatchers.Default)
-private val TAG = "ChatListAdapter"
+    private val TAG = "ChatListAdapter"
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         Log.d(TAG, "onCreateViewHolder: Called")
         return when(viewType){
-            CHAT_LIST_ITEM -> ChatListItemViewHolder.from(parent)
+            CHAT_LIST_ITEM -> ChatListItemViewHolder.from(parent, dataRepository, lifecycleCoroutineScope)
             else -> throw ClassCastException("Unknown viewType $viewType")
         }
     }
@@ -61,9 +66,15 @@ private val TAG = "ChatListAdapter"
 
 }
 
-class ChatListItemViewHolder(val binding: ConversationItemBinding): RecyclerView.ViewHolder(binding.root){
+class ChatListItemViewHolder(
+    val binding: ConversationItemBinding,
+    val dataRepository: DataRepository,
+    val lifecycleCoroutineScope: LifecycleCoroutineScope
+): RecyclerView.ViewHolder(binding.root){
 
     lateinit var navController: NavController
+
+    private val TAG = "ChatListItemViewHolder"
 
     fun bind(conversationView: ConversationView){
         binding.conversationView = conversationView
@@ -73,14 +84,38 @@ class ChatListItemViewHolder(val binding: ConversationItemBinding): RecyclerView
             navController.navigate(ChatListFragmentDirections
                 .actionChatListFragmentToChatFragment(conversationView.conversationID))
         }
+
+        Log.d(TAG, "bind: Setting here")
+        setProfilePhoto(conversationView)
+
+        if(conversationView.conType == Constants.CONVERSATION_TYPE_121){
+            lifecycleCoroutineScope.launch {
+                withContext(Dispatchers.IO){
+                    dataRepository.getProfilePhotoThumbnail(conversationView.conversationID, conversationView.dp_timeStamp)?.addOnSuccessListener {
+                        setProfilePhoto(conversationView)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setProfilePhoto(conversationView: ConversationView) {
+        val profilePicUri =
+            FilePathContract.getContactsProfilePhotoUri(conversationView.conversationID) //conversationID is username
+        if (profilePicUri != Uri.EMPTY)
+            binding.profileImage.setImageURI(profilePicUri)
     }
 
     companion object{
-        fun from(parent: ViewGroup): ChatListItemViewHolder{
+        fun from(
+            parent: ViewGroup,
+            dataRepository: DataRepository,
+            lifecycleCoroutineScope: LifecycleCoroutineScope
+        ): ChatListItemViewHolder{
             val layoutInflater = LayoutInflater.from(parent.context)
             val binding = ConversationItemBinding.inflate(layoutInflater, parent, false)
 
-            val vh = ChatListItemViewHolder(binding)
+            val vh = ChatListItemViewHolder(binding, dataRepository, lifecycleCoroutineScope)
             vh.navController = Navigation.findNavController(parent)
 
             return vh
@@ -95,7 +130,7 @@ class ChatListDiffCallback: DiffUtil.ItemCallback<ChatListDataItem>() {
     }
 
     override fun areContentsTheSame(oldItem: ChatListDataItem, newItem: ChatListDataItem): Boolean {
-        return oldItem.lastMessageID == newItem.lastMessageID
+        return oldItem.lastMessageID == newItem.lastMessageID && oldItem.dp_timestamp == newItem.dp_timestamp
         //TODO consider the case when the last message content changes and you may have to include hwther the message is deleted
     }
 
@@ -104,10 +139,12 @@ class ChatListDiffCallback: DiffUtil.ItemCallback<ChatListDataItem>() {
 sealed class ChatListDataItem{
     abstract val id: String
     abstract val lastMessageID: String?
+    abstract val dp_timestamp: Long?
 
     data class ChatListItem(val conversationView: ConversationView): ChatListDataItem() {
         override val id = conversationView.conversationID
         override val lastMessageID = conversationView.messageID
+        override val dp_timestamp = conversationView.dp_timeStamp
     }
 
 }

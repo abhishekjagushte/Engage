@@ -168,4 +168,7 @@ interface DatabaseDao{
     @Query("UPDATE events SET status = 2 WHERE eventID = :eventID")
     fun markReminderDone(eventID: String)
 
+    @Query("UPDATE contacts SET dp_timeStamp = :currentTimeMillis WHERE username=:username")
+    fun updateContactTimeStamp(currentTimeMillis: Long, username: String)
+
 }

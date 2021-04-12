@@ -439,4 +439,8 @@ class LocalDataSource @Inject constructor (
     fun markReminderDone(eventID: String) {
         databaseDao.markReminderDone(eventID)
     }
+
+    fun updateContactTimestamp(currentTimeMillis: Long, username: String) {
+        databaseDao.updateContactTimeStamp(currentTimeMillis, username)
+    }
 }
