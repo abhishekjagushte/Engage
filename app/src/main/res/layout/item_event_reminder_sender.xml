@@ -67,7 +67,7 @@
                 app:layout_constraintStart_toStartOf="@+id/reminder_description_tv"
                 app:layout_constraintTop_toBottomOf="@+id/reminder_description_tv" />
 
-<!--            <TextView-->
+            <!--            <TextView-->
 <!--                android:id="@+id/created_time"-->
 <!--                android:layout_width="wrap_content"-->
 <!--                android:layout_height="wrap_content"-->

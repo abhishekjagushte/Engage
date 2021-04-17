@@ -1,9 +1,8 @@
-package com.abhishekjagushte.engage.ui.chat.adapters
+package com.abhishekjagushte.engage.ui.main.screens.events.adapter
 
 import android.graphics.Paint
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.paging.PagedList
 import androidx.paging.PagedListAdapter
@@ -26,7 +25,7 @@ import kotlinx.coroutines.withContext
 const val REMINDER_EVENT_ITEM_SENDER = 1
 const val REMINDER_EVENT_ITEM_RECEIVER = 2
 
-class EventsAdapter(private val dataRepository: DataRepository, private val showChatName: Boolean) : PagedListAdapter<EventDataItem, RecyclerView.ViewHolder>(EventsDiffCallback()){
+class EventsFragmentAdapter (private val dataRepository: DataRepository) : PagedListAdapter<EventDataItem, RecyclerView.ViewHolder>(EventsDiffCallback()){
 
     private val adapterScope = CoroutineScope(Dispatchers.Default)
 
@@ -42,8 +41,8 @@ class EventsAdapter(private val dataRepository: DataRepository, private val show
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when(viewType){
-            REMINDER_EVENT_ITEM_SENDER -> ReminderItemSenderViewHolder.from(parent, dataRepository, showChatName)
-            REMINDER_EVENT_ITEM_RECEIVER -> ReminderItemReceiverViewHolder.from(parent, dataRepository, showChatName)
+            REMINDER_EVENT_ITEM_SENDER -> ReminderItemSenderViewHolder.from(parent)
+            REMINDER_EVENT_ITEM_RECEIVER -> ReminderItemReceiverViewHolder.from(parent)
             else -> throw IllegalStateException("Event type is incorrect")
         }
     }
@@ -69,11 +68,7 @@ class EventsAdapter(private val dataRepository: DataRepository, private val show
 
 }
 
-class ReminderItemSenderViewHolder(
-    private val binding: ItemEventReminderSenderBinding,
-    private val dataRepository: DataRepository,
-    private val showChatName: Boolean
-): RecyclerView.ViewHolder(binding.root){
+class ReminderItemSenderViewHolder(private val binding: ItemEventReminderSenderBinding): RecyclerView.ViewHolder(binding.root){
 
     fun bind(eventView: EventView){
         val json = eventView.data
@@ -93,27 +88,21 @@ class ReminderItemSenderViewHolder(
     }
 
     companion object{
-        fun from(parent: ViewGroup, dataRepository: DataRepository, showChatName: Boolean): ReminderItemSenderViewHolder{
+        fun from(parent: ViewGroup): ReminderItemSenderViewHolder{
             val layoutInflater = LayoutInflater.from(parent.context)
             val binding = ItemEventReminderSenderBinding.inflate(layoutInflater, parent, false)
-            return ReminderItemSenderViewHolder(binding, dataRepository, showChatName)
+            return ReminderItemSenderViewHolder(binding)
         }
     }
 }
 
-class ReminderItemReceiverViewHolder(
-    private val binding: ItemEventReminderReceiverBinding,
-    private val dataRepository: DataRepository,
-    private val showChatName: Boolean
-): RecyclerView.ViewHolder(binding.root){
+class ReminderItemReceiverViewHolder(private val binding: ItemEventReminderReceiverBinding): RecyclerView.ViewHolder(binding.root){
 
     fun bind(eventView: EventView, dataRepository: DataRepository){
         val json = eventView.data
         val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
         val jsonAdapter: JsonAdapter<Reminder> = moshi.adapter(Reminder::class.java)
         val reminder = jsonAdapter.fromJson(json!!)
-
-        setUpChatName(eventView)
 
         binding.markDoneButton.setOnClickListener {
             Log.e("**", "bind: clicked", )
@@ -129,19 +118,11 @@ class ReminderItemReceiverViewHolder(
         binding.executePendingBindings()
     }
 
-    private fun setUpChatName(eventView: EventView) {
-        if(showChatName && eventView.type==Constants.EVENT_OTHER){
-            binding.chatName.text = eventView.nickname
-        }
-        else
-            binding.chatName.visibility = View.GONE
-    }
-
     companion object{
-        fun from(parent: ViewGroup, dataRepository: DataRepository, showChatName: Boolean): ReminderItemReceiverViewHolder{
+        fun from(parent: ViewGroup): ReminderItemReceiverViewHolder{
             val layoutInflater = LayoutInflater.from(parent.context)
             val binding = ItemEventReminderReceiverBinding.inflate(layoutInflater, parent, false)
-            return ReminderItemReceiverViewHolder(binding, dataRepository, showChatName)
+            return ReminderItemReceiverViewHolder(binding)
         }
     }
 }

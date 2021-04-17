@@ -16,6 +16,7 @@ import com.abhishekjagushte.engage.ui.chat.screens.events.createscreens.CreateRe
 import com.abhishekjagushte.engage.ui.fragments.ContactListFragment
 import com.abhishekjagushte.engage.ui.main.screens.chatlist.di.ChatListComponent
 import com.abhishekjagushte.engage.ui.main.screens.creategroup.addparticipants.di.AddParticipantsComponent
+import com.abhishekjagushte.engage.ui.main.screens.events.di.EventFragmentComponent
 import com.abhishekjagushte.engage.ui.main.screens.profile.di.ProfileComponent
 import com.abhishekjagushte.engage.ui.main.screens.search.di.SearchComponent
 import com.abhishekjagushte.engage.ui.main.screens.settings.SettingsFragment
@@ -31,16 +32,18 @@ import javax.inject.Singleton
 
 
 @Singleton
-@Component(modules =
-        [LocalStorageModule::class,
-            NetworkModule::class,
-            ViewModelBuilderModule::class,
-            SubcomponentsModule::class,
-            WorkManagerModule::class])
-interface AppComponent: AndroidInjector<EngageApplication>{
+@Component(
+    modules =
+    [LocalStorageModule::class,
+        NetworkModule::class,
+        ViewModelBuilderModule::class,
+        SubcomponentsModule::class,
+        WorkManagerModule::class]
+)
+interface AppComponent : AndroidInjector<EngageApplication> {
 
     @Component.Factory
-    interface Factory{
+    interface Factory {
         fun create(@BindsInstance application: Application): AppComponent
     }
 
@@ -66,18 +69,22 @@ interface AppComponent: AndroidInjector<EngageApplication>{
     fun addLoginComponent(): LoginComponent.Factory
     fun addSignUpComponent(): SignUpComponent.Factory
     fun addSetUsernameComponent(): SetUsernameComponent.Factory
+    fun addEventFragmentComponent(): EventFragmentComponent.Factory
 }
 
-@Module(subcomponents =
+@Module(
+    subcomponents =
     [LoginComponent::class,
-    SignUpComponent::class,
-    SetUsernameComponent::class,
-    ChatListComponent::class,
-    SearchComponent::class,
-    ProfileComponent::class,
-    ChatComponent::class,
-    ChatScreenComponent::class,
-    EventComponent::class,
-    MainComponent::class,
-    AddParticipantsComponent::class])
+        SignUpComponent::class,
+        SetUsernameComponent::class,
+        ChatListComponent::class,
+        SearchComponent::class,
+        ProfileComponent::class,
+        ChatComponent::class,
+        ChatScreenComponent::class,
+        EventComponent::class,
+        MainComponent::class,
+        EventFragmentComponent::class,
+        AddParticipantsComponent::class]
+)
 object SubcomponentsModule

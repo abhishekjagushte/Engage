@@ -231,7 +231,8 @@
         android:name="com.abhishekjagushte.engage.ui.main.screens.settings.SettingsFragment"
         android:label="fragment_settings"
         tools:layout="@layout/fragment_settings" /><action android:id="@+id/action_global_settingsFragment" app:destination="@id/settingsFragment"/>
-    <fragment
+
+    <dialog
         android:id="@+id/bottomSheet2"
         android:name="com.abhishekjagushte.engage.ui.fragments.BottomSheet"
         android:label="fragment_bottom_sheet"

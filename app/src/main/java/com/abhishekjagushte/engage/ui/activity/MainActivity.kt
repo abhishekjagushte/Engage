@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
             super.onOptionsItemSelected(item)
         }
     }
-    
+
     override fun onCreate(savedInstanceState: Bundle?) {
         //Dependency Injection (should be done before onCreate
         (application as EngageApplication).appComponent.inject(this)
@@ -97,7 +97,10 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         arguments: Bundle?
     ) {
         when (destination.id) {
-            R.id.profileFragment -> bottomNavigationView.visibility = View.GONE
+            R.id.profileFragment -> {
+                bottomNavigationView.visibility = View.GONE
+                appBar.visibility = View.GONE
+            }
             R.id.chatFragment -> {
                 bottomNavigationView.visibility = View.GONE
                 appBar.visibility = View.VISIBLE
@@ -150,8 +153,11 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
             }
             else -> {
                 bottomNavigationView.visibility = View.VISIBLE
-                appBar.visibility = View.VISIBLE
-                toolbar.menu.findItem(R.id.action_settings).isVisible = true
+                if(this::appBar.isInitialized)
+                    appBar.visibility = View.VISIBLE
+
+                if(this::toolbar.isInitialized)
+                    toolbar.menu.findItem(R.id.action_settings).isVisible = true
             }
         }
     }

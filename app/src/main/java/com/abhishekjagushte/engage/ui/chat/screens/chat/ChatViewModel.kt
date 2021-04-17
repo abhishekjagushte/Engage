@@ -222,7 +222,7 @@ class ChatViewModel @Inject constructor(
 
                     viewModelScope.launch {
                         withContext(Dispatchers.IO) {
-                            dataRepository.pushMessage(msg).addOnSuccessListener {
+                            dataRepository.pushMessage(msg)?.addOnSuccessListener {
                                 viewModelScope.launch {
                                     withContext(Dispatchers.IO) {
                                         dataRepository.setMessageSent(msg.messageID)
@@ -243,7 +243,7 @@ class ChatViewModel @Inject constructor(
 
                     viewModelScope.launch {
                         withContext(Dispatchers.IO) {
-                            dataRepository.pushMessage(msg).addOnSuccessListener {
+                            dataRepository.pushMessage(msg)?.addOnSuccessListener {
                                 viewModelScope.launch {
                                     Log.d(TAG, "sendTextMessage121: called")
                                     withContext(Dispatchers.IO) {

@@ -130,9 +130,13 @@ class LocalDataSource @Inject constructor (
     }
 
 
-    fun pushMessage(messageID: String): Task<Void> {
+    fun pushMessage(messageID: String): Task<Void>? {
 
         val message = databaseDao.getMessage(messageID)
+
+        if(message.type==Constants.TYPE_NOTICE){
+            return null
+        }
 
         return when (message.conType) {
             Constants.CONVERSATION_TYPE_121 -> {
@@ -157,7 +161,10 @@ class LocalDataSource @Inject constructor (
         }
     }
 
-    fun pushMessage(message: Message): Task<Void> {
+    fun pushMessage(message: Message): Task<Void>? {
+        if(message.type==Constants.TYPE_NOTICE)
+            return null
+
         return when (message.conType) {
             Constants.CONVERSATION_TYPE_121 -> {
                 firestore.collection("messages121")
@@ -426,6 +433,10 @@ class LocalDataSource @Inject constructor (
 
     fun getEvents(conversationID: String): DataSource.Factory<Int, EventView> {
         return databaseDao.getEvents(conversationID)
+    }
+
+    fun getAllEvents(): DataSource.Factory<Int, EventView> {
+        return databaseDao.getAllEvents()
     }
 
     fun getLast121EventTimestamp(): Long {

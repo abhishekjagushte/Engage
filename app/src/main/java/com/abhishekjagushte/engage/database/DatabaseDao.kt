@@ -160,7 +160,9 @@ interface DatabaseDao{
 
     @Query("SELECT * FROM events_view WHERE conversationID == :conversationID ORDER BY timeStamp DESC")
     fun getEvents(conversationID: String): DataSource.Factory<Int, EventView>
-    //LiveData<List<MessageView>>
+
+    @Query("SELECT * FROM events_view ORDER BY timeStamp DESC")
+    fun getAllEvents(): DataSource.Factory<Int, EventView>
 
     @Query("SELECT MAX(timeStamp) FROM events WHERE conType = 1")//contype 1 = 121
     fun getLast121EventTimestamp(): Long

@@ -305,6 +305,15 @@ class DataRepository @Inject constructor(
         }
     }
 
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Events Fragment
+    ///////////////////////////////////////////////////////////////////////////
+
+    fun getAllEvents(): DataSource.Factory<Int, EventView> {
+        return localDataSource.getAllEvents()
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // ChatList Fragment stuff
     ///////////////////////////////////////////////////////////////////////////
@@ -375,12 +384,12 @@ class DataRepository @Inject constructor(
     }
 
 
-    fun pushMessage(messageID: String): Task<Void> {
+    fun pushMessage(messageID: String): Task<Void>? {
         return localDataSource.pushMessage(messageID)//Since pushing messaage is more of a job for local databse updation, it is done in local db source
     }
 
 
-    fun pushMessage(message: Message): Task<Void> {
+    fun pushMessage(message: Message): Task<Void>? {
         return localDataSource.pushMessage(message)
         //Since pushing messaage is more of a job for local databse updation, it is done in local db source
     }

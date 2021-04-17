@@ -6,22 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".ui.main.screens.creategroup.addparticipants.AddParticipantsFragment">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/app_bar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-    </com.google.android.material.appbar.AppBarLayout>
-
     <EditText
         android:id="@+id/search_bar"
         android:layout_width="match_parent"

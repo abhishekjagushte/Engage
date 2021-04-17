@@ -37,8 +37,7 @@ class SearchFragment : Fragment() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
-    lateinit var appBar: AppBarLayout
-    lateinit var toolbar: Toolbar
+
     lateinit var adapter: SearchAdapter
 
     private val viewModel by viewModels<SearchFragmentViewModel> { viewModelFactory }

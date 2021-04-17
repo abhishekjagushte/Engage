@@ -9,4 +9,6 @@
     <color name="submit_button_text_color">#ffffff</color>
     <color name="transparent">#00000000</color>
     <color name="background_primary">#fafafa</color>
+    <color name="light_accent">#906FCC</color>
+
 </resources>

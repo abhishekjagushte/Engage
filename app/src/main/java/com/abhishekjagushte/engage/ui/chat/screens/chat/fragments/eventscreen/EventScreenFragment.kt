@@ -36,7 +36,7 @@ class EventScreenFragment : Fragment(R.layout.fragment_event_screen) {
         SharedViewModel = (parentFragment as ChatFragment).viewModel
 
         events_recyclerview.layoutManager = LinearLayoutManager(context)
-        eventsAdapter = EventsAdapter(dataRepository)
+        eventsAdapter = EventsAdapter(dataRepository, false)
         events_recyclerview.adapter = eventsAdapter
 
         val speedDialView = speedDial

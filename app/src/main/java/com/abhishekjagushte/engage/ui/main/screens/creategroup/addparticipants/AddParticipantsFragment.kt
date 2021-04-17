@@ -28,9 +28,6 @@ import kotlinx.android.synthetic.main.fragment_add_participants.*
 
 class AddParticipantsFragment : Fragment(R.layout.fragment_add_participants) {
 
-    lateinit var appBar: AppBarLayout
-    lateinit var toolbar: Toolbar
-
     lateinit var sharedViewModel: AddParticipantSharedViewModel
 
     lateinit var adapter: AddedParticipantsAdapter
@@ -41,14 +38,6 @@ class AddParticipantsFragment : Fragment(R.layout.fragment_add_participants) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val navController = Navigation.findNavController(view)
-        val appBarConfiguration = AppBarConfiguration.Builder(R.id.searchFragment).build()
-
-        appBar = view.findViewById(R.id.app_bar)
-        toolbar = view.findViewById(R.id.toolbar)
-        NavigationUI.setupWithNavController(toolbar, navController, appBarConfiguration)
-
 
         participantsRecyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         adapter = AddedParticipantsAdapter(ParticipantRemoveListener{
@@ -131,13 +120,3 @@ class AddParticipantsFragment : Fragment(R.layout.fragment_add_participants) {
         })
     }
 }
-
-
-//        activity?.run {
-//            val viewModelFactory =
-//                AddParticipantSharedViewModelFactory(
-//                    (activity as MainActivity).dataRepository
-//                )
-//            sharedViewModel = ViewModelProvider(this, viewModelFactory).get(
-//                AddParticipantSharedViewModel::class.java)
-//        }

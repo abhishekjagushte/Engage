@@ -16,7 +16,7 @@ class PushWorker (
     private val dataRepository: DataRepository
 ): CoroutineWorker(context, workerParams){
 
-    private lateinit var task: Task<Void>
+    private var task: Task<Void>? = null
     private val TAG = "Pushworker"
 
     //earlier this was used to send messages everytime, but i observeed that even if messages are sent while
@@ -28,16 +28,19 @@ class PushWorker (
             val messageID = msg.messageID
             messageID.let{
                 task = dataRepository.pushMessage(messageID)
-                task.await()
-                //TODO sending messages to M2M users is implemented but not tested
-                return if (task.isSuccessful){
-                    dataRepository.setMessageSent(messageID)
-                    Log.i("PushWorker", "success")
-                    Result.success()
-                } else{
-                    Log.i("PushWorker", "failure")
-                    Result.failure()
+                task?.let{
+                    it.await()
+                    //TODO sending messages to M2M users is implemented but not tested
+                    return if (it.isSuccessful){
+                        dataRepository.setMessageSent(messageID)
+                        Log.i("PushWorker", "success")
+                        Result.success()
+                    } else{
+                        Log.i("PushWorker", "failure")
+                        Result.failure()
+                    }
                 }
+                
             }
         }
         Log.d(TAG, "doWork: Returning success: no new message to be sent")
