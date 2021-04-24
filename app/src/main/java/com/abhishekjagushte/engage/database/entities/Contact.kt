@@ -24,7 +24,7 @@ class Contact(
     var dp_thmb: Bitmap? = null,
     var type: Int,
 
-    var dp_timeStamp: String? = null
+    var dp_timeStamp: Long? = null
 
     //conversation ID removed from the contacts
 ){

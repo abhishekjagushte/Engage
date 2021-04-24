@@ -10,5 +10,6 @@
     <color name="transparent">#00000000</color>
     <color name="background_primary">#fafafa</color>
     <color name="light_accent">#906FCC</color>
+    <color name="black">#000000</color>
 
 </resources>

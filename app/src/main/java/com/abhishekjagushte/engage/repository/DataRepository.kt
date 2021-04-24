@@ -175,11 +175,11 @@ class DataRepository @Inject constructor(
         return firebaseInstanceId.getNotificationChannelID()
     }
 
-    suspend fun getProfilePhotoThumbnail(username: String, dpTimestamp: Long?): FileDownloadTask? {
+    suspend fun updateProfilePhotoThumbnail(username: String, dpTimestamp: Long?): FileDownloadTask? {
         dpTimestamp?.let {
-            return storageSource.getProfilePhotoThumbnail(username, dpTimestamp)
+            return storageSource.updateProfilePhotoThumbnail(username, dpTimestamp)
         }
-        return storageSource.getProfilePhotoThumbnail(username, 0)
+        return storageSource.updateProfilePhotoThumbnail(username, 0)
     }
 
 
@@ -705,6 +705,10 @@ class DataRepository @Inject constructor(
 
     fun markReminderDoneLocal(eventID: String) {
         localDataSource.markReminderDone(eventID)
+    }
+
+    fun getDpTimeStamp(username: String): Long? {
+        return localDataSource.getDpTimeStamp(username)
     }
 
 

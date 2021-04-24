@@ -2,9 +2,12 @@ package com.abhishekjagushte.engage.ui.fragments
 
 import android.content.Context
 import android.os.Bundle
+import android.provider.SyncStateContract
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.abhishekjagushte.engage.EngageApplication
 import com.abhishekjagushte.engage.R
@@ -14,7 +17,11 @@ import com.abhishekjagushte.engage.ui.fragments.adapters.ContactItemClickListene
 import com.abhishekjagushte.engage.ui.fragments.adapters.ContactListAdapter
 import com.abhishekjagushte.engage.ui.fragments.adapters.ContactListDataItem
 import com.abhishekjagushte.engage.ui.fragments.adapters.ContactLongItemClickListener
+import com.abhishekjagushte.engage.utils.Constants
 import kotlinx.android.synthetic.main.fragment_contact_list.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
@@ -37,6 +44,14 @@ class ContactListFragment(
         recyclerView.layoutManager = linearLayoutManager
         adapter = ContactListAdapter(clickListener, longClickListener, mode, requireContext())
 
+        if(mode==Constants.CONTACT_LIST_MODE_NORMAL) {
+            dataRepository.getConfirmedContacts().observe(viewLifecycleOwner, Observer {
+                it?.let {
+                    updateList(it)
+                    Log.e(TAG, "onViewCreated: ${it.size}", )
+                }
+            })
+        }
         recyclerView.adapter = adapter
     }
 

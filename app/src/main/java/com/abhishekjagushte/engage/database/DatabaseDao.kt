@@ -173,4 +173,7 @@ interface DatabaseDao{
     @Query("UPDATE contacts SET dp_timeStamp = :currentTimeMillis WHERE username=:username")
     fun updateContactTimeStamp(currentTimeMillis: Long, username: String)
 
+    @Query("SELECT dp_timeStamp FROM contacts WHERE username=:username")
+    fun getDpTimeStamp(username: String): Long?
+
 }

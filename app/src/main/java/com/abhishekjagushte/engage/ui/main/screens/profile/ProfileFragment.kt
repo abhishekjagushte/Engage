@@ -1,6 +1,9 @@
 package com.abhishekjagushte.engage.ui.main.screens.profile
 
+import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,17 +14,23 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.abhishekjagushte.engage.EngageApplication
 import com.abhishekjagushte.engage.R
 import com.abhishekjagushte.engage.utils.Constants
+import com.abhishekjagushte.engage.utils.FilePathContract
 import com.google.android.material.appbar.AppBarLayout
+import kotlinx.android.synthetic.main.fragment_profile.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
-
-class ProfileFragment : Fragment() {
+class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -30,24 +39,11 @@ class ProfileFragment : Fragment() {
     private val TAG = "ProfileFragment"
     var name: String? = null
     var username: String? = null
-    private lateinit var toolbar: Toolbar
-    private lateinit var appBar: AppBarLayout
-
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_profile, container, false)
-    }
+    val handler = Handler(Looper.getMainLooper())
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val navController = Navigation.findNavController(view)
-        //val appBarConfiguration = AppBarConfiguration.Builder(navController.graph).build()
 
         val application = requireActivity().application
 
@@ -64,18 +60,18 @@ class ProfileFragment : Fragment() {
         name = args.name
         username = args.username
 
-        if(name.isNullOrBlank() || username.isNullOrBlank()){
+        if (name.isNullOrBlank() || username.isNullOrBlank()) {
             name = arguments?.getString(Constants.ARGUMENT_NAME)
             username = arguments?.getString(Constants.ARGUMENT_USERNAME)
         }
 
         var updated = false
         viewModel.getProfileLive(username!!).observe(viewLifecycleOwner, Observer {
-            it.let{
+            it.let {
                 viewModel.setProfileDisplay(it, username!!)
-                if(it!=null) {
+                if (it != null) {
                     viewModel.localContact = it
-                    if(!updated) {
+                    if (!updated) {
                         viewModel.getUpdatedProfile(username!!)
                         updated = true
                     }
@@ -99,6 +95,22 @@ class ProfileFragment : Fragment() {
                 }
             }
         })
+
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO){
+                image_progress_bar.visibility=View.VISIBLE
+                viewModel.getUpdatedProfile(username!!)
+                val profilePicUri =
+                    FilePathContract.getContactsProfilePhotoUri(username!!)
+                if (profilePicUri != Uri.EMPTY) {
+                    handler.post {
+                        display_picture_imageView.setImageURI(profilePicUri)
+                    }
+                }
+                image_progress_bar.visibility=View.GONE
+
+            }
+        }
 
         viewModel.profileDisplay.observe(viewLifecycleOwner, Observer {
             if (it != null) {
@@ -141,14 +153,16 @@ class ProfileFragment : Fragment() {
                 Constants.CONTACTS_PENDING -> viewModel.acceptRequest()
 
                 Constants.CONTACTS_CONFIRMED -> {
-                    navController.navigate(ProfileFragmentDirections
-                        .actionProfileActivityToChatFragment(viewModel.localContact.username))
+                    findNavController().navigate(
+                        ProfileFragmentDirections
+                            .actionProfileActivityToChatFragment(viewModel.localContact.username)
+                    )
                 }
             }
         }
     }
 
-    private fun getUpdatedProfile(){
+    private fun getUpdatedProfile() {
 
     }
 }

@@ -1,5 +1,6 @@
 package com.abhishekjagushte.engage.ui.main.screens.profile
 
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -49,7 +50,6 @@ class ProfileFragmentViewModel @Inject constructor(
 
                 if (contact == null) {
                     //In case of unknown contacts
-
                     dataRepository.getContactFirestoreFromUsername(username)
                         .addOnSuccessListener {
                             if (it != null) {
@@ -70,6 +70,19 @@ class ProfileFragmentViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+
+    suspend fun loadProfileImage(username: String){
+        val dpTimestamp = dataRepository.getDpTimeStamp(username)
+        val task = dataRepository.updateProfilePhotoThumbnail(username, dpTimestamp)
+
+        task?.let{
+            it.addOnSuccessListener {
+
+            }
+        }
+
     }
 
     fun addFriend() {
@@ -187,44 +200,14 @@ fun Profile.convertToProfileDisplay(type: Int): ProfileDisplay {
     )
 }
 
-
 data class ProfileDisplay(
     val name: String,
     val username: String,
-    val dp_thmb: ByteArray? = null,
+    val dp_thmb: Uri? = null,
     val bio: String,
     val timeStampString: String,
     var type: Int
-) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as ProfileDisplay
-
-        if (name != other.name) return false
-        if (username != other.username) return false
-        if (dp_thmb != null) {
-            if (other.dp_thmb == null) return false
-            if (!dp_thmb.contentEquals(other.dp_thmb)) return false
-        } else if (other.dp_thmb != null) return false
-        if (bio != other.bio) return false
-        if (timeStampString != other.timeStampString) return false
-        if (type != other.type) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = name.hashCode()
-        result = 31 * result + username.hashCode()
-        result = 31 * result + (dp_thmb?.contentHashCode() ?: 0)
-        result = 31 * result + bio.hashCode()
-        result = 31 * result + timeStampString.hashCode()
-        result = 31 * result + type
-        return result
-    }
-}
+)
 
 /*
       dataRepository.getContactFirestoreFromUsername(username)

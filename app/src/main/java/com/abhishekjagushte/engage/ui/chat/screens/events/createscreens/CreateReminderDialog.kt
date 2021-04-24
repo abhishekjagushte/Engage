@@ -17,14 +17,10 @@ import com.abhishekjagushte.engage.database.entities.jsonmodels.Reminder
 import com.abhishekjagushte.engage.repository.DataRepository
 import com.abhishekjagushte.engage.utils.Constants
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.type.DateTime
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.android.synthetic.main.fragment_create_reminder_dialog.*
-import java.lang.reflect.Array.get
-import java.sql.Time
-import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
@@ -36,6 +32,8 @@ class CreateReminderDialog : BottomSheetDialogFragment() {
     @Inject
     lateinit var dataRepository: DataRepository
 
+    private var selectedDate: Long =  System.currentTimeMillis()
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         (requireActivity().application as EngageApplication).appComponent.inject(this)
@@ -46,13 +44,28 @@ class CreateReminderDialog : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ): View {
         // Inflate the layout for this fragment
-        val view: View = inflater.inflate(R.layout.fragment_create_reminder_dialog, container, false)
+        val view: View = inflater.inflate(
+            R.layout.fragment_create_reminder_dialog,
+            container,
+            false
+        )
 
         val args by navArgs<CreateReminderDialogArgs>()
         val conType = args.conversationType
         val conversationID: String? =  args.conversationID
 
-        view.findViewById<CalendarView>(R.id.calendarView).minDate = System.currentTimeMillis()
+        val calendarView = view.findViewById<CalendarView>(R.id.calendarView)
+        calendarView.minDate = System.currentTimeMillis()
+
+
+        calendarView.setOnDateChangeListener { view, year, month, dayOfMonth ->
+            run {
+                val c = Calendar.getInstance()
+                c[year, month] = dayOfMonth
+                selectedDate = c.timeInMillis
+            }
+        }
+
 
         view.findViewById<Button>(R.id.create_reminder_button).setOnClickListener {
             val createdTime = System.currentTimeMillis()
@@ -60,10 +73,24 @@ class CreateReminderDialog : BottomSheetDialogFragment() {
             val offset = reminderTime - createdTime
             val title = reminder_text_input.text.toString()
             val description = reminder_description_input.text.toString()
-            val reminder = Reminder(title,description,Constants.REMINDER_STATUS_ACTIVE, createdTime, reminderTime, offset)
-            val event = createReminderEvent(reminder,conType, conversationID)
+            val reminder = Reminder(
+                title,
+                description,
+                Constants.REMINDER_STATUS_ACTIVE,
+                createdTime,
+                reminderTime,
+                offset
+            )
+            val event = createReminderEvent(reminder, conType, conversationID)
 
-            Log.d(TAG, "onCreateView: created = ${createdTime} reminderTime = ${reminder.reminderTime} offset = ${Date(offset)}, $offset")
+            Log.d(
+                TAG,
+                "onCreateView: created = ${createdTime} reminderTime = ${reminder.reminderTime} offset = ${
+                    Date(
+                        offset
+                    )
+                }, $offset"
+            )
             
             dataRepository.createReminderEvent(event)
             findNavController().navigateUp()
@@ -96,14 +123,13 @@ class CreateReminderDialog : BottomSheetDialogFragment() {
 
     //TODO convert this time to UTC
     private fun getInputUTCDate(): Long{
-        val calendarDate = calendarView.date
+        val calendarDate = selectedDate
         var time = calendarDate - calendarDate%(24*60*60*1000)
+        Log.e(TAG, "getInputUTCDate: Initial Date = $time  Date = ${Date(time)}")
         val hour = timePicker.hour
         val minutes = timePicker.minute
-
         time += hour * (1000 * 60 * 60) + minutes * (1000 * 60)  //This is a date according to the setter's timezone, convert it as per UTC
         val timeZone =  TimeZone.getDefault()
-
         time -= timeZone.rawOffset
 
         Log.e(TAG, "getInputUTCDate: date = ${Date(time)}  hour = $hour minute = $minutes")

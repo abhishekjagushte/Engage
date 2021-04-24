@@ -454,4 +454,8 @@ class LocalDataSource @Inject constructor (
     fun updateContactTimestamp(currentTimeMillis: Long, username: String) {
         databaseDao.updateContactTimeStamp(currentTimeMillis, username)
     }
+
+    fun getDpTimeStamp(username: String): Long? {
+        return databaseDao.getDpTimeStamp(username)
+    }
 }

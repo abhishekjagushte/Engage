@@ -35,8 +35,6 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
 
     private val TAG = "MainActivity"
 
-    private val mainActivityJob = Job()
-    val mainActivityScope = CoroutineScope(Dispatchers.Main + mainActivityJob)
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var toolbar: Toolbar
     private lateinit var appBar: AppBarLayout
@@ -55,11 +53,13 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        //Dependency Injection (should be done before onCreate
+        //Dependency Injection (should be done before super.onCreate)
         (application as EngageApplication).appComponent.inject(this)
-
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        toolbar = findViewById<Toolbar>(R.id.toolbar)
+        appBar = findViewById(R.id.app_bar)
 
         val viewModelFactory =
             MainActivityViewModelFactory(
@@ -80,8 +80,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
                 R.id.peopleFragment
             )
         )
-        toolbar = findViewById<Toolbar>(R.id.toolbar)
-        appBar = findViewById(R.id.app_bar)
+
         toolbar.setupWithNavController(navController, appBarConfiguration)
         toolbar.setOnMenuItemClickListener { item ->
             toolbarMenuItemListener(item)
@@ -153,11 +152,8 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
             }
             else -> {
                 bottomNavigationView.visibility = View.VISIBLE
-                if(this::appBar.isInitialized)
-                    appBar.visibility = View.VISIBLE
-
-                if(this::toolbar.isInitialized)
-                    toolbar.menu.findItem(R.id.action_settings).isVisible = true
+                appBar.visibility = View.VISIBLE
+                toolbar.menu.findItem(R.id.action_settings).isVisible = true
             }
         }
     }

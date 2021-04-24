@@ -73,7 +73,7 @@ class FirebaseStorageSource @Inject constructor(
             .setContentType("image/jpg").build())
     }
 
-    suspend fun getProfilePhotoThumbnail(username: String, timestamp: Long): FileDownloadTask? {
+    suspend fun updateProfilePhotoThumbnail(username: String, timestamp: Long): FileDownloadTask? {
         val path = Constants.PROFILE_PHOTO_PATH_CLOUD + Constants.THUMBNAIL_PREFIX + username + ".jpg"
         val ref = storage.child(path)
 

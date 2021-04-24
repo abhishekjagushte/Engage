@@ -91,7 +91,7 @@ class ChatListItemViewHolder(
         if(conversationView.conType == Constants.CONVERSATION_TYPE_121){
             lifecycleCoroutineScope.launch {
                 withContext(Dispatchers.IO){
-                    dataRepository.getProfilePhotoThumbnail(conversationView.conversationID, conversationView.dp_timeStamp)?.addOnSuccessListener {
+                    dataRepository.updateProfilePhotoThumbnail(conversationView.conversationID, conversationView.dp_timeStamp)?.addOnSuccessListener {
                         setProfilePhoto(conversationView)
                     }
                 }
