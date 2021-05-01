@@ -94,5 +94,30 @@
         <item name="android:background">@color/colorPrimaryDark</item>
     </style>
 
+    <style name="list_item_heading">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">10dp</item>
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="android:textSize">17sp</item>
+    </style>
+
+    <style name="item_list_subheading">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">16dp</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:layout_marginEnd">10dp</item>
+        <item name="android:layout_marginBottom">8dp</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="display_picture_style">
+        <item name="android:layout_width">60dp</item>
+        <item name="android:layout_height">60dp</item>
+        <item name="android:layout_marginStart">10dp</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:layout_marginBottom">8dp</item>
+    </style>
+
 
 </resources>

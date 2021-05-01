@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="conversationView"
             type="com.abhishekjagushte.engage.database.views.ConversationView" />
@@ -26,11 +27,13 @@
             <TextView
                 android:id="@+id/messageTiming"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Time"
+                android:layout_height="16dp"
+                android:textSize="14sp"
                 app:layout_constraintBottom_toBottomOf="@+id/messageData"
                 app:layout_constraintEnd_toEndOf="@+id/imageView5"
-                app:setMessageTime="@{conversationView}" />
+                app:layout_constraintTop_toTopOf="@+id/messageData"
+                app:setMessageTime="@{conversationView}"
+                tools:text="12:41" />
 
             <ImageView
                 android:id="@+id/imageView5"
@@ -43,56 +46,33 @@
 
             <TextView
                 android:id="@+id/messageData"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:text="Data"
-                app:layout_constraintBottom_toBottomOf="@+id/messageStatus"
-                app:layout_constraintEnd_toStartOf="@+id/messageTiming"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toEndOf="@+id/messageStatus"
-                app:layout_constraintTop_toTopOf="@+id/messageStatus"
-                app:setMessageDataString="@{conversationView}" />
-
-            <ImageView
-                android:id="@+id/messageStatus"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginBottom="8dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-
-                tools:srcCompat="@tools:sample/avatars" />
+                app:layout_constraintEnd_toStartOf="@+id/messageTiming"
+                app:layout_constraintStart_toStartOf="@+id/conversationName"
+                app:layout_constraintTop_toBottomOf="@+id/conversationName"
+                app:setMessageDataString="@{conversationView}"
+                tools:text="Hello there"
+                style="@style/item_list_subheading" />
 
             <TextView
                 android:id="@+id/conversationName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="16dp"
-                android:text="Name"
-                android:textSize="18dp"
                 app:layout_constraintEnd_toStartOf="@+id/imageView5"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:setChatName="@{conversationView}" />
+                app:setChatName="@{conversationView}"
+                tools:text="Abhishek Jagushte"
+                style="@style/list_item_heading" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/profile_image"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
             android:src="@drawable/ic_person_black_24dp"
             app:civ_border_color="#FF000000"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            style="@style/display_picture_style" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

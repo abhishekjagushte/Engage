@@ -4,25 +4,19 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
-import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.abhishekjagushte.engage.EngageApplication
 import com.abhishekjagushte.engage.R
 import com.abhishekjagushte.engage.utils.Constants
 import com.abhishekjagushte.engage.utils.FilePathContract
-import com.google.android.material.appbar.AppBarLayout
 import kotlinx.android.synthetic.main.fragment_profile.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -66,7 +60,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         }
 
         var updated = false
-        viewModel.getProfileLive(username!!).observe(viewLifecycleOwner, Observer {
+        viewModel.getProfileLive(username!!).observe(viewLifecycleOwner, {
             it.let {
                 viewModel.setProfileDisplay(it, username!!)
                 if (it != null) {
@@ -82,7 +76,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         nameText.text = name as String
         usernameText.text = username
 
-        viewModel.actionStatus.observe(viewLifecycleOwner, Observer {
+        viewModel.actionStatus.observe(viewLifecycleOwner, {
             when (it) {
                 FRIEND_REQUEST_SENT -> {
                     button.text = application.resources.getString(R.string.sent)
@@ -98,7 +92,9 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
         lifecycleScope.launch {
             withContext(Dispatchers.IO){
-                image_progress_bar.visibility=View.VISIBLE
+                handler.post {
+                    image_progress_bar.visibility=View.VISIBLE
+                }
                 viewModel.getUpdatedProfile(username!!)
                 val profilePicUri =
                     FilePathContract.getContactsProfilePhotoUri(username!!)
@@ -107,12 +103,14 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                         display_picture_imageView.setImageURI(profilePicUri)
                     }
                 }
-                image_progress_bar.visibility=View.GONE
+                handler.post {
+                    image_progress_bar.visibility=View.GONE
+                }
 
             }
         }
 
-        viewModel.profileDisplay.observe(viewLifecycleOwner, Observer {
+        viewModel.profileDisplay.observe(viewLifecycleOwner, {
             if (it != null) {
                 nameText.text = it.name
                 usernameText.text = it.username
@@ -160,9 +158,5 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                 }
             }
         }
-    }
-
-    private fun getUpdatedProfile() {
-
     }
 }

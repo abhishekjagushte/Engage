@@ -12,7 +12,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.abhishekjagushte.engage.R
 import com.abhishekjagushte.engage.database.entities.Contact
 import com.abhishekjagushte.engage.databinding.ItemContactListBinding
+import com.abhishekjagushte.engage.repository.DataRepository
 import com.abhishekjagushte.engage.utils.Constants
+import com.abhishekjagushte.engage.utils.DisplayDisplayPictureUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -24,7 +26,8 @@ const val NOT_DECIDED = 2
 class ContactListAdapter(private val clickListener: ContactItemClickListener,
                          private val longClickListener: ContactLongItemClickListener,
                          private val mode: Int,
-                         val  context: Context
+                         val  context: Context,
+                         private val dataRepository: DataRepository
 ) :
     ListAdapter<ContactListDataItem, RecyclerView.ViewHolder> (ContactListDiffCallback()){
 
@@ -55,7 +58,7 @@ class ContactListAdapter(private val clickListener: ContactItemClickListener,
         when(holder){
             is ContactListItemViewHolder -> {
                 val item = getItem(position) as ContactListDataItem.ContactItem
-                holder.bind(item, clickListener)
+                holder.bind(item, clickListener, dataRepository)
             }
         }
     }
@@ -78,7 +81,8 @@ class ContactListItemViewHolder(val binding: ItemContactListBinding, private val
 
     fun bind(
         contactDataItem: ContactListDataItem.ContactItem,
-        clickListener: ContactItemClickListener
+        clickListener: ContactItemClickListener,
+        dataRepository: DataRepository
     ){
         this.contactDataItem = contactDataItem
         if(contactDataItem.selected) {
@@ -88,6 +92,8 @@ class ContactListItemViewHolder(val binding: ItemContactListBinding, private val
         else{
             binding.constraintLayout.background = binding.root.context.getDrawable(android.R.color.transparent)
         }
+
+        DisplayDisplayPictureUtil(dataRepository).setProfilePhoto121(contactDataItem.contact.username, binding.profileImage)
 
         binding.contact = contactDataItem.contact
         setupListeners(clickListener)

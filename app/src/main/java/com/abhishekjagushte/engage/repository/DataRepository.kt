@@ -175,11 +175,22 @@ class DataRepository @Inject constructor(
         return firebaseInstanceId.getNotificationChannelID()
     }
 
-    suspend fun updateProfilePhotoThumbnail(username: String, dpTimestamp: Long?): FileDownloadTask? {
-        dpTimestamp?.let {
-            return storageSource.updateProfilePhotoThumbnail(username, dpTimestamp)
+    fun updateProfilePhotoThumbnail(username: String) {
+        repoScope.launch {
+            withContext(Dispatchers.IO) {
+                when (val dpTimestamp = localDataSource.getDpTimeStamp(username)) {
+                    null -> storageSource.updateProfilePhotoThumbnail(username, 0)
+                    else -> storageSource.updateProfilePhotoThumbnail(username, dpTimestamp)
+                }
+            }
         }
-        return storageSource.updateProfilePhotoThumbnail(username, 0)
+    }
+
+    suspend fun updateProfilePhotoThumbnailTask(username: String): FileDownloadTask? {
+        return when (val dpTimestamp = localDataSource.getDpTimeStamp(username)) {
+            null -> storageSource.updateProfilePhotoThumbnail(username, 0)
+            else -> storageSource.updateProfilePhotoThumbnail(username, dpTimestamp)
+        }
     }
 
 

@@ -72,19 +72,6 @@ class ProfileFragmentViewModel @Inject constructor(
         }
     }
 
-
-    suspend fun loadProfileImage(username: String){
-        val dpTimestamp = dataRepository.getDpTimeStamp(username)
-        val task = dataRepository.updateProfilePhotoThumbnail(username, dpTimestamp)
-
-        task?.let{
-            it.addOnSuccessListener {
-
-            }
-        }
-
-    }
-
     fun addFriend() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {

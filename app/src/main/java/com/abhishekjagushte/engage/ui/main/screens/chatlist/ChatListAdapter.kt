@@ -14,6 +14,7 @@ import com.abhishekjagushte.engage.database.views.ConversationView
 import com.abhishekjagushte.engage.databinding.ConversationItemBinding
 import com.abhishekjagushte.engage.repository.DataRepository
 import com.abhishekjagushte.engage.utils.Constants
+import com.abhishekjagushte.engage.utils.DisplayDisplayPictureUtil
 import com.abhishekjagushte.engage.utils.FilePathContract
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -91,19 +92,16 @@ class ChatListItemViewHolder(
         if(conversationView.conType == Constants.CONVERSATION_TYPE_121){
             lifecycleCoroutineScope.launch {
                 withContext(Dispatchers.IO){
-                    dataRepository.updateProfilePhotoThumbnail(conversationView.conversationID, conversationView.dp_timeStamp)?.addOnSuccessListener {
-                        setProfilePhoto(conversationView)
-                    }
+                    dataRepository.updateProfilePhotoThumbnail(conversationView.conversationID)
+                    setProfilePhoto(conversationView)
+                    binding.executePendingBindings()
                 }
             }
         }
     }
 
     private fun setProfilePhoto(conversationView: ConversationView) {
-        val profilePicUri =
-            FilePathContract.getContactsProfilePhotoUri(conversationView.conversationID) //conversationID is username
-        if (profilePicUri != Uri.EMPTY)
-            binding.profileImage.setImageURI(profilePicUri)
+        DisplayDisplayPictureUtil(dataRepository).setProfilePhoto121(conversationView.conversationID, binding.profileImage)
     }
 
     companion object{
@@ -125,11 +123,13 @@ class ChatListItemViewHolder(
 }
 
 class ChatListDiffCallback: DiffUtil.ItemCallback<ChatListDataItem>() {
+    val TAG = "ChatListDiffCallback"
     override fun areItemsTheSame(oldItem: ChatListDataItem, newItem: ChatListDataItem): Boolean {
         return oldItem.id == newItem.id
     }
 
     override fun areContentsTheSame(oldItem: ChatListDataItem, newItem: ChatListDataItem): Boolean {
+        Log.d(TAG, "areContentsTheSame: ${oldItem.dp_timestamp} ${newItem.dp_timestamp}")
         return oldItem.lastMessageID == newItem.lastMessageID && oldItem.dp_timestamp == newItem.dp_timestamp
         //TODO consider the case when the last message content changes and you may have to include hwther the message is deleted
     }
