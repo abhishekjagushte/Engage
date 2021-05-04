@@ -119,5 +119,19 @@
         <item name="android:layout_marginBottom">8dp</item>
     </style>
 
+    <style name="style_type_box">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">10dp</item>
+        <item name="android:layout_marginBottom">10dp</item>
+        <item name="android:background">@drawable/chat_screen_box</item>
+        <item name="android:ems">10</item>
+        <item name="android:inputType">textLongMessage|textMultiLine</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:paddingBottom">10dp</item>
+    </style>
+
 
 </resources>

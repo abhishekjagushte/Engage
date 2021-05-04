@@ -8,10 +8,14 @@
 
     <EditText
         android:id="@+id/search_bar"
+        style="@style/style_type_box"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="top"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="16dp"
         android:hint="@string/search_for_friends"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/participantsRecyclerView" />
 
