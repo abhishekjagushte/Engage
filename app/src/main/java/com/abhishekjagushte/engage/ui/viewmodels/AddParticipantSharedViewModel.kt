@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.abhishekjagushte.engage.database.entities.Contact
-import com.abhishekjagushte.engage.database.entities.ContactNameUsername
+import com.abhishekjagushte.engage.database.entities.ContactDetails
 import com.abhishekjagushte.engage.network.CreateGroupRequest
 import com.abhishekjagushte.engage.repository.DataRepository
 import com.google.gson.Gson
@@ -38,8 +38,8 @@ class AddParticipantSharedViewModel /*@Inject constructor*/(
 
     val participantsHash = HashMap<String, Boolean>()
 
-    private val _participants = MutableLiveData<MutableList<ContactNameUsername>>()
-    val participants: LiveData<MutableList<ContactNameUsername>>
+    private val _participants = MutableLiveData<MutableList<ContactDetails>>()
+    val participants: LiveData<MutableList<ContactDetails>>
         get() = _participants
 
     private val _queryList = MutableLiveData<List<Contact>>()
@@ -84,7 +84,7 @@ class AddParticipantSharedViewModel /*@Inject constructor*/(
         }
     }
 
-    fun addParticipant(contact: ContactNameUsername){
+    fun addParticipant(contact: ContactDetails){
         participantsHash[contact.username] = true
         _participants.value?.add(contact)
         _participants.value = _participants.value
@@ -92,7 +92,7 @@ class AddParticipantSharedViewModel /*@Inject constructor*/(
         Log.d(TAG, "addParticipant: $contact ${participants.value}")
     }
 
-    fun removeParticipant(contact: ContactNameUsername){
+    fun removeParticipant(contact: ContactDetails){
         participantsHash.remove(contact.username)
         for(i in 0..participants.value!!.size)
         {

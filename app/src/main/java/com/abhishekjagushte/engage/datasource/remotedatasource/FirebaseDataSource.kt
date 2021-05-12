@@ -126,10 +126,14 @@ class FirebaseDataSource @Inject constructor(
         return query
     }
 
-    fun markReminderDone(eventID: String, myUsername: String): Task<Void> {
-        val query = firestore.collection("user/$myUsername/events121")
-            .document(eventID).update("status", Constants.REMINDER_STATUS_INACTIVE)
+//    fun markReminderDone(eventID: String, myUsername: String): Task<Void> {
+//        val query = firestore.collection("user/$myUsername/events121")
+//            .document(eventID).update("status", Constants.REMINDER_STATUS_INACTIVE)
+//
+//        return query
+//    }
 
-        return query
+    fun updateBioCloud(bio: String, myUsername: String): Task<Void> {
+        return firestore.document("users/$myUsername").update("bio", bio)
     }
 }

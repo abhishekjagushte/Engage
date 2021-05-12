@@ -36,6 +36,16 @@
         <item name="android:paddingBottom">10dp</item>
     </style>
 
+    <style name="general_input">
+        <item name="android:layout_width">300dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingLeft">16dp</item>
+        <item name="paddingEnd">16dp</item>
+        <item name="android:background">@drawable/edit_text</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+    </style>
+
     <style name="OuterEditText">
         <item name="android:layout_width">300dp</item>
         <item name="android:layout_height">wrap_content</item>
@@ -94,7 +104,11 @@
         <item name="android:background">@color/colorPrimaryDark</item>
     </style>
 
-    <style name="list_item_heading">
+    <style name="list_item">
+        <item name="android:textColor">@color/text_color_dark</item>
+    </style>
+
+    <style name="list_item.heading">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginStart">10dp</item>
@@ -102,13 +116,22 @@
         <item name="android:textSize">17sp</item>
     </style>
 
-    <style name="item_list_subheading">
+    <style name="list_item.heading.active">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/colorPrimaryDark</item>
+    </style>
+
+    <style name="list_item.subheading">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">16dp</item>
         <item name="android:layout_marginTop">8dp</item>
         <item name="android:layout_marginEnd">10dp</item>
         <item name="android:layout_marginBottom">8dp</item>
         <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="list_item.subheading.active">
+        <item name="android:textStyle">bold</item>
     </style>
 
     <style name="display_picture_style">
@@ -123,6 +146,7 @@
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginStart">10dp</item>
+        <item name="android:layout_marginEnd">10dp</item>
         <item name="android:layout_marginBottom">10dp</item>
         <item name="android:background">@drawable/chat_screen_box</item>
         <item name="android:ems">10</item>
@@ -133,5 +157,62 @@
         <item name="android:paddingBottom">10dp</item>
     </style>
 
+    <style name="message">
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="message.data">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:layout_marginStart">8dp</item>
+        <item name="android:layout_marginEnd">8dp</item>
+        <item name="android:layout_marginTop">3dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">match_parent</item>
+    </style>
+
+    <style name="message.time">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:layout_marginBottom">5dp</item>
+        <item name="android:layout_marginTop">2dp</item>
+        <item name="android:layout_marginEnd">8dp</item>
+    </style>
+
+    <style name="message.data.left">
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="message.data.left.image">
+        <item name="android:layout_width">0dp</item>
+    </style>
+
+    <style name="message.data.right.image">
+        <item name="android:layout_width">0dp</item>
+    </style>
+
+    <style name="message.data.right">
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <style name="message.time.left">
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="message.time.right">
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <style name="imageViewMessage">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">8dp</item>
+        <item name="android:layout_marginTop">5dp</item>
+        <item name="android:layout_marginEnd">8dp</item>
+        <item name="android:adjustViewBounds">true</item>
+        <item name="android:maxWidth">300dp</item>
+        <item name="android:maxHeight">300dp</item>
+        <item name="android:scaleType">fitCenter</item>
+    </style>
 
 </resources>

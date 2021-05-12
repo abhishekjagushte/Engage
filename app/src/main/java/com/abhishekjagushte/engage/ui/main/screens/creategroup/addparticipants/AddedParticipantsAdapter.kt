@@ -10,14 +10,14 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.abhishekjagushte.engage.database.entities.ContactNameUsername
+import com.abhishekjagushte.engage.database.entities.ContactDetails
 import com.abhishekjagushte.engage.databinding.ItemParticipantBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class AddedParticipantsAdapter(val clickListener: ParticipantRemoveListener) :
-    ListAdapter<ContactNameUsername, RecyclerView.ViewHolder>(ParticipantsDiffCallback()){
+    ListAdapter<ContactDetails, RecyclerView.ViewHolder>(ParticipantsDiffCallback()){
 
     private val adapterScope = CoroutineScope(Dispatchers.Default)
     private val TAG = "ChatListAdapter"
@@ -28,7 +28,7 @@ class AddedParticipantsAdapter(val clickListener: ParticipantRemoveListener) :
         return ParticipantViewHolder.from(parent)
     }
 
-    fun updateList(list: List<ContactNameUsername>?){
+    fun updateList(list: List<ContactDetails>?){
         adapterScope.launch {
             if(list!=null){
                 submitList(list)
@@ -54,7 +54,7 @@ class ParticipantViewHolder(val binding: ItemParticipantBinding): RecyclerView.V
 
     lateinit var navController: NavController
 
-    fun bind(participant: ContactNameUsername, clickListener: ParticipantRemoveListener){
+    fun bind(participant: ContactDetails, clickListener: ParticipantRemoveListener){
         binding.nickname.text = participant.name
         binding.cancelButton.setOnClickListener {
             clickListener.onClick(participant)
@@ -75,25 +75,25 @@ class ParticipantViewHolder(val binding: ItemParticipantBinding): RecyclerView.V
 
 }
 
-class ParticipantsDiffCallback: DiffUtil.ItemCallback<ContactNameUsername>() {
+class ParticipantsDiffCallback: DiffUtil.ItemCallback<ContactDetails>() {
 
     override fun areItemsTheSame(
-        oldItem: ContactNameUsername,
-        newItem: ContactNameUsername
+        oldItem: ContactDetails,
+        newItem: ContactDetails
     ): Boolean {
         return oldItem.username.equals(newItem.username)
     }
 
     override fun areContentsTheSame(
-        oldItem: ContactNameUsername,
-        newItem: ContactNameUsername
+        oldItem: ContactDetails,
+        newItem: ContactDetails
     ): Boolean {
         return oldItem.username.equals(newItem.username)
     }
 
 }
 
-class ParticipantRemoveListener(val clickListener: (participant: ContactNameUsername) -> Unit){
-    fun onClick(participant: ContactNameUsername) = clickListener(participant)
+class ParticipantRemoveListener(val clickListener: (participant: ContactDetails) -> Unit){
+    fun onClick(participant: ContactDetails) = clickListener(participant)
 }
 

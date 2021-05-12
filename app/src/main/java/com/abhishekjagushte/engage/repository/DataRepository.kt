@@ -222,6 +222,8 @@ class DataRepository @Inject constructor(
         return localDataSource.getContact(username)
     }
 
+
+
     fun getContactFirestoreFromUsername(username: String): Task<DocumentSnapshot> {
         return firebaseDataSource.getContactFirestoreFromUsername(username)
     }
@@ -230,9 +232,11 @@ class DataRepository @Inject constructor(
         localDataSource.updateContact(contact)
     }
 
-    fun getMydetails(): ContactNameUsername? {
+    fun getMydetails(): ContactDetails? {
         return localDataSource.getMyDetails()
     }
+
+
 
     fun addFriend(request: HashMap<String, Any>): Task<DocumentReference> {
         return firebaseDataSource.addFriend(request)
@@ -547,7 +551,7 @@ class DataRepository @Inject constructor(
     // Add Participants
     ///////////////////////////////////////////////////////////////////////////
 
-    fun searchForFriends(query: String): List<ContactNameUsername> {
+    fun searchForFriends(query: String): List<ContactDetails> {
         return localDataSource.searchForFriends(query)
     }
 
@@ -720,6 +724,15 @@ class DataRepository @Inject constructor(
 
     fun getDpTimeStamp(username: String): Long? {
         return localDataSource.getDpTimeStamp(username)
+    }
+
+    fun updateBioCloud(bio: String): Task<Void> {
+        val myDetails = getMydetails()!!
+        return firebaseDataSource.updateBioCloud(bio, myDetails.username)
+    }
+
+    fun updateMyBioLocal(bio: String) {
+        localDataSource.updateMyBioLocal(bio)
     }
 
 

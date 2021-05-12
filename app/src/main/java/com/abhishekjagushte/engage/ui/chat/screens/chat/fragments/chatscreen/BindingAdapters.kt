@@ -23,6 +23,7 @@ fun TextView.setDateTimeString(millis: Long) {
     }
 }
 
+
 @BindingAdapter("setSenderName")
 fun TextView.setSenderName(message: MessageView) {
     if (message.conType == Constants.CONVERSATION_TYPE_121)
@@ -36,3 +37,11 @@ fun TextView.setSenderName(message: MessageView) {
     }
 }
 
+@BindingAdapter("setImageMessageData")
+fun TextView.setImageMessageData(message: MessageView) {
+    if (message.data.isNullOrEmpty())
+        this.visibility = View.GONE
+    else {
+        text = message.data
+    }
+}

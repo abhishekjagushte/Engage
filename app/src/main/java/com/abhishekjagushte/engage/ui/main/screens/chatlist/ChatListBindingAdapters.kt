@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
+import com.abhishekjagushte.engage.R
 import com.abhishekjagushte.engage.database.views.ConversationView
 import com.abhishekjagushte.engage.utils.Constants
 import com.abhishekjagushte.engage.utils.StringFormatting
@@ -41,5 +42,19 @@ fun TextView.setChatName(conversationView: ConversationView){
 fun ImageView.setMessageStatusImage(conversationView: ConversationView){
     when(conversationView.type){
         Constants.TYPE_OTHER_MSG -> this.visibility = View.GONE
+    }
+}
+
+@BindingAdapter("setConversationHeadingFontStyle")
+fun TextView.setConversationHeadingFontStyle(conversationView: ConversationView){
+    if(conversationView.status == Constants.STATUS_RECEIVED_BUT_NOT_READ){
+        this.setTextAppearance(R.style.list_item_heading_active)
+    }
+}
+
+@BindingAdapter("setConversationSubheadingFontStyle")
+fun TextView.setConversationSubheadingFontStyle(conversationView: ConversationView){
+    if(conversationView.status == Constants.STATUS_RECEIVED_BUT_NOT_READ){
+        this.setTextAppearance(R.style.list_item_subheading_active)
     }
 }

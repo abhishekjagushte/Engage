@@ -44,13 +44,7 @@
 
     <EditText
         android:id="@+id/image_preview_message_input"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="5dp"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Name"
+        style="@style/style_type_box"
         app:layout_constraintBottom_toBottomOf="@+id/image_preview_fab"
         app:layout_constraintEnd_toStartOf="@+id/image_preview_fab"
         app:layout_constraintStart_toStartOf="parent"

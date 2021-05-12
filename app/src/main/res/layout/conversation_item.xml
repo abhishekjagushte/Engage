@@ -13,12 +13,18 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
         android:layout_height="wrap_content">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/dataContainer"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
             app:layout_constraintBottom_toBottomOf="@+id/profile_image"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/profile_image"
@@ -26,12 +32,11 @@
 
             <TextView
                 android:id="@+id/messageTiming"
-                android:layout_width="wrap_content"
-                android:layout_height="16dp"
-                android:textSize="14sp"
+                style="@style/list_item.subheading"
                 app:layout_constraintBottom_toBottomOf="@+id/messageData"
-                app:layout_constraintEnd_toEndOf="@+id/imageView5"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/messageData"
+                app:setConversationSubheadingFontStyle="@{conversationView}"
                 app:setMessageTime="@{conversationView}"
                 tools:text="12:41" />
 
@@ -46,33 +51,35 @@
 
             <TextView
                 android:id="@+id/messageData"
+                style="@style/list_item.subheading"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/messageTiming"
                 app:layout_constraintStart_toStartOf="@+id/conversationName"
                 app:layout_constraintTop_toBottomOf="@+id/conversationName"
+                app:setConversationSubheadingFontStyle="@{conversationView}"
                 app:setMessageDataString="@{conversationView}"
-                tools:text="Hello there"
-                style="@style/item_list_subheading" />
+                tools:text="Hello there" />
 
             <TextView
                 android:id="@+id/conversationName"
+                style="@style/list_item.heading"
                 app:layout_constraintEnd_toStartOf="@+id/imageView5"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:setChatName="@{conversationView}"
-                tools:text="Abhishek Jagushte"
-                style="@style/list_item_heading" />
+                app:setConversationHeadingFontStyle="@{conversationView}"
+                tools:text="Abhishek Jagushte" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/profile_image"
+            style="@style/display_picture_style"
             android:src="@drawable/ic_person_black_24dp"
             app:civ_border_color="#FF000000"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            style="@style/display_picture_style" />
+            app:layout_constraintTop_toTopOf="parent" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

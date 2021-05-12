@@ -21,6 +21,7 @@ import com.abhishekjagushte.engage.utils.ImageUtil
 import kotlinx.android.synthetic.main.fragment_settings.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
@@ -36,6 +37,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     lateinit var dataRepository: DataRepository
 
 
+    private var imageChanged: Boolean = false
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         (requireActivity().application as EngageApplication).appComponent.inject(this)
@@ -45,42 +48,81 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         super.onViewCreated(view, savedInstanceState)
 
         val uri = FilePathContract.getProfilePicturePath()
-        if(uri!= Uri.EMPTY)
+        if (uri != Uri.EMPTY)
             profile_image.setImageURI(uri)
 
-        change_profile_image.setOnClickListener() {
+        change_profile_image.setOnClickListener {
             findNavController().navigate(R.id.action_global_bottomSheet2)
         }
 
-        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Pair<Uri?, Bitmap?>>("returnedProfileImageFromSlider")?.observe(
-            viewLifecycleOwner) { result ->
+        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Pair<Uri?, Bitmap?>>(
+            "returnedProfileImageFromSlider"
+        )?.observe(
+            viewLifecycleOwner
+        ) { result ->
             result.second?.let {
                 profileImageUri = result.first
                 profile_image.setImageBitmap(it)
+                imageChanged = true
             }
         }
 
         val handler = Handler(Looper.myLooper()!!)
 
-        doneFAB.setOnClickListener {
-            val bio = bio_input.text.toString()
-            profileImageUri?.let{imageUri ->
-                lifecycleScope.launch {
-                    withContext(Dispatchers.IO){
-                        handler.post {
-                            progressBar2.visibility = View.VISIBLE
-                        }
-                        dataRepository.setProfilePicture(imageUri).addOnSuccessListener {
-                            saveFinalImage(imageUri)
-                            handler.post {
-                                progressBar2.visibility = View.GONE
-                                findNavController().navigateUp()
-                            }
-                        }
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                val myDetails = dataRepository.getMydetails()
+                myDetails?.let {
+                    handler.post {
+                        bio_input.setText(it.bio)
                     }
                 }
             }
         }
+
+        doneFAB.setOnClickListener {
+            val bio = bio_input.text.toString()
+                lifecycleScope.launch {
+                    withContext(Dispatchers.IO) {
+                        handler.post {
+                            progressBar2.visibility = View.VISIBLE
+                        }
+
+                        if (bio != dataRepository.getMydetails()!!.bio)
+                            dataRepository.updateBioCloud(bio).addOnSuccessListener {
+
+                                lifecycleScope.launch {
+                                    withContext(Dispatchers.IO) {
+                                        dataRepository.updateMyBioLocal(bio)
+
+                                        if (imageChanged)
+                                            updateImage(handler)
+                                        else {
+                                            handler.post {
+                                                progressBar2.visibility = View.GONE
+                                                findNavController().navigateUp()
+                                            }
+                                        }
+                                    }
+                                }
+
+                            }
+                        else
+                            updateImage(handler)
+                    }
+            }
+        }
+    }
+
+    private suspend fun updateImage(handler: Handler) {
+        dataRepository.setProfilePicture(profileImageUri!!)
+            .addOnSuccessListener {
+                saveFinalImage(profileImageUri!!)
+                handler.post {
+                    progressBar2.visibility = View.GONE
+                    findNavController().navigateUp()
+                }
+            }
     }
 
     private fun saveFinalImage(croppedImageUri: Uri): Uri {

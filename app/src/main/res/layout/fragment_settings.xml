@@ -35,18 +35,26 @@
             android:src="@drawable/ic_change_profile" />
     </RelativeLayout>
 
-    <com.google.android.material.textfield.TextInputLayout
-        style="@style/OuterEditText"
-        android:layout_marginTop="20dp"
+<!--    <com.google.android.material.textfield.TextInputLayout-->
+<!--        style="@style/OuterEditText"-->
+<!--        android:layout_marginTop="20dp"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/relativeLayout">-->
+
+<!--        <com.google.android.material.textfield.TextInputEditText-->
+<!--          -->
+<!--    </com.google.android.material.textfield.TextInputLayout>-->
+
+    <EditText
+        android:id="@+id/bio_input"
+        style="@style/general_input"
+        android:layout_marginTop="30dp"
+        android:hint="@string/bio"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/relativeLayout">
+        app:layout_constraintTop_toBottomOf="@+id/relativeLayout" />
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/bio_input"
-            style="@style/EditText"
-            android:hint="@string/bio" />
-    </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/doneFAB"

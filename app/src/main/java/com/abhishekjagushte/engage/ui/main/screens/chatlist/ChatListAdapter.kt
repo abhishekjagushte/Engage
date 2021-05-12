@@ -10,6 +10,7 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.abhishekjagushte.engage.R
 import com.abhishekjagushte.engage.database.views.ConversationView
 import com.abhishekjagushte.engage.databinding.ConversationItemBinding
 import com.abhishekjagushte.engage.repository.DataRepository
@@ -97,6 +98,9 @@ class ChatListItemViewHolder(
                     binding.executePendingBindings()
                 }
             }
+        }
+        else{
+            binding.profileImage.setImageDrawable(binding.root.resources.getDrawable(R.drawable.ic_groups_black_24dp))
         }
     }
 

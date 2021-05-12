@@ -4,6 +4,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
@@ -103,10 +104,12 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                         display_picture_imageView.setImageURI(profilePicUri)
                     }
                 }
+                else{
+                    Log.e(TAG, "onViewCreated: Empty")
+                }
                 handler.post {
                     image_progress_bar.visibility=View.GONE
                 }
-
             }
         }
 

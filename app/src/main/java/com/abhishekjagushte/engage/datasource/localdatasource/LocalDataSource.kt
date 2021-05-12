@@ -44,7 +44,7 @@ class LocalDataSource @Inject constructor (
         databaseDao.insertNewContact(contact)
     }
 
-    fun getMyDetails(): ContactNameUsername?{
+    fun getMyDetails(): ContactDetails?{
         return databaseDao.getMyDetails()
     }
 
@@ -252,7 +252,7 @@ class LocalDataSource @Inject constructor (
     // add participants
     ///////////////////////////////////////////////////////////////////////////
 
-    fun searchForFriends(query: String): List<ContactNameUsername> {
+    fun searchForFriends(query: String): List<ContactDetails> {
         return databaseDao.searchForFriends(query)
     }
 
@@ -457,5 +457,9 @@ class LocalDataSource @Inject constructor (
 
     fun getDpTimeStamp(username: String): Long? {
         return databaseDao.getDpTimeStamp(username)
+    }
+
+    fun updateMyBioLocal(bio: String) {
+        databaseDao.updateMyBioLocal(bio)
     }
 }

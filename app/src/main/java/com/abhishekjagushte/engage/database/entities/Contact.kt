@@ -32,9 +32,10 @@ class Contact(
     var selected: Boolean? = false
 }
 
-data class ContactNameUsername(
+data class ContactDetails(
     var name: String,
-    var username: String
+    var username: String,
+    var bio: String = ""
 )
 
 data class SearchResultContact(

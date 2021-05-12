@@ -36,8 +36,8 @@ interface DatabaseDao{
     @Update
     fun updateContact(contact: Contact)
 
-    @Query("SELECT name, username FROM contacts WHERE type == 0")
-    fun getMyDetails(): ContactNameUsername?
+    @Query("SELECT name, username, bio FROM contacts WHERE type == 0")
+    fun getMyDetails(): ContactDetails?
 
     // Search Queries
     //Pass username when type is 121 and pass networkID when M2M
@@ -105,8 +105,8 @@ interface DatabaseDao{
     ///////////////////////////////////////////////////////////////////////////
     // Search for friends
     ///////////////////////////////////////////////////////////////////////////
-    @Query("SELECT name, username FROM contacts WHERE type == 1 AND (name LIKE '%' || :query || '%' OR username LIKE '%' || :query || '%')")
-    fun searchForFriends(query: String): List<ContactNameUsername>
+    @Query("SELECT name, username, bio FROM contacts WHERE type == 1 AND (name LIKE '%' || :query || '%' OR username LIKE '%' || :query || '%')")
+    fun searchForFriends(query: String): List<ContactDetails>
 
     ///////////////////////////////////////////////////////////////////////////
     // Test
@@ -175,5 +175,8 @@ interface DatabaseDao{
 
     @Query("SELECT dp_timeStamp FROM contacts WHERE username=:username")
     fun getDpTimeStamp(username: String): Long?
+
+    @Query("UPDATE contacts SET bio = :bio WHERE type == 0")
+    fun updateMyBioLocal(bio: String)
 
 }

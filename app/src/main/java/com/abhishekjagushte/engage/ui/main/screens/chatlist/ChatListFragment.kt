@@ -2,7 +2,6 @@ package com.abhishekjagushte.engage.ui.main.screens.chatlist
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,10 +12,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.Navigation
 import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.NavigationUI
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.abhishekjagushte.engage.EngageApplication
 import com.abhishekjagushte.engage.R
@@ -25,6 +22,7 @@ import com.abhishekjagushte.engage.repository.DataRepository
 import com.google.android.material.appbar.AppBarLayout
 import kotlinx.android.synthetic.main.fragment_chat_list.*
 import javax.inject.Inject
+
 
 class ChatListFragment : Fragment() {
 
@@ -63,8 +61,17 @@ class ChatListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        recyclerView.layoutManager = LinearLayoutManager(context)
+        val layoutManager = LinearLayoutManager(context)
+        recyclerView.layoutManager = layoutManager
+
         chatListAdapter = ChatListAdapter(dataRepository, lifecycleScope)
+
+        val mDividerItemDecoration = DividerItemDecoration(
+            recyclerView.context,
+            layoutManager.orientation
+        )
+        recyclerView.addItemDecoration(mDividerItemDecoration)
+
         recyclerView.adapter = chatListAdapter
 
         observeChatList()

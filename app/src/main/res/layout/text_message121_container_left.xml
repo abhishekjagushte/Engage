@@ -35,11 +35,11 @@
                 android:id="@+id/message_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="18dp"
-                android:layout_marginTop="4dp"
                 android:text="@{message.data}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/sender_name_tv" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Hey, its Abhishek here from RGIT" />
 
             <TextView
                 android:id="@+id/time_tv"
@@ -49,6 +49,7 @@
                 android:layout_marginEnd="4dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                tools:text="17:10"
                 app:layout_constraintTop_toBottomOf="@+id/message_tv"
                 app:setTimeString="@{message}" />
 

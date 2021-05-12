@@ -1,21 +1,16 @@
 package com.abhishekjagushte.engage.ui.main.screens.creategroup.addparticipants
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.widget.Toolbar
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.navigation.Navigation
 import androidx.navigation.findNavController
 import androidx.navigation.navGraphViewModels
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.NavigationUI
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.abhishekjagushte.engage.R
-import com.abhishekjagushte.engage.database.entities.ContactNameUsername
+import com.abhishekjagushte.engage.database.entities.ContactDetails
 import com.abhishekjagushte.engage.ui.activity.MainActivity
 import com.abhishekjagushte.engage.ui.fragments.ContactListFragment
 import com.abhishekjagushte.engage.ui.fragments.adapters.ContactItemClickListener
@@ -23,7 +18,6 @@ import com.abhishekjagushte.engage.ui.fragments.adapters.ContactLongItemClickLis
 import com.abhishekjagushte.engage.ui.viewmodels.AddParticipantSharedViewModel
 import com.abhishekjagushte.engage.ui.viewmodels.factory.AddParticipantSharedViewModelFactory
 import com.abhishekjagushte.engage.utils.Constants
-import com.google.android.material.appbar.AppBarLayout
 import kotlinx.android.synthetic.main.fragment_add_participants.*
 
 class AddParticipantsFragment : Fragment(R.layout.fragment_add_participants) {
@@ -75,9 +69,9 @@ class AddParticipantsFragment : Fragment(R.layout.fragment_add_participants) {
     private fun initializeContactListFragment() {
         contactListFragment = ContactListFragment(ContactItemClickListener {
             if(sharedViewModel.participantsHash[it.username] == null)
-                sharedViewModel.addParticipant(ContactNameUsername(it.name, it.username))
+                sharedViewModel.addParticipant(ContactDetails(it.name, it.username))
             else
-                sharedViewModel.removeParticipant(ContactNameUsername(it.name, it.username))
+                sharedViewModel.removeParticipant(ContactDetails(it.name, it.username))
 
             sharedViewModel.query(search_bar.text.toString())
 
