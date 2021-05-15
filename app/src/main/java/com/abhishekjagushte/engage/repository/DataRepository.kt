@@ -49,6 +49,7 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.*
+import kotlinx.coroutines.tasks.await
 import org.json.JSONObject
 import java.io.File
 import java.util.*
@@ -268,7 +269,8 @@ class DataRepository @Inject constructor(
     }
 
 
-    fun addContact(contact: Contact) {
+    suspend fun addContact(contact: Contact) {
+        contact.dp_thmb_url = storageSource.getImageThumbnailDownloadURL(contact.username).await().toString()
         localDataSource.addContact(contact)
     }
 
@@ -447,7 +449,7 @@ class DataRepository @Inject constructor(
         }
     }
 
-    suspend fun setProfilePicture(profilePictureUri: Uri): UploadTask {
+    fun setProfilePicture(profilePictureUri: Uri): UploadTask {
         val myUsername = getMydetails()!!.username
         val path = "users/$myUsername.jpg"
         return storageSource.setProfilePicture(profilePictureUri, path)
@@ -735,5 +737,19 @@ class DataRepository @Inject constructor(
         localDataSource.updateMyBioLocal(bio)
     }
 
+    fun getImageThumbnailDownloadURL(username: String): Task<Uri> {
+        return storageSource.getImageThumbnailDownloadURL(username)
+    }
 
+    fun getImageDownloadURL(username: String): Task<Uri> {
+        return storageSource.getImageDownloadURL(username)
+    }
+
+    fun updateDpThumbnailURLIfDifferent(username: String, dpThmbUrl: String?) {
+        repoScope.launch {
+            withContext(Dispatchers.IO){
+                storageSource.updateDpThumbnailURLIfDifferent(username, dpThmbUrl)
+            }
+        }
+    }
 }

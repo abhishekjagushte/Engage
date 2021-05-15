@@ -21,7 +21,7 @@ class Contact(
     @ColumnInfo(defaultValue = "I am using Engage!")
     var bio: String = "I am using Engage!",
 
-    var dp_thmb: Bitmap? = null,
+    var dp_thmb_url:String? = null,
     var type: Int,
 
     var dp_timeStamp: Long? = null

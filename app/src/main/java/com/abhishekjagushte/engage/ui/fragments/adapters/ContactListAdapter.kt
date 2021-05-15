@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.DiffUtil
@@ -14,7 +15,7 @@ import com.abhishekjagushte.engage.database.entities.Contact
 import com.abhishekjagushte.engage.databinding.ItemContactListBinding
 import com.abhishekjagushte.engage.repository.DataRepository
 import com.abhishekjagushte.engage.utils.Constants
-import com.abhishekjagushte.engage.utils.DisplayDisplayPictureUtil
+import com.abhishekjagushte.engage.utils.GlideApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -37,7 +38,7 @@ class ContactListAdapter(private val clickListener: ContactItemClickListener,
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         Log.d(TAG, "onCreateViewHolder: Called")
         return when(viewType){
-            CHAT_LIST_ITEM -> ContactListItemViewHolder.from(parent, mode)
+            CHAT_LIST_ITEM -> ContactListItemViewHolder.from(parent, mode, dataRepository)
             else -> throw ClassCastException("Unknown viewType $viewType")
         }
     }
@@ -58,7 +59,7 @@ class ContactListAdapter(private val clickListener: ContactItemClickListener,
         when(holder){
             is ContactListItemViewHolder -> {
                 val item = getItem(position) as ContactListDataItem.ContactItem
-                holder.bind(item, clickListener, dataRepository)
+                holder.bind(item, clickListener)
             }
         }
     }
@@ -72,7 +73,11 @@ class ContactListAdapter(private val clickListener: ContactItemClickListener,
 
 }
 
-class ContactListItemViewHolder(val binding: ItemContactListBinding, private val mode: Int): RecyclerView.ViewHolder(binding.root){
+class ContactListItemViewHolder private constructor(
+    val binding: ItemContactListBinding,
+    private val mode: Int,
+    private val dataRepository: DataRepository
+): RecyclerView.ViewHolder(binding.root){
 
     lateinit var navController: NavController
 
@@ -81,24 +86,35 @@ class ContactListItemViewHolder(val binding: ItemContactListBinding, private val
 
     fun bind(
         contactDataItem: ContactListDataItem.ContactItem,
-        clickListener: ContactItemClickListener,
-        dataRepository: DataRepository
+        clickListener: ContactItemClickListener
     ){
         this.contactDataItem = contactDataItem
         if(contactDataItem.selected) {
             binding.constraintLayout.background =
-                binding.root.context.getDrawable(R.drawable.selected_background)
+                ContextCompat.getDrawable(binding.root.context, R.drawable.selected_background)
         }
         else{
-            binding.constraintLayout.background = binding.root.context.getDrawable(android.R.color.transparent)
+            ContextCompat.getDrawable(binding.root.context, android.R.color.transparent)
         }
 
-        DisplayDisplayPictureUtil(dataRepository).setProfilePhoto121(contactDataItem.contact.username, binding.profileImage)
+        setProfilePhoto(contact = contactDataItem.contact)
 
         binding.contact = contactDataItem.contact
         setupListeners(clickListener)
         binding.executePendingBindings()
     }
+
+    private fun setProfilePhoto(contact: Contact) {
+        GlideApp
+            .with(binding.root)
+            .load(contact.dp_thmb_url)
+            .placeholder(R.drawable.ic_mail_profile_picture_male)
+            .into(binding.profileImage)
+
+        if(contact.dp_thmb_url == null)
+            dataRepository.updateDpThumbnailURLIfDifferent(contact.username, contact.dp_thmb_url)
+    }
+
 
     private fun setupListeners(clickListener: ContactItemClickListener){
         when(mode){
@@ -107,10 +123,10 @@ class ContactListItemViewHolder(val binding: ItemContactListBinding, private val
                     clickListener.onClick(contactDataItem.contact)
                     if(!contactDataItem.selected){
                         binding.constraintLayout.background =
-                            binding.root.context.getDrawable(R.drawable.selected_background)
+                            ContextCompat.getDrawable(binding.root.context, R.drawable.selected_background)
                     }
                     else{
-                        binding.constraintLayout.background = binding.root.context.getDrawable(android.R.color.transparent)
+                            ContextCompat.getDrawable(binding.root.context, android.R.color.transparent)
                     }
                 }
             }
@@ -125,11 +141,11 @@ class ContactListItemViewHolder(val binding: ItemContactListBinding, private val
     }
 
     companion object{
-        fun from(parent: ViewGroup, mode: Int): ContactListItemViewHolder{
+        fun from(parent: ViewGroup, mode: Int, dataRepository: DataRepository): ContactListItemViewHolder{
             val layoutInflater = LayoutInflater.from(parent.context)
             val binding = ItemContactListBinding.inflate(layoutInflater, parent, false)
 
-            val vh = ContactListItemViewHolder(binding, mode)
+            val vh = ContactListItemViewHolder(binding, mode, dataRepository)
             vh.navController = Navigation.findNavController(parent)
             return vh
         }

@@ -7,6 +7,7 @@ import com.abhishekjagushte.engage.database.entities.Message
 import com.abhishekjagushte.engage.datasource.localdatasource.LocalDataSource
 import com.abhishekjagushte.engage.utils.Constants
 import com.abhishekjagushte.engage.utils.FilePathContract
+import com.google.android.gms.tasks.Task
 import com.google.firebase.storage.FileDownloadTask
 import com.google.firebase.storage.StorageMetadata
 import com.google.firebase.storage.StorageReference
@@ -91,6 +92,31 @@ class FirebaseStorageSource @Inject constructor(
             e.printStackTrace()
         }
         return null
+    }
+
+    fun getImageThumbnailDownloadURL(username: String): Task<Uri> {
+        val path = Constants.PROFILE_PHOTO_PATH_CLOUD + Constants.THUMBNAIL_PREFIX + username + ".jpg"
+        val ref = storage.child(path)
+        return ref.downloadUrl
+    }
+
+    fun getImageDownloadURL(username: String): Task<Uri> {
+        val path = Constants.PROFILE_PHOTO_PATH_CLOUD + username + ".jpg"
+        val ref = storage.child(path)
+
+        return ref.downloadUrl
+    }
+
+    suspend fun updateDpThumbnailURLIfDifferent(username: String, dpThmbUrl: String?) {
+        try {
+            val url = getImageThumbnailDownloadURL(username).await().toString()
+            if(dpThmbUrl!=url)
+                localDataSource.updateDpThumbnailURL(username, url)
+        }catch (e: Exception){
+            e.printStackTrace()
+            Log.e(TAG, "updateDpThumbnailURL: Dp does not exist")
+        }
+        
     }
 
 }

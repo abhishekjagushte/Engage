@@ -264,6 +264,10 @@ class LocalDataSource @Inject constructor (
         return databaseDao.getConfirmedContactsTest()
     }
 
+    fun getAllConfirmedContacts(): List<Contact> {
+        return databaseDao.getAllConfirmedContactsTest()
+    }
+
     fun createGroupLocal(request: CreateGroupRequest, pushed: Boolean) {
         //The initial Message will be set when the group will be pushed
         val conversation: Conversation?
@@ -461,5 +465,9 @@ class LocalDataSource @Inject constructor (
 
     fun updateMyBioLocal(bio: String) {
         databaseDao.updateMyBioLocal(bio)
+    }
+
+    fun updateDpThumbnailURL(username: String, url: String) {
+        databaseDao.updateDpThumbnailURL(username, url)
     }
 }

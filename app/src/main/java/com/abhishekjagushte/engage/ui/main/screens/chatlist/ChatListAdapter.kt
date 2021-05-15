@@ -1,6 +1,5 @@
 package com.abhishekjagushte.engage.ui.main.screens.chatlist
 
-import android.net.Uri
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -15,8 +14,7 @@ import com.abhishekjagushte.engage.database.views.ConversationView
 import com.abhishekjagushte.engage.databinding.ConversationItemBinding
 import com.abhishekjagushte.engage.repository.DataRepository
 import com.abhishekjagushte.engage.utils.Constants
-import com.abhishekjagushte.engage.utils.DisplayDisplayPictureUtil
-import com.abhishekjagushte.engage.utils.FilePathContract
+import com.abhishekjagushte.engage.utils.GlideApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -71,7 +69,7 @@ class ChatListAdapter(private val dataRepository: DataRepository, val lifecycleC
 class ChatListItemViewHolder(
     val binding: ConversationItemBinding,
     val dataRepository: DataRepository,
-    val lifecycleCoroutineScope: LifecycleCoroutineScope
+    private val lifecycleCoroutineScope: LifecycleCoroutineScope
 ): RecyclerView.ViewHolder(binding.root){
 
     lateinit var navController: NavController
@@ -86,26 +84,20 @@ class ChatListItemViewHolder(
             navController.navigate(ChatListFragmentDirections
                 .actionChatListFragmentToChatFragment(conversationView.conversationID))
         }
-
-        Log.d(TAG, "bind: Setting here")
+        Log.e(TAG, "bind: ${conversationView.dp_thmb_url}", )
         setProfilePhoto(conversationView)
-
-        if(conversationView.conType == Constants.CONVERSATION_TYPE_121){
-            lifecycleCoroutineScope.launch {
-                withContext(Dispatchers.IO){
-                    dataRepository.updateProfilePhotoThumbnail(conversationView.conversationID)
-                    setProfilePhoto(conversationView)
-                    binding.executePendingBindings()
-                }
-            }
-        }
-        else{
-            binding.profileImage.setImageDrawable(binding.root.resources.getDrawable(R.drawable.ic_groups_black_24dp))
-        }
     }
 
     private fun setProfilePhoto(conversationView: ConversationView) {
-        DisplayDisplayPictureUtil(dataRepository).setProfilePhoto121(conversationView.conversationID, binding.profileImage)
+        GlideApp
+            .with(binding.root)
+            .load(conversationView.dp_thmb_url)
+            .placeholder(R.drawable.ic_mail_profile_picture_male)
+            .into(binding.profileImage)
+
+        if(conversationView.conType==Constants.CONVERSATION_TYPE_121)
+            if(conversationView.dp_thmb_url == null)
+                dataRepository.updateDpThumbnailURLIfDifferent(conversationView.conversationID, conversationView.dp_thmb_url)
     }
 
     companion object{

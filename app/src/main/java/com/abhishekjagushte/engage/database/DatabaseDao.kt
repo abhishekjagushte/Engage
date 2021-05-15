@@ -179,4 +179,11 @@ interface DatabaseDao{
     @Query("UPDATE contacts SET bio = :bio WHERE type == 0")
     fun updateMyBioLocal(bio: String)
 
+
+    @Query("SELECT * FROM contacts WHERE type == 1")
+    fun getAllConfirmedContactsTest(): List<Contact>
+
+    @Query("UPDATE contacts SET dp_thmb_url = :url WHERE username = :username")
+    fun updateDpThumbnailURL(username: String, url: String)
+
 }

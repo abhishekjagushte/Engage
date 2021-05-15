@@ -48,6 +48,7 @@ class ProfileFragmentViewModel @Inject constructor(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
 
+                //If the contact is not available locally
                 if (contact == null) {
                     //In case of unknown contacts
                     dataRepository.getContactFirestoreFromUsername(username)
@@ -89,8 +90,8 @@ class ProfileFragmentViewModel @Inject constructor(
                     viewModelScope.launch {
                         withContext(Dispatchers.IO) {
                             dataRepository.addContact(networkProfile!!.convertDomainObject(Constants.CONTACTS_REQUESTED))
+                            _profileDisplay.value!!.type = Constants.CONTACTS_REQUESTED
                         }
-                        _profileDisplay.value!!.type = Constants.CONTACTS_REQUESTED
                     }
                 }
             }
@@ -118,8 +119,8 @@ class ProfileFragmentViewModel @Inject constructor(
                         withContext(Dispatchers.IO) {
                             localContact.type = Constants.CONTACTS_CONFIRMED
                             dataRepository.addContact(localContact)
+                            _profileDisplay.value!!.type = Constants.CONTACTS_CONFIRMED
                         }
-                        _profileDisplay.value!!.type = Constants.CONTACTS_CONFIRMED
                     }
                 }
             }
@@ -134,12 +135,12 @@ class ProfileFragmentViewModel @Inject constructor(
                     val profile = it.toObject(Profile::class.java)
                     if (profile != null) {
                         networkProfile = profile
-                        //this won't happen if localcontact isnt initialized
+                        //this won't happen if localcontact isn't initialized
                         try {
                             val p = networkProfile!!.convertDomainObject(localContact.type)
                             localContact.name = p.name
                             localContact.bio = p.bio
-                            localContact.dp_thmb = p.dp_thmb
+                            localContact.dp_thmb_url = p.dp_thmb_url
                             localContact.networkID = p.networkID
                             localContact.dp_timeStamp = p.dp_timeStamp
                             viewModelScope.launch {
@@ -154,6 +155,12 @@ class ProfileFragmentViewModel @Inject constructor(
                 }
             }
         }
+
+    fun test() {
+        dataRepository.getImageThumbnailDownloadURL("rheaseahorn").addOnSuccessListener {
+            Log.e(TAG, "test: $it", )
+        }
+    }
 }
 
 
@@ -172,6 +179,7 @@ fun Contact.convertToProfileDisplay(): ProfileDisplay {
         name = this.name,
         username = this.username,
         bio = this.bio,
+        dp_thmb_url = this.dp_thmb_url,
         timeStampString = timeStampString,
         type = this.type
     )
@@ -190,41 +198,8 @@ fun Profile.convertToProfileDisplay(type: Int): ProfileDisplay {
 data class ProfileDisplay(
     val name: String,
     val username: String,
-    val dp_thmb: Uri? = null,
+    val dp_thmb_url: String?=null,
     val bio: String,
     val timeStampString: String,
     var type: Int
 )
-
-/*
-      dataRepository.getContactFirestoreFromUsername(username)
-                                .addOnSuccessListener {
-                                    if (it != null) {
-                                        val profile = it.toObject(Profile::class.java)
-                                        if (profile != null) {
-                                            Log.d(TAG, "${profile.name} ${profile.username}")
-
-                                            networkProfile = profile
-                                            //This part is for updating contact information
-                                            val networkProfileDisplay = profile.convertToProfileDisplay(contact.type)
-
-                                            if(!localProfileDisplay.equals(networkProfileDisplay)){
-                                                _profileDisplay.postValue(networkProfileDisplay)
-                                                Log.d(TAG, "Changed + ${networkProfileDisplay.timeStampString}")
-                                                contact.bio = networkProfileDisplay.bio
-                                                contact.dp_thmb = networkProfileDisplay.dp_thmb
-                                                contact.name = networkProfileDisplay.name
-                                                viewModelScope.launch {
-                                                    withContext(Dispatchers.IO){
-                                                        dataRepository.updateContact(contact)
-                                                        updated = true//Ensures no infinite loop
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        Log.d(TAG, profile.toString())
-                                    }
-                                }
- */
-
-

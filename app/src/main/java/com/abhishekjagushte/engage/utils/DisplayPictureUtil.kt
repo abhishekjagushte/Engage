@@ -6,11 +6,11 @@ import com.abhishekjagushte.engage.repository.DataRepository
 import de.hdodenhof.circleimageview.CircleImageView
 import kotlinx.coroutines.*
 
-class DisplayDisplayPictureUtil(
+class DisplayPictureUtil(
     private val dataRepository: DataRepository
 ) {
 
-    val TAG = "DisplayDisplayPictureUtil"
+    val TAG = "DisplayPictureUtil"
     val job = Job()
     val scope = CoroutineScope(job + Dispatchers.Main)
 
