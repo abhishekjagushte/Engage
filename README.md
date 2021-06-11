@@ -11,3 +11,4 @@ Currently implemented:
 6. Notifications via FCM
 7. One to One Chats
 8. Group Chats
+9. Events Feature to remind someone at specific time.
